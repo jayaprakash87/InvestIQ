@@ -51,7 +51,10 @@ def forward_pe(*, price: float, forward_eps: float) -> float:
     """Forward P/E proxy, valid only for positive forward earnings per share."""
     _positive(price, "price")
     _positive(forward_eps, "forward_eps")
-    return price / forward_eps
+    multiple = price / forward_eps
+    if not isfinite(multiple):
+        raise ValueError("calculated P/E multiple must be finite")
+    return multiple
 
 
 def cagr(*, start_value: float, end_value: float, years: int) -> float:
@@ -64,7 +67,10 @@ def cagr(*, start_value: float, end_value: float, years: int) -> float:
     _years(years)
     if end_value < 0:
         raise ValueError("end_value cannot be negative")
-    return (end_value / start_value) ** (1 / years) - 1
+    ratio = end_value / start_value
+    if not isfinite(ratio):
+        raise ValueError("growth ratio must be finite")
+    return ratio ** (1 / years) - 1
 
 
 def annualized_return(*, total_return: float, years: int) -> float:
@@ -90,7 +96,10 @@ def scenario_return(
     Invalid for non-positive earnings or where P/E is not economically relevant.
     """
     _positive(initial_price, "initial_price")
-    return _terminal_price(start_eps, annual_eps_growth, years, terminal_pe) / initial_price - 1
+    result = _terminal_price(start_eps, annual_eps_growth, years, terminal_pe) / initial_price - 1
+    if not isfinite(result):
+        raise ValueError("calculated price return must be finite")
+    return result
 
 
 def required_eps_growth(
@@ -115,7 +124,13 @@ def required_eps_growth(
     required_terminal_price = initial_price * (1 + target_annual_return) ** years
     if not isfinite(required_terminal_price):
         raise ValueError("required terminal price must be finite")
-    return (required_terminal_price / (start_eps * terminal_pe)) ** (1 / years) - 1
+    denominator = start_eps * terminal_pe
+    if denominator == 0 or not isfinite(denominator):
+        raise ValueError("invalid reverse-valuation denominator")
+    ratio = required_terminal_price / denominator
+    if not isfinite(ratio):
+        raise ValueError("required growth ratio must be finite")
+    return ratio ** (1 / years) - 1
 
 
 @dataclass(frozen=True, slots=True)

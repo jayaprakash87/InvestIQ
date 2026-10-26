@@ -122,3 +122,19 @@ def test_invalid_scenario_assumptions() -> None:
     ]:
         with pytest.raises(ValueError):
             ValuationScenario(*values)
+
+def test_extreme_finite_inputs_cannot_generate_infinite_outputs() -> None:
+    with pytest.raises(ValueError, match="multiple must be finite"):
+        forward_pe(price=1e308, forward_eps=1e-308)
+    with pytest.raises(ValueError, match="growth ratio"):
+        cagr(start_value=1e-308, end_value=1e308, years=3)
+    with pytest.raises(ValueError, match="price return must be finite"):
+        scenario_return(
+            start_eps=1e308, annual_eps_growth=0, years=2,
+            terminal_pe=1, initial_price=1e-308,
+        )
+    with pytest.raises(ValueError, match="denominator"):
+        required_eps_growth(
+            start_eps=1e-308, years=3, terminal_pe=1e-308,
+            initial_price=75, target_annual_return=0.1,
+        )
