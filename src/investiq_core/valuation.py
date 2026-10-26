@@ -6,9 +6,9 @@ Results are scenarios, not investment advice or statistical predictions.
 No cash dividends, repurchases, dilution or transaction costs are modelled.
 """
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from math import isclose, isfinite
-from typing import Iterable
 
 
 def _finite(value: float, label: str) -> None:
