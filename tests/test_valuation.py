@@ -138,3 +138,17 @@ def test_extreme_finite_inputs_cannot_generate_infinite_outputs() -> None:
             start_eps=1e-308, years=3, terminal_pe=1e-308,
             initial_price=75, target_annual_return=0.1,
         )
+
+
+def test_annualized_scenario_loss_avoids_cancellation_to_minus_one() -> None:
+    """A tiny positive terminal value must preserve the annualized loss rate."""
+    analysis = evaluate_scenarios(
+        start_eps=1, initial_price=1, years=60,
+        scenarios=[ValuationScenario("decline", -0.5, 1, 1)],
+    )
+    outcome = analysis.outcomes[0]
+    assert outcome.terminal_price > 0
+    # The cumulative return rounds to -100%, but annualization need not.
+    assert outcome.total_price_return == -1.0
+    assert outcome.annualized_price_return == pytest.approx(-0.5)
+    assert analysis.annualized_return_on_expected_price == pytest.approx(-0.5)

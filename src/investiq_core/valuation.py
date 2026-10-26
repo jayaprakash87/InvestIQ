@@ -204,8 +204,8 @@ def evaluate_scenarios(
                 probability=scenario.probability,
                 terminal_price=terminal_price,
                 total_price_return=total_return,
-                annualized_price_return=annualized_return(
-                    total_return=total_return, years=years
+                annualized_price_return=cagr(
+                    start_value=initial_price, end_value=terminal_price, years=years
                 ),
             )
         )
