@@ -164,8 +164,13 @@ class FinancialObservation:
         if (self.period_start is None) != (self.period_end is None):
             raise ValueError("fiscal periods require both start and end")
         if self.period_start is not None:
-            if not isinstance(self.period_start, date) or not isinstance(self.period_end, date):
-                raise ValueError("fiscal period endpoints must be dates")
+            if (
+                not isinstance(self.period_start, date)
+                or not isinstance(self.period_end, date)
+                or isinstance(self.period_start, datetime)
+                or isinstance(self.period_end, datetime)
+            ):
+                raise ValueError("fiscal period endpoints must be dates, not datetimes")
             if self.period_start > self.period_end:
                 raise ValueError("fiscal period start must not follow end")
         if self.supersedes is not None:
@@ -332,5 +337,14 @@ def observations_as_of(
         and (basis == "public" or item.recorded_at <= cutoff)
     ]
     ids = {item.observation_id for item in visible}
-    superseded = {item.supersedes for item in visible if item.supersedes in ids}
+    superseded: set[str] = set()
+    for item in visible:
+        ancestor_id = item.supersedes
+        while ancestor_id is not None:
+            if ancestor_id in ids:
+                superseded.add(ancestor_id)
+            ancestor = indexed.get(ancestor_id)
+            if ancestor is None:
+                break
+            ancestor_id = ancestor.supersedes
     return tuple(item for item in visible if item.observation_id not in superseded)

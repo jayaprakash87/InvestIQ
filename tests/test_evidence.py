@@ -164,3 +164,37 @@ def test_cross_instrument_revision_is_rejected() -> None:
     )
     with pytest.raises(ValueError, match="revision must preserve"):
         observations_as_of([first, revision], cutoff=time(2026, 1, 1))
+
+def test_datetime_fiscal_endpoints_do_not_corrupt_wire_roundtrip() -> None:
+    with pytest.raises(ValueError, match="not datetimes"):
+        sample(period_start=time(2024, 10, 1), period_end=time(2024, 12, 31))
+
+
+def test_transitive_supersession_across_late_backfill() -> None:
+    v1 = sample()
+    v2_source = EvidenceSource(
+        reference="synthetic:v2",
+        publisher="Synthetic example",
+        published_at=time(2025, 3, 10),
+        retrieved_at=time(2025, 3, 11),
+    )
+    v3_source = EvidenceSource(
+        reference="synthetic:v3",
+        publisher="Synthetic example",
+        published_at=time(2025, 3, 20),
+        retrieved_at=time(2025, 3, 21),
+    )
+    v2 = replace(
+        v1, observation_id="rev-2", value=Decimal("123"),
+        source=v2_source, publicly_available_at=time(2025, 3, 10),
+        recorded_at=time(2025, 4, 10), supersedes="rev-1",
+    )
+    v3 = replace(
+        v1, observation_id="rev-3", value=Decimal("122"),
+        source=v3_source, publicly_available_at=time(2025, 3, 20),
+        recorded_at=time(2025, 3, 22), supersedes="rev-2",
+    )
+    # v2 is excluded from recorded view, but its lineage is still meaningful.
+    assert observations_as_of(
+        [v1, v2, v3], cutoff=time(2025, 3, 30), basis="recorded"
+    ) == (v3,)
