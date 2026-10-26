@@ -96,3 +96,56 @@ def test_snapshot_corruption_detected() -> None:
     bundle["thesis_history"][0]["statement"] = "Silently rewritten history"
     with pytest.raises(ValueError, match="ancestry"):
         validate_bundle(bundle)
+
+def _select_unreferenced_growth(bundle: dict, evidence_id: str) -> None:
+    """Make valuation depend on a hypothesis unused by report and thesis."""
+    alternative = deepcopy(bundle["assumptions"][0])
+    alternative["assumption_id"] = "synthetic:valuation-only-growth"
+    alternative["evidence_ids"] = [evidence_id]
+    bundle["assumptions"].append(alternative)
+    bundle["valuation"]["base_growth_assumption_id"] = alternative["assumption_id"]
+
+
+def test_valuation_only_assumption_rejects_unknown_support() -> None:
+    bundle = build_synthetic_bundle()
+    _select_unreferenced_growth(bundle, "synthetic:nonexistent-support")
+    with pytest.raises(ValueError, match="growth supporting evidence"):
+        validate_bundle(bundle)
+
+
+def test_valuation_only_assumption_rejects_foreign_instrument_support() -> None:
+    bundle = build_synthetic_bundle()
+    foreign = deepcopy(bundle["evidence"][0])
+    foreign["observation_id"] = "synthetic:foreign-eps"
+    foreign["instrument"]["ticker"] = "OTHER"
+    foreign["instrument"]["venue"] = "XNYS"
+    bundle["evidence"].append(foreign)
+    _select_unreferenced_growth(bundle, "synthetic:foreign-eps")
+    with pytest.raises(ValueError, match="supporting evidence instrument"):
+        validate_bundle(bundle)
+
+
+def test_valuation_only_assumption_rejects_future_public_support() -> None:
+    bundle = build_synthetic_bundle()
+    future = deepcopy(bundle["evidence"][0])
+    future["observation_id"] = "synthetic:late-eps"
+    future["source"]["published_at"] = "2025-03-05T12:00:00+00:00"
+    future["source"]["retrieved_at"] = "2025-03-06T12:00:00+00:00"
+    future["publicly_available_at"] = "2025-03-05T12:00:00+00:00"
+    future["recorded_at"] = "2025-03-06T12:00:00+00:00"
+    bundle["evidence"].append(future)
+    _select_unreferenced_growth(bundle, "synthetic:late-eps")
+    with pytest.raises(ValueError, match="not publicly available at creation"):
+        validate_bundle(bundle)
+
+
+def test_valuation_only_assumption_rejects_late_recorded_support() -> None:
+    bundle = build_synthetic_bundle()
+    late = deepcopy(bundle["evidence"][0])
+    late["observation_id"] = "synthetic:late-record-eps"
+    late["recorded_at"] = "2025-03-08T12:00:00+00:00"
+    bundle["evidence"].append(late)
+    _select_unreferenced_growth(bundle, "synthetic:late-record-eps")
+    assert validate_bundle(bundle, basis="public")["validation"] == "structural_only"
+    with pytest.raises(ValueError, match="not recorded at creation"):
+        validate_bundle(bundle, basis="recorded")

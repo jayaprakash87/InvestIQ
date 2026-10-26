@@ -234,6 +234,21 @@ def validate_bundle(
         or growth.created_at > report.as_of
     ):
         raise ValueError("base growth hypothesis is inconsistent with report")
+    # Validate support even when the valuation hypothesis is not cited by
+    # the narrative report or thesis. Those validators only traverse cited IDs.
+    for supporting_id in growth.evidence_ids:
+        supporting = [
+            item for item in observations if item.observation_id == supporting_id
+        ]
+        if len(supporting) != 1:
+            raise ValueError("unknown or duplicate growth supporting evidence ID")
+        item = supporting[0]
+        if item.instrument != growth.instrument:
+            raise ValueError("growth supporting evidence instrument mismatch")
+        if item.publicly_available_at > growth.created_at:
+            raise ValueError("growth supporting evidence not publicly available at creation")
+        if basis == "recorded" and item.recorded_at > growth.created_at:
+            raise ValueError("growth supporting evidence not recorded at creation")
     scenario_records = valuation["scenarios"]
     if not isinstance(scenario_records, list):
         raise TypeError("valuation scenarios must be a JSON array")

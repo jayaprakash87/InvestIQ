@@ -2,6 +2,17 @@
 
 The software is under active development. The public API may evolve; use versioned research bundles.
 
+## [0.1.1] — 2026-10-26
+
+Maintenance release improving provenance validation and safe, repeatable release publication.
+
+### Fixed
+- Verify the cited financial support for a valuation-only growth assumption, even when that hypothesis is not present in the narrative report or thesis; enforce evidence identity, instrument and historical availability.
+- Verify that an existing remote release tag points to the exact tested source commit before uploading artifacts, especially when recovering an incomplete release.
+
+### Compatibility
+The JSON bundle format remains `schema_version: "0.1"`. No account, brokerage or live-data integration has been added.
+
 ## [0.1.0] — 2026-10-26
 
 First public research-toolkit release.

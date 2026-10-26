@@ -1,16 +1,16 @@
-name: Publish verified v0.1.0
+name: Publish verified release
 
 on:
   push:
     branches: [main]
     paths:
-      - ".release/v0.1.0.json"
+      - ".release/v*.json"
 
 permissions:
   contents: write
 
 concurrency:
-  group: investiq-release-v0.1.0
+  group: investiq-publish
   cancel-in-progress: false
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Check out release commit
+      - name: Check out exact release commit
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
@@ -27,23 +27,45 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - name: Install project and build tooling
-        run: python -m pip install -e ".[dev]"
-      - name: Check release manifest and package version
+      - name: Select newly added release intent
+        id: manifest
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
         run: |
-          python - <<'PY'
+          set -euo pipefail
+          changed="$(git diff --name-only --diff-filter=A "$BEFORE_SHA" "$GITHUB_SHA" -- '.release/v*.json')"
+          if [[ -z "$changed" || "$changed" == *$'\n'* ]]; then
+            echo "Expected exactly one newly added release manifest." >&2
+            exit 1
+          fi
+          RELEASE_FILE="$changed" python - <<'PY'
           import json
+          import os
+          import re
           import tomllib
           from pathlib import Path
 
-          manifest = json.loads(Path(".release/v0.1.0.json").read_text())
+          file = Path(os.environ["RELEASE_FILE"])
+          intent = json.loads(file.read_text(encoding="utf-8"))
           project = tomllib.loads(Path("pyproject.toml").read_text())["project"]
-          assert manifest["version"] == project["version"] == "0.1.0"
-          assert manifest["tag"] == "v0.1.0"
-          assert manifest["package"] == project["name"] == "investiq-core"
-          assert Path(manifest["release_notes"]).is_file()
-          print("Release manifest and package version verified.")
+          version = project["version"]
+          tag = intent["tag"]
+          notes = intent["release_notes"]
+          if not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag):
+              raise SystemExit("Invalid release tag")
+          if intent["version"] != version or tag != f"v{version}":
+              raise SystemExit("Release intent does not match the packaged version")
+          if intent["package"] != project["name"] or project["name"] != "investiq-core":
+              raise SystemExit("Unexpected package name")
+          if notes != f"docs/releases/{tag}.md" or not Path(notes).is_file():
+              raise SystemExit("Missing or inconsistent release notes")
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as out:
+              print(f"tag={tag}", file=out)
+              print(f"notes={notes}", file=out)
+          print(f"Verified release intent: {tag}")
           PY
+      - name: Install project and build tooling
+        run: python -m pip install -e ".[dev]"
       - name: Run release acceptance checks
         run: |
           ruff check .
@@ -51,24 +73,32 @@ jobs:
           investiq demo --output /tmp/investiq-release-example.json
           investiq validate /tmp/investiq-release-example.json --basis recorded
           python -m build --sdist --wheel
-      - name: Publish v0.1.0 tag and GitHub release
+      - name: Tag only the tested commit and publish release
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.manifest.outputs.tag }}
+          NOTES: ${{ steps.manifest.outputs.notes }}
         run: |
           set -euo pipefail
-          tag="v0.1.0"
-          if gh release view "$tag" >/dev/null 2>&1; then
-            echo "Release $tag already exists; no changes made." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          if ! git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
+            git fetch origin "refs/tags/$TAG:refs/tags/$TAG"
+            actual="$(git rev-parse "$TAG^{commit}")"
+            if [[ "$actual" != "$GITHUB_SHA" ]]; then
+              echo "Existing tag points to $actual, not tested commit $GITHUB_SHA" >&2
+              exit 1
+            fi
+          else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag -a "$tag" -m "InvestIQ v0.1.0 public research toolkit"
-            git push origin "refs/tags/$tag"
+            git tag -a "$TAG" -m "InvestIQ $TAG verified research toolkit"
+            git push origin "refs/tags/$TAG"
           fi
-          gh release create "$tag" dist/* \
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; no artifacts changed." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          gh release create "$TAG" dist/* \
             --verify-tag \
-            --title "InvestIQ v0.1.0" \
-            --notes-file docs/releases/v0.1.0.md
-          echo "Published $tag with source and wheel distributions." >> "$GITHUB_STEP_SUMMARY"
+            --title "InvestIQ $TAG" \
+            --notes-file "$NOTES"
+          echo "Published tested commit $GITHUB_SHA as $TAG." >> "$GITHUB_STEP_SUMMARY"
