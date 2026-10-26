@@ -107,7 +107,7 @@ def test_future_observation_and_future_hypothesis_rejected() -> None:
 
 
 def test_recorded_basis_is_stricter_than_public_basis() -> None:
-    obs, assumption, report = example()
+    obs, _, report = example()
     cutoff = at(2)
     report = replace(report, as_of=cutoff, findings=(report.findings[0],))
     validate_research_report(report, evidence=[obs])
@@ -185,3 +185,15 @@ def test_report_does_not_accept_bare_ticker_or_unknown_skill() -> None:
         replace(report, skill="personal-stock-picker")
     with pytest.raises(ValueError, match="InstrumentId"):
         replace(report, subjects=("DEMO",))
+
+
+def test_invalid_json_arrays_are_not_reinterpreted_as_characters() -> None:
+    _, _, report = example()
+    record = report.to_record()
+    record["findings"][0]["evidence_ids"] = "revenue-1"
+    with pytest.raises(ValueError, match="must be arrays"):
+        ResearchReport.from_record(record)
+    record = report.to_record()
+    record["questions"] = "What is known?"
+    with pytest.raises(ValueError, match="must be arrays"):
+        ResearchReport.from_record(record)

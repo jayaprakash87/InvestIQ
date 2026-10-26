@@ -68,7 +68,7 @@ class ResearchFinding:
         _text(self.finding_id, "finding_id")
         _text(self.text, "text")
         if not isinstance(self.kind, FindingKind):
-            raise ValueError("kind must be a FindingKind")
+            raise TypeError("kind must be a FindingKind")
         _ids(self.evidence_ids, "evidence_ids")
         _ids(self.assumption_ids, "assumption_ids")
 
@@ -83,12 +83,16 @@ class ResearchFinding:
 
     @classmethod
     def from_record(cls, record: Mapping[str, Any]) -> ResearchFinding:
+        evidence_ids = record.get("evidence_ids", [])
+        assumption_ids = record.get("assumption_ids", [])
+        if not isinstance(evidence_ids, list) or not isinstance(assumption_ids, list):
+            raise ValueError("JSON evidence_ids and assumption_ids must be arrays")
         return cls(
             finding_id=record["finding_id"],
             kind=FindingKind(record["kind"]),
             text=record["text"],
-            evidence_ids=tuple(record.get("evidence_ids", [])),
-            assumption_ids=tuple(record.get("assumption_ids", [])),
+            evidence_ids=tuple(evidence_ids),
+            assumption_ids=tuple(assumption_ids),
         )
 
 
@@ -118,7 +122,7 @@ class ResearchReport:
         if len(ids) != len(set(ids)):
             raise ValueError("finding_id must be unique within a report")
         if not isinstance(self.questions, tuple):
-            raise ValueError("questions must be a tuple")
+            raise TypeError("questions must be a tuple")
         for question in self.questions:
             _text(question, "question")
         if self.skill == "peer-comparison" and len(self.subjects) < 2:
@@ -142,12 +146,17 @@ class ResearchReport:
 
     @classmethod
     def from_record(cls, record: Mapping[str, Any]) -> ResearchReport:
+        subjects = record["subjects"]
+        findings = record["findings"]
+        questions = record.get("questions", [])
+        if any(not isinstance(value, list) for value in (subjects, findings, questions)):
+            raise ValueError("JSON subjects, findings and questions must be arrays")
         return cls(
             skill=record["skill"],
             as_of=datetime.fromisoformat(record["as_of"]),
-            subjects=tuple(InstrumentId(**subject) for subject in record["subjects"]),
-            findings=tuple(ResearchFinding.from_record(f) for f in record["findings"]),
-            questions=tuple(record.get("questions", [])),
+            subjects=tuple(InstrumentId(**subject) for subject in subjects),
+            findings=tuple(ResearchFinding.from_record(f) for f in findings),
+            questions=tuple(questions),
         )
 
 
@@ -198,9 +207,12 @@ def validate_research_report(
         elif finding.kind == FindingKind.ASSUMPTION:
             if not finding.assumption_ids or finding.evidence_ids:
                 raise ValueError("assumption must cite assumptions and no observed facts")
-        elif finding.kind == FindingKind.INFERENCE:
-            if not finding.evidence_ids and not finding.assumption_ids:
-                raise ValueError("inference requires evidence or assumptions")
+        elif (
+            finding.kind == FindingKind.INFERENCE
+            and not finding.evidence_ids
+            and not finding.assumption_ids
+        ):
+            raise ValueError("inference requires evidence or assumptions")
 
         for evidence_id in finding.evidence_ids:
             item = evidence_by_id.get(evidence_id)
