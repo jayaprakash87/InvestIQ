@@ -1,20 +1,35 @@
-# Architecture — Modular Monolith First
+# InvestIQ Architecture — Portable Core First
 
-## Dependency direction
-- `src/investiq_core`: pure Python financial calculations; no AI, web, credentials, external services or database.
-- Future adapters for data providers and normalization: version source metadata and as-of timestamps.
-- Future research engine: typed facts, assumptions, evidence and thesis records.
-- Future skills: portable instructions with structured input/output validated by shared domain schemas.
-- Future quant module: separate portfolio simulations with point-in-time checks and explicit transaction costs.
-- Future CLI/API/UI: thin interfaces to underlying domain services, not sources of business logic.
+The open-source project is a small modular Python package, not a premature web application or microservice system.
 
-Start with a Python package and CI, not placeholder microservices or a heavy application stack. Add storage only when decision-history requirements are established; add a web app only when a working research workflow exists.
+```text
+src/investiq_core/
+  evidence.py    Numeric observations, sources, assumptions and point-in-time dates
+  valuation.py   Pure mathematical scenarios and sensitivity calculations
+  research.py    Research report structure and provenance validator
+  thesis.py      Hash-linked thesis snapshots, diffs, local JSONL export
+  workflow.py    Offline synthetic bundle and integrated structural validator
+  cli.py         Thin local interface, no external dependencies
+  __main__.py    python -m investiq_core
+skills/
+  */SKILL.md     Portable model-neutral analysis instructions
+tests/           Synthetic deterministic and negative-case regression tests
+docs/            Methodology, product scope, architecture, releases
+```
 
-## Data contracts
-Always distinguish observed facts, sourced estimates, user hypotheses and computed values. Missing is not zero. Do not silently fill missing data or treat an LLM output as a primary source.
+## Dependencies
+`evidence` and `valuation` provide foundational contracts; `research` and `thesis` depend on evidence; `workflow` orchestrates those modules, and `cli` calls workflow. No model provider, market API, database or brokerage dependency appears in the public v0.1 package.
 
-## Security and openness
-No credentials in code or test data; prohibit real user positions and personal details in public fixtures; include license and provenance review when integrating external market data. Public software does not imply free redistribution rights to vendor datasets.
+## Data and trust boundaries
+- Observations have source/availability/recorded timestamps, currency, metric, units and source classification.
+- Assumptions are a separate class with their own evidence lineage.
+- Deterministic validators check structure and timing, not correctness of natural language.
+- Valuation inputs are hypothetical and do not constitute real-time market-price facts.
+- Hash links detect changes to a thesis chain if a trusted earlier digest is independently preserved; they cannot prove historic authorship.
+- Only synthetic fixtures are included. Private research should be stored outside this repository.
+- Optional integrations must establish provenance and redistribution rights independently.
 
-## Architecture decisions
-Document decisions affecting public semantics in `docs/decisions/`, with rationale and rejected alternatives.
+## Engineering posture
+Lightweight, tested and public reuse first. Add a local persistence adapter and sourced financial-data ingestion only when contracts and license rules are proven. Add a web frontend after a complete research workflow is validated and desired by users.
+
+Architecture decisions are recorded under `docs/decisions/`.

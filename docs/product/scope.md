@@ -1,23 +1,23 @@
-# Product Scope (v0.1)
+# InvestIQ v0.1 Product Scope
 
 ## Mission
-An open-source toolkit that makes investment research reproducible, transparent, modular, and accessible to anyone.
+An open-source, standalone investment research toolkit that makes assumptions, sources, time cutoffs, comparisons and thesis evolution reproducible.
 
-## Primary users
-Independent researchers, students, educators, developers, research teams, and investors using software to support *their own* analysis.
+## Intended audiences
+Independent researchers, students, educators, financial analysts and software developers. No account, broker, specific data provider or AI model is required.
 
-## Initial outcomes
-1. Run validated financial and valuation calculations offline without accounts.
-2. Separate facts, market data, interpretations and user assumptions.
-3. Preserve investment hypotheses and revisions with evidence and timestamps.
-4. Apply optional portable research skills and compare research results.
-5. Run repeatable simulations with proper point-in-time safeguards.
+## v0.1 user journey
+1. Install the Python package and run `investiq demo --output demo.json`.
+2. Inspect a synthetic research bundle: observations, assumptions, findings and revisions.
+3. Validate it using `investiq validate demo.json` with public or recorded basis.
+4. Review hypothetical scenario outputs and their assumptions.
+5. Reuse five documented research skills and the public Python contracts.
 
-## Explicitly out of scope for v0.1
-Live brokerage orders, customer accounts, proprietary recommendations, personalized suitability, paid data redistribution, quantitative fund operation, authentication, multi-tenancy, monetization and autonomous trade execution.
+## Capabilities
+Deterministic math, source metadata, venue-aware instrument identities, time availability and revision links, structural report validation, linked thesis history, local serialization, CLI and fully offline demo.
 
-## Non-functional criteria
-Tested numerical correctness; deterministic outputs for identical inputs; documented data rights; no mandatory cloud; no secrets in git; accessible documentation; clean extension points; platform-independent examples.
+## Not yet supported
+Live quotes, financial data ingestion, semantic source checking, tailored investment advice, accounts, broker execution, portfolios, performance claims, proper quant backtesting, production web API, hosted UX, authentication, licensing of data or fund management.
 
-## Release acceptance
-A fresh user can install and run tests, follow a synthetic example, understand its assumptions, and file an actionable issue without disclosing personal information.
+## v0.1 release acceptance
+Clean Python 3.11 install, successful lint and tests, wheel and sdist building, functional CLI roundtrip from installed wheel, documented method limitations, no private fixtures and an MIT license. This does not imply financial strategy validation.

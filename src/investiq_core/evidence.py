@@ -285,6 +285,50 @@ class ResearchAssumption:
         ):
             raise ValueError("evidence_ids must be a tuple of nonempty strings")
 
+    def to_record(self) -> dict[str, Any]:
+        """Serialize hypotheses independently from reported/estimated observations."""
+        return {
+            "assumption_id": self.assumption_id,
+            "instrument": {
+                "ticker": self.instrument.ticker,
+                "venue": self.instrument.venue,
+                "trading_currency": self.instrument.trading_currency,
+            },
+            "parameter": self.parameter,
+            "value": str(self.value),
+            "unit": self.unit.value,
+            "rationale": self.rationale,
+            "created_at": self.created_at.isoformat(),
+            "scenario": self.scenario,
+            "currency": self.currency,
+            "evidence_ids": list(self.evidence_ids),
+        }
+
+    @classmethod
+    def from_record(cls, record: Mapping[str, Any]) -> ResearchAssumption:
+        raw_value = record["value"]
+        if not isinstance(raw_value, str):
+            raise TypeError("assumption value must be a decimal string")
+        try:
+            value = Decimal(raw_value)
+        except InvalidOperation as exc:
+            raise ValueError("invalid decimal assumption") from exc
+        evidence_ids = record.get("evidence_ids", [])
+        if not isinstance(evidence_ids, list):
+            raise TypeError("assumption evidence_ids must be a JSON array")
+        return cls(
+            assumption_id=record["assumption_id"],
+            instrument=InstrumentId(**record["instrument"]),
+            parameter=record["parameter"],
+            value=value,
+            unit=ValueUnit(record["unit"]),
+            rationale=record["rationale"],
+            created_at=datetime.fromisoformat(record["created_at"]),
+            scenario=record.get("scenario", "base"),
+            currency=record.get("currency"),
+            evidence_ids=tuple(evidence_ids),
+        )
+
 
 def observations_as_of(
     observations: Iterable[FinancialObservation],

@@ -5,14 +5,33 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "investiq-core"
 version = "0.1.0"
-description = "Open-source, reproducible investment research calculations"
+description = "Open-source, reproducible equity research and valuation toolkit"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
+keywords = ["investment-research", "valuation", "equities", "financial-analysis"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
 dependencies = []
 
+[project.urls]
+Homepage = "https://github.com/jayaprakash87/InvestIQ"
+Repository = "https://github.com/jayaprakash87/InvestIQ"
+Issues = "https://github.com/jayaprakash87/InvestIQ/issues"
+
+[project.scripts]
+investiq = "investiq_core.cli:main"
+
 [project.optional-dependencies]
-dev = ["pytest>=8,<10", "ruff>=0.6,<1"]
+dev = ["pytest>=8,<10", "ruff>=0.6,<1", "build>=1.2,<2"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
