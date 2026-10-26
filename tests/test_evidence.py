@@ -185,12 +185,12 @@ def test_transitive_supersession_across_late_backfill() -> None:
         retrieved_at=time(2025, 3, 21),
     )
     v2 = replace(
-        v1, observation_id="rev-2", value=Decimal("123"),
+        v1, observation_id="rev-2", value=Decimal(123),
         source=v2_source, publicly_available_at=time(2025, 3, 10),
         recorded_at=time(2025, 4, 10), supersedes="rev-1",
     )
     v3 = replace(
-        v1, observation_id="rev-3", value=Decimal("122"),
+        v1, observation_id="rev-3", value=Decimal(122),
         source=v3_source, publicly_available_at=time(2025, 3, 20),
         recorded_at=time(2025, 3, 22), supersedes="rev-2",
     )
