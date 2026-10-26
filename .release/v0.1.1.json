@@ -1,0 +1,7 @@
+{
+  "version": "0.1.1",
+  "tag": "v0.1.1",
+  "package": "investiq-core",
+  "release_notes": "docs/releases/v0.1.1.md",
+  "purpose": "Reviewed, one-time maintenance release intent."
+}

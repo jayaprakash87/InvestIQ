@@ -13,7 +13,7 @@ python -m pip install -e ".[dev]"
 investiq --help
 ```
 
-Windows PowerShell activation: `.venv\Scripts\Activate.ps1`. Alternatively invoke the virtual environment's Python directly. Install from a release wheel with `python -m pip install investiq_core-0.1.0-py3-none-any.whl`.
+Windows PowerShell activation: `.venv\Scripts\Activate.ps1`. Alternatively invoke the virtual environment's Python directly. Install from a release wheel with `python -m pip install investiq_core-0.1.1-py3-none-any.whl`.
 
 ## Reproduce the complete research example
 
