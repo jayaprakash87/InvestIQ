@@ -193,6 +193,19 @@ def validate_research_report(
         assumptions_by_id[item.assumption_id] = item
 
     subjects = set(report.subjects)
+
+    def resolve_evidence(evidence_id: str, cutoff: datetime) -> FinancialObservation:
+        item = evidence_by_id.get(evidence_id)
+        if item is None:
+            raise ValueError(f"unknown evidence ID: {evidence_id}")
+        if item.instrument not in subjects:
+            raise ValueError("evidence instrument not included in report subjects")
+        if item.publicly_available_at > cutoff:
+            raise ValueError("evidence not publicly available by required cutoff")
+        if basis == "recorded" and item.recorded_at > cutoff:
+            raise ValueError("evidence was not recorded by required cutoff")
+        return item
+
     for finding in report.findings:
         if finding.kind == FindingKind.DATA_GAP:
             if finding.evidence_ids or finding.assumption_ids:
@@ -215,15 +228,7 @@ def validate_research_report(
             raise ValueError("inference requires evidence or assumptions")
 
         for evidence_id in finding.evidence_ids:
-            item = evidence_by_id.get(evidence_id)
-            if item is None:
-                raise ValueError(f"unknown evidence ID: {evidence_id}")
-            if item.instrument not in subjects:
-                raise ValueError("evidence instrument not included in report subjects")
-            if item.publicly_available_at > report.as_of:
-                raise ValueError("evidence not publicly available as of report cutoff")
-            if basis == "recorded" and item.recorded_at > report.as_of:
-                raise ValueError("evidence was not recorded by report cutoff")
+            item = resolve_evidence(evidence_id, report.as_of)
             if finding.kind == FindingKind.REPORTED_FACT and (
                 item.kind != ObservationKind.REPORTED
             ):
@@ -241,6 +246,12 @@ def validate_research_report(
                 raise ValueError("assumption instrument not included in report subjects")
             if assumption.created_at > report.as_of:
                 raise ValueError("assumption was created after report cutoff")
+            # An assumption must not evade provenance controls via its own citations.
+            # Validate against when the assumption was first made, not just this report date.
+            for supporting_id in assumption.evidence_ids:
+                support = resolve_evidence(supporting_id, assumption.created_at)
+                if support.instrument != assumption.instrument:
+                    raise ValueError("assumption support instrument does not match hypothesis")
 
 
 def extract_evidence_ids(report: ResearchReport) -> frozenset[str]:

@@ -197,3 +197,48 @@ def test_invalid_json_arrays_are_not_reinterpreted_as_characters() -> None:
     record["questions"] = "What is known?"
     with pytest.raises(ValueError, match="must be arrays"):
         ResearchReport.from_record(record)
+
+
+def test_assumption_support_must_exist_and_be_available_at_creation() -> None:
+    obs, assumption, report = example()
+    cited_assumption = replace(assumption, evidence_ids=("missing-observation",))
+    assumption_only = replace(report, findings=(report.findings[1],))
+    with pytest.raises(ValueError, match="unknown evidence"):
+        validate_research_report(
+            assumption_only, evidence=[], assumptions=[cited_assumption]
+        )
+
+    future_assumption = replace(assumption, created_at=at(2), evidence_ids=("revenue-1",))
+    with pytest.raises(ValueError, match="not recorded"):
+        validate_research_report(
+            assumption_only, evidence=[obs], assumptions=[future_assumption], basis="recorded"
+        )
+
+    future_source = EvidenceSource(
+        reference="synthetic:later", publisher="Synthetic Test",
+        published_at=at(5), retrieved_at=at(6),
+    )
+    future_observation = replace(
+        obs, source=future_source, publicly_available_at=at(5), recorded_at=at(6)
+    )
+    with pytest.raises(ValueError, match="not publicly available"):
+        validate_research_report(
+            assumption_only, evidence=[future_observation], assumptions=[future_assumption]
+        )
+
+
+def test_assumption_support_cannot_cross_instrument_even_within_comparison() -> None:
+    obs, assumption, report = example()
+    other = InstrumentId("OTHER", "XNYS", "USD")
+    peer_report = replace(
+        report, skill="peer-comparison", subjects=(obs.instrument, other),
+        findings=(report.findings[1],),
+    )
+    cross_company = replace(
+        obs, instrument=other,
+    )
+    referenced = replace(assumption, evidence_ids=("revenue-1",))
+    with pytest.raises(ValueError, match="support instrument"):
+        validate_research_report(
+            peer_report, evidence=[cross_company], assumptions=[referenced]
+        )

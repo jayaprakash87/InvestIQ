@@ -49,3 +49,11 @@ The `examples/synthetic_research_bundle.json` file contains a complete public, f
 
 ## Versioning
 The wire schema is experimental v0.1. Breaking field changes require a new documented contract revision and migration notes.
+
+## Assumption support lineage
+A cited `ResearchAssumption` may itself list `evidence_ids`. Validation
+checks those underlying observations for identity, instrument consistency and
+public/recorded availability **at the time the assumption was created**.
+An assumption created before its cited supporting evidence became available
+cannot retroactively claim to have used that information. These checks remain
+structural, not semantic source verification.
