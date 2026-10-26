@@ -26,8 +26,8 @@ def test_scenario_return_is_reproducible() -> None:
     ],
 )
 def test_invalid_inputs_are_rejected(kwargs: dict) -> None:
-    params = dict(start_eps=5.0, annual_eps_growth=0.1, years=3,
-                  terminal_pe=15.0, initial_price=75.0)
+    params = {"start_eps": 5.0, "annual_eps_growth": 0.1, "years": 3,
+              "terminal_pe": 15.0, "initial_price": 75.0}
     params.update(kwargs)
     with pytest.raises(ValueError):
         scenario_return(**params)
