@@ -264,6 +264,6 @@ def import_thesis_jsonl(raw: str) -> tuple[ThesisSnapshot, ...]:
         raise TypeError("JSONL input must be a string")
     return tuple(
         ThesisSnapshot.from_record(json.loads(line))
-        for line in raw.split("\\n")
+        for line in raw.split("\n")
         if line.strip()
     )
