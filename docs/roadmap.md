@@ -1,22 +1,28 @@
-# Roadmap
+# InvestIQ Roadmap
 
-## PR 1 — Public open-source foundation
-README, MIT license, contribution and security guidance, scope, methodology principles, architecture ADR, minimal deterministic valuation core, tests and CI.
+## Released in v0.1 — Offline research foundations
+- Evidence, instrument and scenario contracts.
+- Tested financial and valuation primitives.
+- Five portable, model-neutral research skills.
+- Structural provenance checks and attributed research reports.
+- Hash-linked thesis history and JSONL import/export.
+- Locally generated synthetic research bundle plus CLI validation.
+- Build, tests, documentation and release packaging.
 
-## PR 2 — Evidence and point-in-time research contracts (current)
-Venue-qualified instrument identity, source references, precise decimal values, fact-vs-assumption semantics, independent economic/publication/retrieval/recorded dates, explicit revisions, public vs recorded as-of queries, serializable records, synthetic tests, documentation and ADR.
+## Candidate v0.2 — Meaningful researcher workflows
+- Independent semantic/source validation evaluations for skill outputs.
+- Reusable company dossiers and share-class / symbol-history mapping.
+- Public-data adapters with explicit rights, as-of integrity and error handling.
+- Persisted local research storage with schema migrations and backups.
+- Improved CLI reporting and research comparison views.
 
-## PR 3 — Financial metrics and valuation library
-Canonical metric definitions, normalized earnings caveats, ratio semantics, multiple-based and reverse valuation calculations, CAGR/IRR cases, missing-data handling and comprehensive tests. Never infer consensus probabilities.
+## Future only after domain/data acceptance
+- Point-in-time historical fundamentals and survivorship-bias-aware backtests.
+- Transparent strategy specification, prospective paper performance and risk attribution.
+- Optional GUI, integrations and community research plugins.
+- Commercial or regulated products only if evidence, demand and compliance justify them.
 
-## PR 4 — Portable research skills
-Business, financial, valuation, comparison and thesis-challenge skills with common schemas, structured examples and evaluations.
+## Acceptance gates
+Numerical accuracy, historical provenance, licensing and source semantics precede rankings. No backtest should be published without vintage-safe data, realistic costs and appropriate benchmarks. No realized-performance claims from simulations. No broker/trading integrations in v0.1.
 
-## PR 5 — Research memory prototype
-Company dossiers, immutable thesis snapshots, revision explanations, import of **synthetic or openly licensed** example data.
-
-## Later, behind acceptance gates
-Quant research/backtesting with bias controls; user-facing app; optional data adapters, API, model portfolios, and only then commercial/regulated concepts.
-
-## Gates
-Numerical correctness and provenance before rankings; point-in-time proof before backtests; prospective paper record before claims of strategy value; product-market demand before SaaS expansion.
+These are research opportunities, not promises or current product capabilities.
