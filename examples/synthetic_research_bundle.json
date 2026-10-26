@@ -1,0 +1,65 @@
+{
+  "description": "Purely synthetic evidence and research findings, not an investment recommendation.",
+  "evidence": [
+    {
+      "observation_id": "synthetic:revenue:q4",
+      "instrument": {
+        "ticker": "DEMO",
+        "venue": "XNAS",
+        "trading_currency": "USD"
+      },
+      "metric": "revenue",
+      "value": "125.50",
+      "unit": "money",
+      "kind": "reported",
+      "currency": "USD",
+      "effective_at": "2024-12-31T12:00:00+00:00",
+      "publicly_available_at": "2025-03-01T12:00:00+00:00",
+      "recorded_at": "2025-03-05T12:00:00+00:00",
+      "period_start": "2024-10-01",
+      "period_end": "2024-12-31",
+      "supersedes": null,
+      "source": {
+        "reference": "synthetic:demo-quarter",
+        "publisher": "Synthetic Research Fixtures",
+        "url": null,
+        "published_at": "2025-03-01T12:00:00+00:00",
+        "retrieved_at": "2025-03-04T12:00:00+00:00",
+        "redistribution": "permitted"
+      }
+    }
+  ],
+  "assumptions": [],
+  "report": {
+    "skill": "financial-analysis",
+    "as_of": "2025-03-15T12:00:00+00:00",
+    "subjects": [
+      {
+        "ticker": "DEMO",
+        "venue": "XNAS",
+        "trading_currency": "USD"
+      }
+    ],
+    "findings": [
+      {
+        "finding_id": "f1",
+        "kind": "reported_fact",
+        "text": "In this fictional dataset, reported quarterly revenue is USD 125.50.",
+        "evidence_ids": [
+          "synthetic:revenue:q4"
+        ],
+        "assumption_ids": []
+      },
+      {
+        "finding_id": "f2",
+        "kind": "data_gap",
+        "text": "No matched prior-year quarter was supplied to compute growth.",
+        "evidence_ids": [],
+        "assumption_ids": []
+      }
+    ],
+    "questions": [
+      "Can we obtain a comparable prior-year revenue observation?"
+    ]
+  }
+}
