@@ -7,18 +7,19 @@ not financial advice or a source of current market prices.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import asdict, replace
 from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Any, Literal, Mapping
+from typing import Any, Literal
 
 from .evidence import (
     EvidenceSource,
     FinancialObservation,
     InstrumentId,
     ObservationKind,
-    ResearchAssumption,
     Redistribution,
+    ResearchAssumption,
     ValueUnit,
 )
 from .research import (
