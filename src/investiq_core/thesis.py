@@ -262,4 +262,8 @@ def import_thesis_jsonl(raw: str) -> tuple[ThesisSnapshot, ...]:
     """Parse snapshots; independently validate lineage/evidence before trusting them."""
     if not isinstance(raw, str):
         raise TypeError("JSONL input must be a string")
-    return tuple(ThesisSnapshot.from_record(json.loads(line)) for line in raw.splitlines() if line.strip())
+    return tuple(
+        ThesisSnapshot.from_record(json.loads(line))
+        for line in raw.split("\\n")
+        if line.strip()
+    )

@@ -159,3 +159,11 @@ def test_open_research_thesis_can_have_explicit_gaps() -> None:
         statement="Research needed: unknown business economics",
     )
     assert validate_thesis_history([speculative]) == (speculative,)
+
+
+def test_jsonl_roundtrip_with_unicode_paragraph_and_line_separators() -> None:
+    _, _, a, b = example()
+    a = replace(a, statement="Research line\u2028continues\u2029across paragraphs")
+    b = replace(b, parent_digest=a.digest)
+    restored = import_thesis_jsonl(export_thesis_jsonl([a, b]))
+    assert restored == (a, b)
