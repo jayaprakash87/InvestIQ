@@ -191,7 +191,7 @@ def test_invalid_json_arrays_are_not_reinterpreted_as_characters() -> None:
     _, _, report = example()
     record = report.to_record()
     record["findings"][0]["evidence_ids"] = "revenue-1"
-    with pytest.raises(ValueError, match="must be arrays"):
+    with pytest.raises(TypeError, match="must be arrays"):
         ResearchReport.from_record(record)
     record = report.to_record()
     record["questions"] = "What is known?"

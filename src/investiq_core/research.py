@@ -86,7 +86,7 @@ class ResearchFinding:
         evidence_ids = record.get("evidence_ids", [])
         assumption_ids = record.get("assumption_ids", [])
         if not isinstance(evidence_ids, list) or not isinstance(assumption_ids, list):
-            raise ValueError("JSON evidence_ids and assumption_ids must be arrays")
+            raise TypeError("JSON evidence_ids and assumption_ids must be arrays")
         return cls(
             finding_id=record["finding_id"],
             kind=FindingKind(record["kind"]),
