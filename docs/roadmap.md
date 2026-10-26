@@ -1,13 +1,13 @@
 # Roadmap
 
-## PR 1 — Public open-source foundation (current)
+## PR 1 — Public open-source foundation
 README, MIT license, contribution and security guidance, scope, methodology principles, architecture ADR, minimal deterministic valuation core, tests and CI.
 
-## PR 2 — Domain contract and research method specification
-Canonical identifiers, financial metric glossary, evidence provenance, timestamps and point-in-time contract, assumptions/results schemas, industry extensions, methodology validation cases.
+## PR 2 — Evidence and point-in-time research contracts (current)
+Venue-qualified instrument identity, source references, precise decimal values, fact-vs-assumption semantics, independent economic/publication/retrieval/recorded dates, explicit revisions, public vs recorded as-of queries, serializable records, synthetic tests, documentation and ADR.
 
-## PR 3 — Valuation and financial analysis core
-Validated ratio semantics, normalized earnings caveats, multiple-based and reverse valuation calculations, CAGR/IRR cases, missing-data handling and comprehensive tests.
+## PR 3 — Financial metrics and valuation library
+Canonical metric definitions, normalized earnings caveats, ratio semantics, multiple-based and reverse valuation calculations, CAGR/IRR cases, missing-data handling and comprehensive tests. Never infer consensus probabilities.
 
 ## PR 4 — Portable research skills
 Business, financial, valuation, comparison and thesis-challenge skills with common schemas, structured examples and evaluations.
