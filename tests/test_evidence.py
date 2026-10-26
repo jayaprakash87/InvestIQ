@@ -2,7 +2,7 @@
 
 import json
 from dataclasses import replace
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 import pytest
@@ -20,7 +20,7 @@ from investiq_core.evidence import (
 
 
 def time(year: int, month: int, day: int) -> datetime:
-    return datetime(year, month, day, 12, tzinfo=timezone.utc)
+    return datetime(year, month, day, 12, tzinfo=UTC)
 
 
 def sample(**overrides: object) -> FinancialObservation:
@@ -61,7 +61,7 @@ def test_roundtrip_preserves_decimal_source_and_dates() -> None:
 def test_float_json_value_is_rejected() -> None:
     record = sample().to_record()
     record["value"] = 125.5
-    with pytest.raises(ValueError, match="decimal string"):
+    with pytest.raises(TypeError, match="decimal string"):
         FinancialObservation.from_record(record)
 
 
@@ -154,3 +154,13 @@ def test_assumptions_are_explicit_not_mislabeled_as_facts() -> None:
     assert assumption.value == Decimal("0.12")
     with pytest.raises(ValueError):
         replace(assumption, rationale="  ")
+
+def test_cross_instrument_revision_is_rejected() -> None:
+    first = sample()
+    revision = replace(
+        first, observation_id="rev-2",
+        instrument=InstrumentId("OTHER", "XNAS", "USD"),
+        supersedes="rev-1",
+    )
+    with pytest.raises(ValueError, match="revision must preserve"):
+        observations_as_of([first, revision], cutoff=time(2026, 1, 1))

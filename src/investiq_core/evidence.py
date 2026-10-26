@@ -9,11 +9,12 @@ replay of a particular researcher's records.
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from enum import Enum
-from typing import Any, Iterable, Literal, Mapping
+from typing import Any, Literal
 
 
 class ValueUnit(str, Enum):
@@ -53,7 +54,7 @@ def _value_and_currency(value: Decimal, unit: ValueUnit, currency: str | None) -
     if not isinstance(value, Decimal) or not value.is_finite():
         raise ValueError("value must be a finite Decimal; do not silently round floats")
     if not isinstance(unit, ValueUnit):
-        raise ValueError("unit must be a ValueUnit")
+        raise TypeError("unit must be a ValueUnit")
     is_monetary = unit in (ValueUnit.MONEY, ValueUnit.MONEY_PER_SHARE)
     if is_monetary != (currency is not None):
         raise ValueError("currency must be present exactly for monetary units")
@@ -107,7 +108,7 @@ class EvidenceSource:
         ):
             raise ValueError("source URL must be absolute HTTP(S)")
         if not isinstance(self.redistribution, Redistribution):
-            raise ValueError("redistribution must be a Redistribution value")
+            raise TypeError("redistribution must be a Redistribution value")
 
 
 @dataclass(frozen=True, slots=True)
@@ -140,16 +141,16 @@ class FinancialObservation:
     def __post_init__(self) -> None:
         _nonempty(self.observation_id, "observation_id")
         if not isinstance(self.instrument, InstrumentId):
-            raise ValueError("instrument must be an InstrumentId")
+            raise TypeError("instrument must be an InstrumentId")
         if not isinstance(self.metric, str) or not re.fullmatch(
             r"[a-z][a-z0-9_]*", self.metric
         ):
             raise ValueError("metric must be a lowercase snake_case identifier")
         _value_and_currency(self.value, self.unit, self.currency)
         if not isinstance(self.kind, ObservationKind):
-            raise ValueError("kind must be an ObservationKind")
+            raise TypeError("kind must be an ObservationKind")
         if not isinstance(self.source, EvidenceSource):
-            raise ValueError("source must be an EvidenceSource")
+            raise TypeError("source must be an EvidenceSource")
         for name in ("effective_at", "publicly_available_at", "recorded_at"):
             _aware(getattr(self, name), name)
         if self.source.published_at is not None and (
@@ -208,7 +209,7 @@ class FinancialObservation:
         """Parse the documented wire format. Reject floating-point JSON numbers."""
         raw_value = record["value"]
         if not isinstance(raw_value, str):
-            raise ValueError("value must be a decimal string in the wire format")
+            raise TypeError("value must be a decimal string in the wire format")
         try:
             value = Decimal(raw_value)
         except InvalidOperation as exc:
@@ -268,7 +269,7 @@ class ResearchAssumption:
     def __post_init__(self) -> None:
         _nonempty(self.assumption_id, "assumption_id")
         if not isinstance(self.instrument, InstrumentId):
-            raise ValueError("instrument must be an InstrumentId")
+            raise TypeError("instrument must be an InstrumentId")
         _nonempty(self.parameter, "parameter")
         _nonempty(self.rationale, "rationale")
         _nonempty(self.scenario, "scenario")
@@ -298,10 +299,22 @@ def observations_as_of(
     indexed: dict[str, FinancialObservation] = {}
     for item in observations:
         if not isinstance(item, FinancialObservation):
-            raise ValueError("all observations must be FinancialObservation instances")
+            raise TypeError("all observations must be FinancialObservation instances")
         if item.observation_id in indexed:
             raise ValueError(f"duplicate observation_id: {item.observation_id}")
         indexed[item.observation_id] = item
+
+    # Cross-instrument revisions and cyclic lineage can otherwise hide valid data.
+    for item in indexed.values():
+        if item.supersedes is not None and item.supersedes in indexed:
+            previous = indexed[item.supersedes]
+            if (
+                previous.instrument != item.instrument
+                or previous.metric != item.metric
+                or previous.period_start != item.period_start
+                or previous.period_end != item.period_end
+            ):
+                raise ValueError("a revision must preserve instrument, metric and period")
 
     # Inconsistent revision lineage can otherwise hide the entire history.
     for item in indexed.values():
