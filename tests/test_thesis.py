@@ -7,12 +7,20 @@ from decimal import Decimal
 import pytest
 
 from investiq_core.evidence import (
-    EvidenceSource, FinancialObservation, InstrumentId,
-    ObservationKind, ResearchAssumption, ValueUnit,
+    EvidenceSource,
+    FinancialObservation,
+    InstrumentId,
+    ObservationKind,
+    ResearchAssumption,
+    ValueUnit,
 )
 from investiq_core.thesis import (
-    ThesisSnapshot, ThesisStage, compare_thesis_revisions,
-    export_thesis_jsonl, import_thesis_jsonl, validate_thesis_history,
+    ThesisSnapshot,
+    ThesisStage,
+    compare_thesis_revisions,
+    export_thesis_jsonl,
+    import_thesis_jsonl,
+    validate_thesis_history,
 )
 
 
@@ -28,7 +36,7 @@ def example():
     )
     observation = FinancialObservation(
         observation_id="synthetic:rev", instrument=subject, metric="revenue",
-        value=Decimal("125"), unit=ValueUnit.MONEY, currency="USD",
+        value=Decimal(125), unit=ValueUnit.MONEY, currency="USD",
         kind=ObservationKind.REPORTED, source=source,
         effective_at=dt(1), publicly_available_at=dt(1), recorded_at=dt(3),
     )
