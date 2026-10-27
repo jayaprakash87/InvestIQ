@@ -285,3 +285,41 @@ h2 { font-size: 21px; line-height: 1.3; letter-spacing: -.4px; margin: 0 0 6px; 
 .ai-source-detail { color: #adcad3; font-size: 11px; line-height: 1.6; margin: 8px 0; }
 .ai-citations .secondary-link { font-size: 10px; }
 @media (max-width: 700px) { .ai-findings { grid-template-columns: 1fr; } }
+
+
+/* v0.3 PR5: purely hypothetical valuation workbench and independent follow-ups */
+.scenario-panel { background: #132532; border-color: #426170; }
+.scenario-panel label { display: block; color: #dce9ef; font-weight: 650; font-size: 12px; margin-bottom: 7px; }
+.scenario-top-inputs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px; margin: 18px 0; }
+.scenario-top-inputs input, .scenario-input-table input {
+  width: 100%; min-width: 85px; border: 1px solid #4b6475; border-radius: 7px;
+  background: #0b1a29; color: #eaf8f5; padding: 10px 12px; font: inherit;
+}
+.scenario-top-inputs input::placeholder { color: #8196a8; }
+.scenario-table-scroll { overflow-x: auto; max-width: 100%; }
+.scenario-input-table { border-collapse: collapse; width: 100%; min-width: 540px; }
+.scenario-input-table caption { text-align: left; color: #9eb6c4; font-size: 11px; padding-bottom: 12px; }
+.scenario-input-table th, .scenario-input-table td { text-align: left; padding: 11px; border-bottom: 1px solid #344d5b; }
+.scenario-input-table thead th { color: #9cb9c6; font-size: 10px; }
+.scenario-input-table tbody th { color: #d9e8ee; text-transform: capitalize; font-size: 12px; }
+.scenario-input-table input { min-width: 100px; font-size: 12px; }
+.scenario-cta { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; margin-top: 22px; }
+.scenario-cta .field-help { margin: 0; max-width: 440px; }
+.scenario-results { margin-top: 18px; border-top: 1px solid #3a5866; padding-top: 20px; }
+.scenario-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
+.scenario-summary .connected-detail { padding: 14px; border: 1px solid #355462; background: #0f2633; border-radius: 8px; display: grid; gap: 6px; }
+.scenario-summary .connected-detail strong { text-align: left; font-size: 15px; }
+.scenario-result-cases { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 14px; }
+.scenario-case { padding: 15px; border: 1px solid #385464; background: #102331; border-radius: 8px; }
+.scenario-case-title { display: block; color: #a1e5cf; font-size: 11px; margin-bottom: 7px; letter-spacing: 1px; }
+.scenario-case .connected-detail { flex-wrap: wrap; }
+.scenario-input-hash { font-size: 10px; color: #8ca5b5; overflow-wrap: anywhere; }
+.followup-panel { border: 1px solid #3b5d65; border-radius: 8px; padding: 14px; background: #112a32; margin: 18px 0; }
+.followup-suggestions { display: flex; flex-wrap: wrap; gap: 9px; }
+.followup-question { text-align: left; max-width: 100%; line-height: 1.55; white-space: normal; }
+.question-history { margin: 13px 0; color: #a9c2ce; font-size: 11px; }
+.question-history summary { cursor: pointer; font-weight: 700; }
+.question-history li { line-height: 1.7; padding: 4px 0; overflow-wrap: anywhere; }
+@media (max-width: 950px) {
+  .scenario-top-inputs, .scenario-summary, .scenario-result-cases { grid-template-columns: 1fr; }
+}
