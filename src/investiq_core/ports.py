@@ -54,6 +54,7 @@ class ProviderFailureCode(str, Enum):
     UNSUPPORTED_INSTRUMENT = "unsupported_instrument"
     AMBIGUOUS_INSTRUMENT = "ambiguous_instrument"
     MISSING_DATA = "missing_data"
+    UNSUPPORTED_REQUEST = "unsupported_request"
     INVALID_RESPONSE = "invalid_response"
 
 
