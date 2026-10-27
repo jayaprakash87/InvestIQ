@@ -18,7 +18,6 @@ from pathlib import Path
 from typing import Any
 
 from .adapters._http import JsonTransport
-from .browser_decisions import BrowserDecisionHistory
 from .adapters.sec_companyfacts import SecCompanyFactsProvider
 from .adapters.sec_edgar import SecEdgarFilingProvider
 from .adapters.twelve_data import TwelveDataQuoteProvider
@@ -30,6 +29,7 @@ from .ai_research import (
 )
 from .application.connected_data import ConnectedDataService
 from .application.connected_research import CompanyResearchRequest, ConnectedResearchService
+from .browser_decisions import BrowserDecisionHistory
 from .connected_cli import _render_current
 from .evidence import InstrumentId
 from .filing_evidence import SecFilingEvidenceProvider
