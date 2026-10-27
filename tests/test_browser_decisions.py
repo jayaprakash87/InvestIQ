@@ -234,5 +234,13 @@ def test_history_browser_never_reads_ai_response_or_licensed_quote_markup():
     assert "confirm_currency" in script
     assert "decision-consent" in script
     assert "scenario-calculated" in script
+    connected_script = files("investiq_core").joinpath("web", "connect.js").read_text(
+        encoding="utf-8"
+    )
+    assert (
+        'resetInteractions();'
+        + '\\n    selected = null;'
+        + '\\n    document.dispatchEvent(new Event("investiq:issuer-cleared"));'
+    ) in connected_script
     assert 'document.getElementById("connected-output")' not in script
     assert 'document.getElementById("ai-result")' not in script
