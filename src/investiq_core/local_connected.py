@@ -24,6 +24,7 @@ from .application.connected_data import ConnectedDataService
 from .application.connected_research import CompanyResearchRequest, ConnectedResearchService
 from .connected_cli import _render_current
 from .evidence import InstrumentId
+from .filing_evidence import SecFilingEvidenceProvider
 from .issuer_directory import IssuerCandidate, SecDirectoryProvider, search_candidates
 from .market import IssuerId, IssuerListing
 
@@ -55,6 +56,7 @@ class LocalConnectedResearch:
         *,
         directory_transport: JsonTransport | None = None,
         research_factory: Callable[[str, str], ConnectedResearchService] | None = None,
+        evidence_factory: Callable[[str], SecFilingEvidenceProvider] | None = None,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self._sessions: dict[str, BrowserSession] = {}
@@ -62,6 +64,9 @@ class LocalConnectedResearch:
         self._clock = clock
         self._directory_transport = directory_transport
         self._research_factory = research_factory or _build_research_service
+        self._evidence_factory = evidence_factory or (
+            lambda contact: SecFilingEvidenceProvider(user_agent=contact)
+        )
 
     def session(self, session_id: str | None, *, create: bool) -> tuple[str, BrowserSession] | None:
         now = self._clock()
@@ -150,6 +155,44 @@ class LocalConnectedResearch:
                     "You must confirm current listing and proposed USD currency.",
                 ],
             }
+
+    def inspect_evidence(
+        self, session: BrowserSession, data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """On-demand 10-K excerpts for a confirmed directory candidate.
+
+        Never fetch arbitrary CIK, path or supplied URL; require matching
+        candidate, directory TTL and current listing/currency confirmation.
+        """
+        symbol, venue, cik = (data.get(name) for name in ("symbol", "venue", "cik"))
+        topic = data.get("topic")
+        if (
+            not isinstance(symbol, str) or not isinstance(venue, str)
+            or not isinstance(cik, str)
+            or topic not in ("business", "risks", "management")
+            or data.get("currency") != "USD"
+            or data.get("confirm_current_listing") is not True
+            or data.get("confirm_currency") is not True
+        ):
+            raise ValueError("Confirm supported listing and evidence topic")
+        with session.lock:
+            if not session.configured or session.contact is None:
+                raise PermissionError("Configure your authorized provider session first")
+            if (
+                session.directory_refreshed_at is None
+                or self._clock() - session.directory_refreshed_at > DIRECTORY_LIFETIME_SECONDS
+            ):
+                raise ValueError("Company directory expired; search and confirm again")
+            matches = [
+                item for item in session.directory
+                if (item.symbol, item.venue, item.cik) == (symbol, venue, cik)
+            ]
+            if len(matches) != 1:
+                raise ValueError("Listing is not in the current SEC directory")
+            issuer = IssuerId("SEC_CIK", matches[0].cik)
+            return asyncio.run(self._evidence_factory(session.contact).inspect(
+                issuer, topic=topic
+            ))
 
     def analyze(self, session: BrowserSession, data: dict[str, Any]) -> dict[str, Any]:
         symbol, venue, cik = (data.get(name) for name in ("symbol", "venue", "cik"))

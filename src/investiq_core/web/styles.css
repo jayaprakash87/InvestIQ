@@ -247,3 +247,16 @@ h2 { font-size: 21px; line-height: 1.3; letter-spacing: -.4px; margin: 0 0 6px; 
   .connection-panel { padding: 17px; }
   .chosen-company, .connected-summary, .connected-facts { grid-template-columns: 1fr; }
 }
+
+
+/* PR 3 — source-document evidence inspection; text is untrusted and escaped. */
+.filing-panel { margin: 18px 0; border: 1px solid #355363; background: #0e2130; border-radius: 10px; padding: 22px; scroll-margin-top: 22px; }
+.filing-panel h3 { font-size: 17px; margin: 0 0 10px; }
+.evidence-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.filing-source { border: 1px solid #2c4955; background: #102a31; border-radius: 8px; padding: 12px 15px; margin: 12px 0; }
+.filing-metadata { color: #bdd3d8; font-size: 11px; overflow-wrap: anywhere; }
+.filing-excerpts { display: grid; gap: 10px; }
+.filing-excerpt { background: #0b1a28; border: 1px solid #345060; border-radius: 8px; padding: 17px; }
+.filing-excerpt-text { color: #e4eff1; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.75; }
+.filing-excerpt-ref { color: #93adbb; font-size: 10px; }
+@media (max-width: 600px) { .filing-panel { padding: 16px; } }
