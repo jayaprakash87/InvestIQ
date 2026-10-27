@@ -102,9 +102,9 @@ def harness():
         assert not thread.is_alive()
 
 
-def request(harness, method, path, data=None, *, cookie=None, csrf=None, origin=True):
+def request(\n    harness, method, path, data=None, *, cookie=None, csrf=None,\n    origin=True, initialize_header=True, fetch_site=None,\n):
     connection = http.client.HTTPConnection("127.0.0.1", harness.port, timeout=5)
-    headers = {"Host": f"127.0.0.1:{harness.port}"}
+    headers = {"Host": f"127.0.0.1:{harness.port}"}\n    if method == "GET" and path == "/api/v1/session" and initialize_header:\n        headers["X-InvestIQ-Init"] = "1"\n    if fetch_site is not None:\n        headers["Sec-Fetch-Site"] = fetch_site
     if origin:
         headers["Origin"] = f"http://127.0.0.1:{harness.port}"
     if cookie:
@@ -158,6 +158,37 @@ def test_sec_directory_candidates_are_not_verified_listings():
     }
     with pytest.raises(ValueError, match="Conflicting"):
         parse_directory(conflicting, observed_at=datetime.now(UTC))
+
+
+def test_cross_site_resources_cannot_exhaust_browser_sessions(harness):
+    # An attacker may embed localhost as an image; it cannot add the init
+    # header without triggering a browser CORS preflight.
+    for _ in range(20):
+        code, _, _ = request(
+            harness, "GET", "/api/v1/session",
+            origin=False, initialize_header=False, fetch_site="cross-site",
+        )
+        assert code == 403
+    code, _, _ = request(
+        harness, "GET", "/api/v1/session",
+        origin=False, initialize_header=True, fetch_site="cross-site",
+    )
+    assert code == 403
+    cookie, csrf, _, _ = initialize(harness)
+    assert cookie.startswith("investiq_sid=")
+    assert csrf
+
+
+def test_browser_discards_results_for_stale_selections():
+    from importlib.resources import files
+
+    source = files("investiq_core").joinpath("web", "connect.js").read_text(
+        encoding="utf-8"
+    )
+    assert "selectionVersion += 1" in source
+    assert "submittedVersion !== selectionVersion" in source
+    assert "selected !== submittedCandidate" in source
+    assert "submittedSearch === searchVersion" in source
 
 
 def test_session_cookie_and_csrf_are_required_for_all_connected_requests(harness):
