@@ -210,7 +210,8 @@
       setConfigured(session.configured, session.quote_configured);
       setModelConfigured(session.model_configured, session.model_name);
       document.dispatchEvent(new CustomEvent("investiq:session-ready", {
-        detail: { csrf, privateHistoryEnabled: session.private_history_enabled === true }
+        detail: { csrf, privateHistoryEnabled: session.private_history_enabled === true,
+          privateHistoryUnlocked: session.private_history_unlocked === true }
       }));
       status("setup-message", session.configured ?
         "Provider credentials are configured in server memory." :
