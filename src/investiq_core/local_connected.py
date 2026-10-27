@@ -14,6 +14,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 from .adapters._http import JsonTransport
@@ -28,6 +29,7 @@ from .ai_research import (
 )
 from .application.connected_data import ConnectedDataService
 from .application.connected_research import CompanyResearchRequest, ConnectedResearchService
+from .browser_decisions import BrowserDecisionHistory
 from .connected_cli import _render_current
 from .evidence import InstrumentId
 from .filing_evidence import SecFilingEvidenceProvider
@@ -75,6 +77,7 @@ class LocalConnectedResearch:
         research_factory: Callable[[str, str], ConnectedResearchService] | None = None,
         evidence_factory: Callable[[str], SecFilingEvidenceProvider] | None = None,
         ai_coordinator: AiResearchCoordinator | None = None,
+        decision_dir: Path | None = None,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self._sessions: dict[str, BrowserSession] = {}
@@ -82,6 +85,7 @@ class LocalConnectedResearch:
         self._clock = clock
         self._directory_transport = directory_transport
         self._ai = ai_coordinator or default_ai_coordinator()
+        self._decisions = BrowserDecisionHistory(decision_dir)
         self._research_factory = research_factory or _build_research_service
         self._evidence_factory = evidence_factory or (
             lambda contact: SecFilingEvidenceProvider(user_agent=contact)
@@ -252,6 +256,53 @@ class LocalConnectedResearch:
                 cik=cik, contact=session.contact, model_key=session.model_key,
                 model_name=session.model_name, question=question.strip(),
             ))
+
+    def history_available(self) -> bool:
+        return self._decisions.enabled
+
+    def list_decisions(self) -> dict[str, Any]:
+        return self._decisions.list()
+
+    def open_decision(self, data: dict[str, Any]) -> dict[str, Any]:
+        return self._decisions.load(data.get("thesis_id"), data.get("revision"))
+
+    def export_decision(self, data: dict[str, Any]) -> dict[str, str]:
+        return self._decisions.export(
+            data.get("thesis_id"), data.get("revision"), data.get("format"),
+        )
+
+    def save_decision(
+        self, session: BrowserSession, data: dict[str, Any]
+    ) -> dict[str, Any]:
+        symbol, venue, cik = (data.get(name) for name in ("symbol", "venue", "cik"))
+        if (
+            not isinstance(symbol, str) or not isinstance(venue, str)
+            or not isinstance(cik, str) or data.get("currency") != "USD"
+            or data.get("confirm_current_listing") is not True
+            or data.get("confirm_currency") is not True
+            or data.get("approve_private_save") is not True
+            or set(data) != {
+                "symbol", "venue", "cik", "currency", "confirm_current_listing",
+                "confirm_currency", "approve_private_save", "decision",
+            }
+        ):
+            raise ValueError("Explicit save requires a confirmed issuer and decision")
+        with session.lock:
+            if not session.configured:
+                raise PermissionError("Configure SEC discovery first")
+            if (
+                session.directory_refreshed_at is None
+                or self._clock() - session.directory_refreshed_at > DIRECTORY_LIFETIME_SECONDS
+            ):
+                raise ValueError("Issuer directory expired; search again")
+            if sum(
+                (item.symbol, item.venue, item.cik) == (symbol, venue, cik)
+                for item in session.directory
+            ) != 1:
+                raise ValueError("Issuer is not the selected directory candidate")
+            return self._decisions.save(
+                symbol=symbol, venue=venue, cik=cik, data=data["decision"],
+            )
 
     def preview_scenarios(
         self, session: BrowserSession, data: dict[str, Any]

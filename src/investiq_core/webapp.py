@@ -12,6 +12,7 @@ import webbrowser
 from http.cookies import CookieError, SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib.resources import files
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -26,6 +27,7 @@ _ASSETS = {
     "/styles.css": ("styles.css", "text/css; charset=utf-8"),
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
     "/connect.js": ("connect.js", "text/javascript; charset=utf-8"),
+    "/history.js": ("history.js", "text/javascript; charset=utf-8"),
 }
 _HEADERS = {
     "Cache-Control": "no-store",
@@ -136,7 +138,8 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             return
         sid, state = session
         self._json(
-            200, self.server.connected.session_status(state),
+            200, {**self.server.connected.session_status(state),
+                  "private_history_enabled": self.server.connected.history_available()},
             extra_headers={
                 "Set-Cookie": (
                     f"investiq_sid={sid}; HttpOnly; SameSite=Strict; "
@@ -173,6 +176,10 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             "/api/v1/model/clear",
             "/api/v1/research/ai",
             "/api/v1/research/scenarios",
+            "/api/v1/decisions/list",
+            "/api/v1/decisions/save",
+            "/api/v1/decisions/open",
+            "/api/v1/decisions/export",
             "/api/v1/companies/search",
             "/api/v1/research/connected",
             "/api/v1/research/filing-evidence",
@@ -184,8 +191,8 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             self.headers.get("Transfer-Encoding")
             or not length.isascii()
             or not length.isdigit()
-            or len(length) > 4
-            or not 2 <= int(length) <= 2048
+            or len(length) > 5
+            or not 2 <= int(length) <= 32768
             or self.headers.get("Content-Type") != "application/json"
         ):
             self._json(400, {"error": "Expected a bounded JSON request body"})
@@ -202,6 +209,14 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
                 result = self.server.connected.configure_model(state, body)
             elif path.path == "/api/v1/model/clear":
                 result = self.server.connected.clear_model(state)
+            elif path.path == "/api/v1/decisions/list":
+                result = self.server.connected.list_decisions()
+            elif path.path == "/api/v1/decisions/save":
+                result = self.server.connected.save_decision(state, body)
+            elif path.path == "/api/v1/decisions/open":
+                result = self.server.connected.open_decision(body)
+            elif path.path == "/api/v1/decisions/export":
+                result = self.server.connected.export_decision(body)
             elif path.path == "/api/v1/research/ai":
                 result = self.server.connected.ai_analyze(state, body)
             elif path.path == "/api/v1/research/scenarios":
@@ -222,6 +237,12 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
         except ProviderFailure as exc:
             status = 429 if exc.code == ProviderFailureCode.RATE_LIMITED else 502
             self._json(status, {"error": "Connected provider request failed", "code": exc.code.value})
+        except FileExistsError:
+            self._json(409, {"error": "A revision already exists; reload history before saving"})
+        except FileNotFoundError:
+            self._json(404, {"error": "Private decision revision does not exist"})
+        except OSError:
+            self._json(503, {"error": "Local private decision store is unavailable"})
         except (ValueError, TypeError, KeyError, UnicodeError, json.JSONDecodeError):
             # No exception bodies or request values may be reflected: keys and
             # contact details are present in the setup request.
@@ -268,23 +289,28 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
 
 
 def create_app_server(
-    port: int = 8765, *, connected: LocalConnectedResearch | None = None
+    port: int = 8765, *, connected: LocalConnectedResearch | None = None,
+    research_dir: Path | None = None,
 ) -> ThreadingHTTPServer:
     """Bind to IPv4 loopback only. Zero selects a free port (useful in tests)."""
     if isinstance(port, bool) or not isinstance(port, int) or not 0 <= port <= 65535:
         raise ValueError("port must be an integer between 0 and 65535")
     server = ThreadingHTTPServer(("127.0.0.1", port), ResearchAppHandler)
-    server.connected = connected or LocalConnectedResearch()
+    server.connected = connected or LocalConnectedResearch(decision_dir=research_dir)
     server.daemon_threads = True
     return server
 
 
-def serve_app(*, port: int = 8765, open_browser: bool = True) -> None:
+def serve_app(
+    *, port: int = 8765, open_browser: bool = True,
+    research_dir: Path | None = None,
+) -> None:
     """Run the local research app until stopped; connected mode is user-initiated."""
-    with create_app_server(port) as server:
+    with create_app_server(port, research_dir=research_dir) as server:
         url = f"http://127.0.0.1:{server.server_port}/"
         print(f"InvestIQ local research desk: {url}", flush=True)
         print("Demo is fictional; connected data requires session setup; Ctrl+C to stop.", flush=True)
+        print("Private history: " + ("opt-in enabled" if research_dir else "disabled"), flush=True)
         if open_browser:
             webbrowser.open(url)
         try:
