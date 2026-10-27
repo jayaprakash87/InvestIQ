@@ -1,7 +1,7 @@
 # InvestIQ — Product Validation, Dogfooding and External Adoption
 
 > **Status:** Proposed evidence protocol · **Date:** 2026-10-27 · **No user-study or model-evaluation outcome is claimed.**
-> **Scope:** [Complete v0.3→v1.0 roadmap](product-roadmap.md) · [Research use cases](research-foundations.md) · [Personal Desk PRD](ai-research-experience.md).
+> **Scope:** [Complete v0.3→v1.0 roadmap](product-roadmap.md) · [Personal Desk PRD](ai-research-experience.md).
 
 ## 1. Validate in the right order
 
