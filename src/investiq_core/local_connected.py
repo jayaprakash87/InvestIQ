@@ -12,7 +12,7 @@ import secrets
 import threading
 import time
 from dataclasses import dataclass, field
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any, Callable
 
 from .adapters._http import JsonTransport
