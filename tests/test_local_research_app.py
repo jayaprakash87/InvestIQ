@@ -60,6 +60,7 @@ def test_local_http_assets_are_packaged_and_available(app_port):
         ("/styles.css", "text/css"),
         ("/app.js", "text/javascript"),
         ("/connect.js", "text/javascript"),
+        ("/history.js", "text/javascript"),
     ):
         status, headers, body = _request(app_port, "GET", path)
         assert status == 200
@@ -156,7 +157,7 @@ def test_only_loopback_host_and_valid_ports():
 def test_app_cli_launches_local_server_without_default_provider_usage():
     with patch("investiq_core.webapp.serve_app") as serve:
         assert main(["app", "--port", "0", "--no-browser"]) == 0
-        serve.assert_called_once_with(port=0, open_browser=False)
+        serve.assert_called_once_with(port=0, open_browser=False, research_dir=None)
 
 
 def test_app_cli_rejects_invalid_port(capsys):
