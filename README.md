@@ -2,7 +2,7 @@
 
 **Open-source, evidence-aware equity research.** InvestIQ v0.2.0 introduces opt-in, bring-your-own-key connected issuer analysis and private research-decision snapshots alongside the original offline Python toolkit, five AI-neutral research skills and hash-linked thesis history. The synthetic example and offline replay need no accounts or provider keys.
 
-**Proposed personal-to-open-source product direction (not shipped):** [Research-aligned Roadmap v3.0 through v1.0](docs/product/product-roadmap.md) starts with a **local AI Personal Research Desk in v0.3** for the original investor, then adds company/peer analysis, explainable screening, underwriting/entry conditions, monitoring, optional portfolio context, and externally installable OSS beta before stable v1.0. The [research foundations](docs/product/research-foundations.md) trace these features to earlier AI-infrastructure/physical-AI and valuation workflows. **No integrated research agent, GUI, scoring/portfolio product, provider-entitled public feed or PMF claim exists in v0.2.**
+**Proposed product direction (not shipped):** [InvestIQ's AI-first, open-source roadmap to v1.0](docs/product/product-roadmap.md) starts with a useful local equity research interface (v0.3), then progressively adds source-connected analysis, valid comparisons, configurable screening/scoring, valuation scenarios, thesis monitoring, optional private portfolio research and external-user readiness. **The platform is independent of particular industries, stock selections, research histories and portfolios.** These AI/UI capabilities are not shipped in v0.2.
 
 **This is experimental research software, not investment advice, a trading system, live market-data feed, backtesting engine or managed investment product.** No returns or predictive accuracy are claimed.
 
@@ -88,8 +88,7 @@ All numbers are **fictional assumptions**, not estimates of a listed company's f
 - [Portable AI skills](skills/README.md)
 - [Project architecture](docs/architecture/overview.md)
 - [Engineering Blueprint](docs/engineering/engineering-blueprint.md) — code quality, architecture, testing, security, AI readiness, future UX and PR gates
-- [Proposed Research-Aligned Product Roadmap v3.0 → v1.0](docs/product/product-roadmap.md) — personal dogfooding, phased investing capabilities and independent OSS release gates
-- [Research Foundations & Traceability](docs/product/research-foundations.md) — prior AI/physical-AI universe maps, scoring, company comparisons, entry models, portfolio workflows
+- [Proposed Product Roadmap v3.0 → v1.0](docs/product/product-roadmap.md) — personal dogfooding, phased investing capabilities and independent OSS release gates
 - [v0.3 Personal AI Research Desk PRD](docs/product/ai-research-experience.md) — first usable local app, supported company research and bounded tools
 - [Product Validation Plan](docs/product/validation-plan.md) — first personal daily use, then external install/repeat-use and LLM/tool comparisons
 - [ADR 0009 — AI-first product pivot](docs/decisions/0009-ai-first-product-pivot.md) — proposed roadmap decision
