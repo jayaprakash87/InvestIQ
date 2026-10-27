@@ -59,6 +59,14 @@ The bundle contains fictional issuer observations, explicit assumptions, source-
 
 Connected mode shows a source-attributed quote and selected SEC annual facts, with clear freshness/session/missing-data flags. It does not automatically save data, perform currency conversion, claim a real-time feed or recommend securities. Requested annual P/E is withheld unless the required financial context and an independent share-basis confirmation are supplied.
 
+## Private decisions from the local browser — v0.3 PR 6
+
+By default, **no** web decision storage is enabled. Choose a parent folder that already exists, then launch `investiq app --research-dir /your/private/parent/decisions`. The app uses existing create-only, integrity-checked snapshots; on POSIX it creates its private child folder as 0700 and individual revisions as 0600. No cloud account or synchronizer is used. Local machine users or processes with sufficient OS access may still read the data; use disk encryption and backups.
+
+Choose a supported SEC issuer and confirm its current listing and USD currency. Under **Research decisions & revisions**, manually author your thesis and stage, reason, risks and invalidation conditions, then explicitly approve saving. Do **not** paste an AI-generated claim, private account statement, restricted financial-data extract or credential into the editable text. Revisiting a saved version requires no provider key or network connection; the saved content has its own digest and hash-linked ancestry. Export private JSON or Markdown for review, not automatic publishing.
+
+**Important rights boundary:** The browser saves only author-written decision text and, optionally, user-supplied growth/P-E/subjective-weight assumptions and years. It never saves Twelve Data quotes, typed entry-price or EPS values, any AI answer or full SEC filing body. Therefore its **offline replay intentionally cannot recreate numeric price returns**, even when you used the hypothetical workbench earlier. The existing independently rights-gated CLI capture remains available separately for authorized retained public SEC facts. A content hash is not certified historical authorship, strong encryption or independent evidence that a decision was recorded at a claimed market time.
+
 ## Explicit research save and offline replay
 
 Use `investiq research ... --save-dir <private-dir> --thesis-id ... --thesis-statement ... --revision-reason ...` to create a private decision **only when requested**. Then run `investiq replay --store-dir <private-dir> --thesis-id ... --revision 1` offline, optionally with `--format markdown` or `--format manifest`.
