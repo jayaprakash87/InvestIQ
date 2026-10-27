@@ -577,6 +577,112 @@ def test_ai_browser_does_not_render_untrusted_html_or_stale_results():
     assert "validatedSecLink" in js
 
 
+def test_manual_scenarios_require_csrf_selected_issuer_and_fresh_confirmations(harness):
+    cookie, csrf, _, _ = initialize(harness)
+    hypothesis = {
+        "start_eps": 4.0, "initial_price": 75.0, "years": 5,
+        "scenarios": [
+            {"name": "bear", "annual_growth_percent": -5, "terminal_pe": 10,
+             "weight_percent": 25},
+            {"name": "base", "annual_growth_percent": 5, "terminal_pe": 15,
+             "weight_percent": 50},
+            {"name": "bull", "annual_growth_percent": 15, "terminal_pe": 20,
+             "weight_percent": 25},
+        ],
+    }
+    selected = {
+        "symbol": "EXM", "venue": "XNAS", "cik": "0000012345",
+        "currency": "USD", "confirm_current_listing": True,
+        "confirm_currency": True, "hypothetical": hypothesis,
+    }
+    assert request(
+        harness, "POST", "/api/v1/research/scenarios", selected,
+        cookie=cookie, csrf=csrf,
+    )[0] == 403
+    assert configure(harness, cookie, csrf)[0] == 200
+    assert request(
+        harness, "POST", "/api/v1/research/scenarios", selected,
+        cookie=cookie, csrf=csrf,
+    )[0] == 400
+    assert request(
+        harness, "POST", "/api/v1/companies/search",
+        {"query": "EXM"}, cookie=cookie, csrf=csrf,
+    )[0] == 200
+    for bad in (
+        {**selected, "confirm_currency": False},
+        {**selected, "cik": "0000012346"},
+        {**selected, "symbol": "BAD"},
+        {**selected, "currency": "EUR"},
+        {**selected, "hypothetical": {**hypothesis, "start_eps": 0}},
+    ):
+        assert request(
+            harness, "POST", "/api/v1/research/scenarios", bad,
+            cookie=cookie, csrf=csrf,
+        )[0] == 400
+    assert request(
+        harness, "POST", "/api/v1/research/scenarios", selected,
+        cookie=cookie,
+    )[0] == 403
+    status, _, outcome = request(
+        harness, "POST", "/api/v1/research/scenarios", selected,
+        cookie=cookie, csrf=csrf,
+    )
+    assert status == 200
+    assert outcome["mode"] == "manual_hypothetical_no_provider_data"
+    assert outcome["selection"]["symbol"] == "EXM"
+    assert len(outcome["outcomes"]) == 3
+    assert outcome["weighted_terminal_price"] > 0
+    assert outcome["inputs"]["start_eps"] == 4.0
+    assert harness.research.calls == []  # no quotes
+    assert harness.ai.calls == []        # no LLM
+    assert harness.evidence.calls == []  # no filing retrieval
+    assert request(
+        harness, "POST", "/api/v1/session/clear", {}, cookie=cookie, csrf=csrf,
+    )[0] == 200
+    assert request(
+        harness, "POST", "/api/v1/research/scenarios", selected,
+        cookie=cookie, csrf=csrf,
+    )[0] == 403
+
+
+def test_manual_scenarios_do_not_require_quote_or_ai_provider_key(harness):
+    cookie, csrf, _, _ = initialize(harness)
+    code, _, _ = request(
+        harness, "POST", "/api/v1/session/configure",
+        {"sec_contact": "InvestIQ Test research@example.com",
+         "twelve_data_api_key": ""},
+        cookie=cookie, csrf=csrf,
+    )
+    assert code == 200
+    assert request(
+        harness, "POST", "/api/v1/companies/search",
+        {"query": "EXM"}, cookie=cookie, csrf=csrf,
+    )[0] == 200
+    code, _, result = request(
+        harness, "POST", "/api/v1/research/scenarios", {
+            "symbol": "EXM", "venue": "XNAS", "cik": "0000012345",
+            "currency": "USD", "confirm_current_listing": True,
+            "confirm_currency": True,
+            "hypothetical": {
+                "start_eps": 2, "initial_price": 25, "years": 2,
+                "scenarios": [
+                    {"name": "bear", "annual_growth_percent": -10,
+                     "terminal_pe": 5, "weight_percent": 20},
+                    {"name": "base", "annual_growth_percent": 0,
+                     "terminal_pe": 12, "weight_percent": 60},
+                    {"name": "bull", "annual_growth_percent": 10,
+                     "terminal_pe": 20, "weight_percent": 20},
+                ],
+            },
+        },
+        cookie=cookie, csrf=csrf,
+    )
+    assert code == 200
+    assert result["method"] == "investiq_core.valuation.evaluate_scenarios"
+    assert harness.research.calls == []
+    assert harness.ai.calls == []
+
+
 def test_app_does_not_require_connection_for_existing_synthetic_demo(harness):
     status, _, payload = request(harness, "GET", "/api/v1/demo", origin=False)
     assert status == 200
