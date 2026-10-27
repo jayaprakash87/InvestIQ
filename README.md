@@ -2,6 +2,8 @@
 
 **Open-source, evidence-aware equity research.** InvestIQ v0.2.0 introduces opt-in, bring-your-own-key connected issuer analysis and private research-decision snapshots alongside the original offline Python toolkit, five AI-neutral research skills and hash-linked thesis history. The synthetic example and offline replay need no accounts or provider keys.
 
+**Proposed next product direction (not shipped):** [AI-first Research Experience v0.3](docs/product/ai-research-experience.md): a nontechnical investor asks a question, receives source-linked research, inspects a specific bear case, and controls what is saved. This is a hypothesis under comparative user validation, **not** a deployed research agent, browser app, live research feed or evidence of product-market fit. See [roadmap v3.0](docs/product/product-roadmap.md) and [validation plan](docs/product/validation-plan.md).
+
 **This is experimental research software, not investment advice, a trading system, live market-data feed, backtesting engine or managed investment product.** No returns or predictive accuracy are claimed.
 
 ## What works
@@ -86,7 +88,10 @@ All numbers are **fictional assumptions**, not estimates of a listed company's f
 - [Portable AI skills](skills/README.md)
 - [Project architecture](docs/architecture/overview.md)
 - [Engineering Blueprint](docs/engineering/engineering-blueprint.md) — code quality, architecture, testing, security, AI readiness, future UX and PR gates
-- [Approved Product Roadmap v2.0](docs/product/product-roadmap.md) — connected research, truthful quote freshness, provider strategy and releases
+- [Proposed Product Strategy and Roadmap v3.0](docs/product/product-roadmap.md) — AI-first product positioning, release order and gates
+- [v0.3 AI Research Experience PRD](docs/product/ai-research-experience.md) — planned user journey, bounded tools and acceptance
+- [Product Validation Plan](docs/product/validation-plan.md) — comparison with LLM/research tools, standalone vs assistant distribution
+- [ADR 0009 — AI-first product pivot](docs/decisions/0009-ai-first-product-pivot.md) — proposed roadmap decision
 - [Architecture Decision: Connected Data](docs/decisions/0003-connected-data-and-research-history.md)
 - [Roadmap Summary](docs/roadmap.md)
 - [Changelog](CHANGELOG.md)
@@ -99,7 +104,7 @@ Source-supported analysis over fabricated certainty. Distinct observed facts, co
 
 ## Connected research status
 
-The [connected-research roadmap](docs/product/product-roadmap.md) targets **provider-agnostic, appropriately current market information** with visible source, session and delay, optional freshness-aware caching, and **immutable saved research decisions**. A local workspace may hold a user's private historic theses, but it must **not** masquerade as a live pricing feed.
+The [proposed AI-first roadmap](docs/product/product-roadmap.md) preserves provider-entitled data freshness and **immutable research decisions**, while moving an accessible, bounded model-assisted research experience to the next product milestone. A standalone app versus an assistant-native interface remains an **unresolved, testable distribution decision**. A local workspace may hold a user's private historic theses, but it must **not** masquerade as a live pricing feed.
 
 The v0.2.0 Python/CLI connected vertical slice is **implemented**, but not independently tested against real provider accounts in standard CI. **Verified exchange real-time entitlement, unrestricted price retention, hosted accounts, shared cloud cache, full market coverage, web application and true historical backtesting are not shipped.**
 
