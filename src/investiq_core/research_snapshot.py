@@ -16,7 +16,7 @@ from decimal import Decimal
 from typing import Any
 
 from .application.connected_research import CompanyResearchRequest, CompanyResearchResult
-from .evidence import InstrumentId, ValueUnit
+from .evidence import ValueUnit
 from .fundamentals import AnnualMetricFact
 from .market import (
     IssuerId,

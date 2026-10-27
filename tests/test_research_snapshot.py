@@ -31,8 +31,6 @@ from investiq_core.market import (
 )
 from investiq_core.research_snapshot import (
     REPLAY_METHOD,
-    RetainedQuote,
-    ResearchSnapshot,
     capture_research_snapshot,
     replay_snapshot,
 )

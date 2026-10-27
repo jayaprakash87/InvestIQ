@@ -158,8 +158,10 @@ def render_snapshot_markdown(snapshot: ResearchSnapshot) -> str:
         parts.append(f"- {_md(warning)}")
     parts.extend([
         "",
-        "This is a private research decision record, not investment advice. "
-        "A SHA-256 content hash is not independent proof of when the decision was made.",
+        (
+            "This is a private research decision record, not investment advice. "
+            "A SHA-256 content hash is not independent proof of when the decision was made."
+        ),
         "",
     ])
     return "\n".join(parts)
