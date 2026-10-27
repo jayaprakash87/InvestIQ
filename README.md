@@ -64,6 +64,7 @@ All numbers are **fictional assumptions**, not estimates of a listed company's f
 - [Getting started and CLI](docs/getting-started.md)
 - [v0.1 scope and limitations](docs/product/scope.md)
 - [Evidence contract](docs/methodology/evidence-contract.md)
+- [Connected market-data contracts (v0.2 PR 1)](docs/methodology/connected-data-contracts.md) — provider-neutral types, not live data
 - [Research report contract](docs/methodology/research-report-contract.md)
 - [Valuation conventions](docs/methodology/valuation.md)
 - [Thesis history](docs/methodology/thesis-history.md)

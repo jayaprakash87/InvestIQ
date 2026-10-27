@@ -24,6 +24,10 @@ tests/           Public synthetic and negative-case automated tests
 
 There is **no live/delayed price provider, cloud cache, cloud database, web UI or live-data ingestion capability in v0.1.1**. Do not interpret this target description as deployed functionality.
 
+### v0.2 PR 1 domain contracts (implemented; adapters still planned)
+
+`market.py` defines issuer-to-listing lineage, sourced quotes, quote timeliness, reuse rights and caller-policy freshness. `fundamentals.py` contains filing references and a narrow financial metric catalog. `ports.py` declares optional-provider capabilities, requests and categorized failures using async Protocol interfaces. None of these modules makes network requests or grants market-data entitlements. See [ADR 0004](../decisions/0004-provider-neutral-data-contracts.md) and [connected data contracts](../methodology/connected-data-contracts.md).
+
 ## 2. Target logical components
 
 ```text
