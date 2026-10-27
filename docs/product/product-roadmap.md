@@ -1,7 +1,7 @@
 # InvestIQ — Product Strategy and Roadmap v3.0
 
 > **Status:** Proposed AI-first planning baseline for review · **Date:** 2026-10-27
-> **Supersedes:** [Product Roadmap v2.0](../decisions/0009-ai-first-product-pivot.md) for **future priorities**; it does not retroactively change the v0.2 implementation or signed release decisions.
+> **Supersedes:** The previous v2.0 release-order baseline for **future priorities**, as recorded in [ADR 0009](../decisions/0009-ai-first-product-pivot.md); it does not retroactively change the v0.2 implementation or signed release decisions.
 > **Implementation baseline:** v0.2.0 **source release candidate**, not a fully validated public/hosted product. The connected CLI and synthetic acceptance exist; independent live-provider entitlement smoke, public tag and user validation remain pending.
 > **Companion documents:** [AI Research Experience PRD](ai-research-experience.md) · [Product Validation Plan](validation-plan.md) · [Engineering Blueprint](../engineering/engineering-blueprint.md) · [Architecture](../architecture/overview.md).
 
