@@ -178,7 +178,7 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
         try:
             body = json.loads(self.rfile.read(int(length)).decode("utf-8"))
             if not isinstance(body, dict):
-                raise ValueError("JSON body must be an object")
+                raise TypeError("JSON body must be an object")
             if path.path == "/api/v1/session/configure":
                 result = self.server.connected.configure(state, body)
             elif path.path == "/api/v1/session/clear":
@@ -197,7 +197,7 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             # No exception bodies or request values may be reflected: keys and
             # contact details are present in the setup request.
             self._json(400, {"error": "Invalid request or unsupported issuer selection"})
-        except Exception:
+        except Exception:  # noqa: BLE001 - sanitize all unexpected HTTP boundary failures
             self._json(500, {"error": "Local research request failed"})
 
 
