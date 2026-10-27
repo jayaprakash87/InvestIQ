@@ -514,6 +514,8 @@
         status("ai-message", error.message || "AI research failed.");
       }
     } finally {
+      // Consent is per request, not an ongoing or blanket authorization.
+      $("ai-consent").checked = false;
       submit.disabled = !modelConfigured || !configured;
     }
   });
