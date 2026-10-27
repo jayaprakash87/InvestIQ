@@ -111,6 +111,22 @@
           </form>
           <p class="field-help">Confirmation does not independently verify historical listing dates, split/share basis or market-data rights.</p>
         </div>
+        <section class="filing-panel" id="filing-evidence-panel" hidden aria-labelledby="filing-evidence-heading">
+          <div class="form-step">STEP 04 · SOURCE DOCUMENT INSPECTION</div>
+          <h3 id="filing-evidence-heading">Inspect annual filing evidence</h3>
+          <p class="field-help">Retrieve a recent SEC 10-K primary document on demand. The excerpt finder uses keywords, not AI; a match does not establish an SEC Item section or prove an investment claim.</p>
+          <div class="evidence-controls" role="group" aria-label="Filing passage topics">
+            <button type="button" class="secondary-button filing-topic" data-topic="business">Business</button>
+            <button type="button" class="secondary-button filing-topic" data-topic="risks">Risks</button>
+            <button type="button" class="secondary-button filing-topic" data-topic="management">Management discussion</button>
+          </div>
+          <p class="connection-message" id="filing-message" role="status" aria-live="polite">Confirm the selected issuer, listing and currency before inspecting filing text.</p>
+          <div id="filing-result" hidden>
+            <div class="filing-source" id="filing-source"></div>
+            <div class="filing-excerpts" id="filing-excerpts"></div>
+            <ul class="connected-warnings" id="filing-limitations"></ul>
+          </div>
+        </section>
         <div class="connection-message" id="research-message" role="status" aria-live="polite"></div>
         <div class="connected-output" id="connected-output" hidden>
           <div class="connected-output-head"><h3>Connected research view</h3><span class="current-not-saved">NOT SAVED · NOT VERIFIED LIVE</span></div>
