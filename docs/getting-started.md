@@ -2,7 +2,7 @@
 
 InvestIQ has an **offline synthetic workflow** and an **opt-in connected issuer-research workflow**. Python 3.11+ is required. No account or key is necessary for offline use.
 
-**What this is not:** The current v0.2.0 source release candidate is developer-oriented CLI software, **not** an integrated LLM research assistant or consumer UI. The [proposed v0.3 Personal AI Research Desk](product/ai-research-experience.md) will be a **locally runnable app** with guided permitted provider/model setup and a no-key synthetic demo; neither interface nor one-time configuration wizard is implemented now. The [complete v0.3→v1.0 open-source roadmap](product/product-roadmap.md) adds peers, explainable scoring, entry scenarios, watchlists, optional portfolio and external packaging through validated increments. See [research use cases](product/research-foundations.md) and [personal/external validation](product/validation-plan.md).
+**What this is not:** The current v0.2.0 source release candidate is developer-oriented CLI software, **not** an integrated LLM research assistant or consumer UI. The [proposed v0.3 Personal AI Research Desk](product/ai-research-experience.md) will be a **locally runnable app** with guided permitted provider/model setup and a no-key synthetic demo; neither interface nor one-time configuration wizard is implemented now. The [complete v0.3→v1.0 open-source roadmap](product/product-roadmap.md) adds peers, explainable scoring, entry scenarios, watchlists, optional portfolio and external packaging through validated increments. See [capability and release acceptance](product/product-roadmap.md) and [initial/external validation](product/validation-plan.md).
 
 ## Installation
 
