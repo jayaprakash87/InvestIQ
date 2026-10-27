@@ -77,7 +77,7 @@ def test_local_http_assets_are_packaged_and_available(app_port):
     js = files("investiq_core").joinpath("web", "app.js").read_text(
         encoding="utf-8"
     )
-    assert "FICTIONAL DATA" in html
+    assert "SYNTHETIC DEMO BELOW" in html
     assert "model" in html.lower()
     assert "textContent" in js
     assert "innerHTML" not in js
