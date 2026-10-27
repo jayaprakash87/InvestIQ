@@ -61,12 +61,12 @@ def parse_directory(payload: Any, *, observed_at: datetime) -> tuple[IssuerCandi
     if observed_at.tzinfo is None or observed_at.utcoffset() is None:
         raise ValueError("observed_at must be timezone-aware")
     if not isinstance(payload, dict):
-        raise ValueError("SEC directory must be an object")
+        raise TypeError("SEC directory must be an object")
     fields = payload.get("fields")
     rows = payload.get("data")
     if not isinstance(fields, list) or not all(isinstance(x, str) for x in fields):
         raise ValueError("SEC directory fields must be strings")
-    if len(fields) != len(set(fields)) or not set(("cik", "name", "ticker", "exchange")) <= set(fields):
+    if len(fields) != len(set(fields)) or not {"cik", "name", "ticker", "exchange"} <= set(fields):
         raise ValueError("SEC directory missing or duplicate required fields")
     if not isinstance(rows, list) or len(rows) > 100_000:
         raise ValueError("SEC directory data has invalid shape/size")
