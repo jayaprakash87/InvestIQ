@@ -14,9 +14,11 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 from .adapters._http import JsonTransport
+from .browser_decisions import BrowserDecisionHistory
 from .adapters.sec_companyfacts import SecCompanyFactsProvider
 from .adapters.sec_edgar import SecEdgarFilingProvider
 from .adapters.twelve_data import TwelveDataQuoteProvider
@@ -75,6 +77,7 @@ class LocalConnectedResearch:
         research_factory: Callable[[str, str], ConnectedResearchService] | None = None,
         evidence_factory: Callable[[str], SecFilingEvidenceProvider] | None = None,
         ai_coordinator: AiResearchCoordinator | None = None,
+        decision_dir: Path | None = None,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self._sessions: dict[str, BrowserSession] = {}
@@ -82,6 +85,7 @@ class LocalConnectedResearch:
         self._clock = clock
         self._directory_transport = directory_transport
         self._ai = ai_coordinator or default_ai_coordinator()
+        self._decisions = BrowserDecisionHistory(decision_dir)
         self._research_factory = research_factory or _build_research_service
         self._evidence_factory = evidence_factory or (
             lambda contact: SecFilingEvidenceProvider(user_agent=contact)
