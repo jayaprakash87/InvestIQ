@@ -36,7 +36,6 @@ from investiq_core.ports import (
     QuoteRequest,
 )
 
-
 INSTRUMENT = InstrumentId("DEMO", "XNAS", "USD")
 ISSUER = IssuerId("SEC_CIK", "0000123456")
 NOW = datetime(2026, 10, 27, 14, tzinfo=UTC)
@@ -416,3 +415,58 @@ def test_real_twelve_data_unknown_rights_never_cached_without_license():
     run(app.quote(QUOTE_REQUEST, max_age=timedelta(minutes=1)))
     run(app.quote(QUOTE_REQUEST, max_age=timedelta(minutes=1)))
     assert app.cache_size == 0
+
+
+def test_scope_lookup_index_is_bounded_with_lru_cache():
+    # Regression: an unbounded request-to-entitlement index defeats max_entries.
+    class MultiTicker(FakeProvider):
+        async def get_quote(self, request):
+            self.quote_calls += 1
+            return replace(
+                self.observation,
+                instrument=request.instrument,
+                provider_symbol=request.instrument.ticker,
+                quote_id="synthetic:" + request.instrument.ticker,
+            )
+
+    provider = MultiTicker(sample_quote(rights=licensed()))
+    app = service(provider, cache=BoundedQuoteCache(max_entries=2))
+    for n in range(30):
+        request = QuoteRequest(
+            InstrumentId(f"TEST{n}", "XNAS", "USD"), kind=QuoteKind.CLOSE
+        )
+        run(app.quote(request, max_age=timedelta(minutes=1)))
+    assert app.cache_size <= 2
+    assert len(app._quote_scopes) <= 2
+
+
+@pytest.mark.parametrize("invalidation", ["clear", "single"])
+def test_inflight_quote_cannot_repopulate_or_escape_invalidated_access(invalidation):
+    async def scenario():
+        start = asyncio.Event()
+        finish = asyncio.Event()
+
+        class SlowProvider(FakeProvider):
+            async def get_quote(self, request):
+                start.set()
+                await finish.wait()
+                return await super().get_quote(request)
+
+        provider = SlowProvider(sample_quote(rights=licensed()))
+        app = service(provider)
+        pending = asyncio.create_task(
+            app.quote(QUOTE_REQUEST, max_age=timedelta(minutes=1))
+        )
+        await start.wait()
+        if invalidation == "clear":
+            app.clear_cache()
+        else:
+            app.invalidate_quote(QUOTE_REQUEST)
+        finish.set()
+        with pytest.raises(ProviderFailure) as error:
+            await pending
+        assert error.value.code == ProviderFailureCode.ENTITLEMENT_DENIED
+        assert app.cache_size == 0
+        assert app._quote_scopes == {}
+
+    run(scenario())

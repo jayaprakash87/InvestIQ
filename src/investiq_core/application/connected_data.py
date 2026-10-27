@@ -142,6 +142,10 @@ class BoundedQuoteCache:
         self._ttl = ttl
         self._entries: OrderedDict[QuoteCacheKey, tuple[MarketQuote, datetime]] = OrderedDict()
 
+    @property
+    def max_entries(self) -> int:
+        return self._max
+
     def get(self, key: QuoteCacheKey, *, now: datetime) -> MarketQuote | None:
         current = _instant(now)
         entry = self._entries.get(key)
@@ -217,7 +221,10 @@ class ConnectedDataService:
         # This namespace is intentionally local to a specific provider object,
         # not a value claim usable as a global multi-process authorization key.
         self._provider_instance = f"local:{id(quote_provider)}"
-        self._quote_scopes: dict[QuoteRequest, str] = {}
+        self._quote_scopes: OrderedDict[QuoteRequest, str] = OrderedDict()
+        # Revocation can occur synchronously during an awaited provider call.
+        # Never return or recache data acquired under an invalidated context.
+        self._cache_epoch = 0
         self._lock = asyncio.Lock()
 
     @property
@@ -226,10 +233,14 @@ class ConnectedDataService:
 
     def clear_cache(self) -> None:
         """Call when credentials, license grants or principal change."""
+        self._cache_epoch += 1
         self._cache.clear()
         self._quote_scopes.clear()
 
     def invalidate_quote(self, request: QuoteRequest) -> None:
+        # Conservative global epoch: in-flight writes from this provider must
+        # never repopulate an invalidated cache entry.
+        self._cache_epoch += 1
         entitlement = self._quote_scopes.pop(request, None)
         if entitlement is not None:
             self._cache.invalidate(self._key(request, entitlement))
@@ -280,6 +291,7 @@ class ConnectedDataService:
         # Guard the cache read/write path. Async lock is per service instance;
         # this also prevents duplicate concurrent fetches for the same account.
         async with self._lock:
+            epoch = self._cache_epoch
             now = _instant(self._clock())
             scope = self._quote_scopes.get(request)
             if allow_cache and max_age is not None and scope is not None:
@@ -287,16 +299,24 @@ class ConnectedDataService:
                 if found is not None and self._valid_quote(found, request, check=False):
                     status = assess_quote_freshness(found, now=now, max_age=max_age)
                     if status == QuoteFreshness.WITHIN_POLICY:
+                        self._quote_scopes.move_to_end(request)
                         return QuoteResult(found, status, True, 0)
                     self._cache.invalidate(self._key(request, scope))
+                self._quote_scopes.pop(request, None)
             quote, attempts = await self._invoke(
                 lambda: self._quote_provider.get_quote(request)
             )
+            if self._cache_epoch != epoch:
+                raise ProviderFailure(
+                    self._quote_provider.capabilities.provider,
+                    ProviderFailureCode.ENTITLEMENT_DENIED,
+                    "Data-access context changed during provider request",
+                )
             self._valid_quote(quote, request)
             now = _instant(self._clock())
             try:
                 freshness = assess_quote_freshness(quote, now=now, max_age=max_age)
-            except ValueError as exc:
+            except ValueError:
                 raise ProviderFailure(
                     self._quote_provider.capabilities.provider,
                     ProviderFailureCode.INVALID_RESPONSE,
@@ -312,6 +332,9 @@ class ConnectedDataService:
                 key = self._key(request, quote.entitlement_scope)
                 self._cache.put(key, quote, now=now)
                 self._quote_scopes[request] = quote.entitlement_scope
+                self._quote_scopes.move_to_end(request)
+                while len(self._quote_scopes) > self._cache.max_entries:
+                    self._quote_scopes.popitem(last=False)
             return QuoteResult(quote, freshness, False, attempts)
 
     def _valid_quote(self, quote: MarketQuote, request: QuoteRequest, *, check: bool = True) -> bool:
