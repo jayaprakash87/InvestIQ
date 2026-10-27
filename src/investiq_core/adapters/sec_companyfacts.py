@@ -229,5 +229,5 @@ def _annual_facts(
         if len({(r.value, r.currency, r.unit) for r in latest}) > 1:
             continue
         # Prefer deterministic representation of duplicated/reported facts.
-        results.append(sorted(latest, key=lambda r: (r.accession, r.tag))[0])
+        results.append(min(latest, key=lambda r: (r.accession, r.tag)))
     return tuple(sorted(results, key=lambda item: item.metric))

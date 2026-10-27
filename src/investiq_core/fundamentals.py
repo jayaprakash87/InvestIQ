@@ -7,9 +7,9 @@ belong to actual provider adapters and are NOT implied by this seed catalog.
 from __future__ import annotations
 
 import re
-from decimal import Decimal
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
+from decimal import Decimal
 from enum import Enum
 
 from .evidence import ValueUnit

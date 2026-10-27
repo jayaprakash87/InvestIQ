@@ -10,7 +10,6 @@ from investiq_core.adapters.sec_companyfacts import SecCompanyFactsProvider
 from investiq_core.market import IssuerId
 from investiq_core.ports import AnnualMetricsRequest, ProviderFailure, ProviderFailureCode
 
-
 NOW = datetime(2026, 10, 27, 14, tzinfo=UTC)
 ISSUER = IssuerId("SEC_CIK", "320193")
 ACC = "0000320193-26-000001"
@@ -38,7 +37,7 @@ def companyfacts(*, cik=320193):
                            filed="2025-02-11", accession="0000320193-25-000001"),
                     annual(Decimal("9.99"), filed="2026-10-27",
                            accession="0000320193-26-000099"),
-                    annual(Decimal("999"), form="10-Q", fp="Q3"),
+                    annual(Decimal(999), form="10-Q", fp="Q3"),
                 ]}
             },
             "RevenueFromContractWithCustomerExcludingAssessedTax": {
@@ -107,7 +106,7 @@ def test_sec_filters_same_day_filing_and_later_amended_annual_fact():
 def test_conflicting_latest_annual_tags_yield_gap_not_arbitrary_revenue():
     payload = companyfacts()
     payload["facts"]["us-gaap"]["Revenues"] = {
-        "units": {"USD": [annual(Decimal("188000000"))]}
+        "units": {"USD": [annual(Decimal(188000000))]}
     }
     rows, _ = fetch(payload)
     assert "revenue" not in {item.metric for item in rows}

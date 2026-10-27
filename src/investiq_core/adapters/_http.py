@@ -8,10 +8,10 @@ from __future__ import annotations
 
 import asyncio
 import json
-from decimal import Decimal
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from decimal import Decimal
 from email.utils import parsedate_to_datetime
 from http.client import HTTPException
 from math import ceil

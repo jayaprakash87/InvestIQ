@@ -25,7 +25,6 @@ from investiq_core.market import (
 from investiq_core.ports import DataCapability, ProviderCapabilities, ProviderFailure
 from investiq_core.valuation import ValuationScenario
 
-
 NOW = datetime(2026, 10, 27, 14, tzinfo=UTC)
 ISSUER = IssuerId("SEC_CIK", "0000320193")
 INSTRUMENT = InstrumentId("DEMO", "XNAS", "USD")
