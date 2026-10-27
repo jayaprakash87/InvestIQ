@@ -170,6 +170,7 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             "/api/v1/session/clear",
             "/api/v1/companies/search",
             "/api/v1/research/connected",
+            "/api/v1/research/filing-evidence",
         }:
             self._json(404, {"error": "Not found"})
             return
@@ -194,6 +195,8 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
                 result = self.server.connected.clear(state)
             elif path.path == "/api/v1/companies/search":
                 result = self.server.connected.search(state, body)
+            elif path.path == "/api/v1/research/filing-evidence":
+                result = self.server.connected.inspect_evidence(state, body)
             else:
                 result = self.server.connected.analyze(state, body)
             self._json(200, result)
