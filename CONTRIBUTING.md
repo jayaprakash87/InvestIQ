@@ -7,7 +7,7 @@ All contributors are welcome. Propose changes via an issue or pull request.
 For fewer unnecessary GitHub Actions runs, follow the [draft-to-ready CI policy](docs/engineering/ci-efficiency.md): group local changes, keep unfinished PRs in draft, and make the PR ready only when the head is reviewable. CI still runs on every update **after** ready so the final-commit gate is never bypassed.
 
 
-Follow the [InvestIQ Engineering Blueprint v2.0](docs/engineering/engineering-blueprint.md) for financial integrity, bounded AI orchestration, evaluation, security, architecture and v0.3 UX gates. The [proposed AI-first Product Roadmap v3.0](docs/product/product-roadmap.md) sets user outcomes and priorities; the blueprint sets implementation standards. [ADR 0009](docs/decisions/0009-ai-first-product-pivot.md) records the proposed strategic change; it does not alter completed v0.2 behavior.
+Follow the [InvestIQ Engineering Blueprint v2.0](docs/engineering/engineering-blueprint.md) for financial integrity, bounded AI orchestration, evaluation, security, architecture and v0.3 UX gates. The [research-aligned personal-to-v1.0 Product Roadmap](docs/product/product-roadmap.md) sets stepwise user outcomes, open-source release gates and research-method traceability; the blueprint sets implementation standards. The [research foundations](docs/product/research-foundations.md) map earlier investment questions to planned functionality. Future extensions must not include private user holdings or copyrighted/licensed stock data in public fixtures. [ADR 0009](docs/decisions/0009-ai-first-product-pivot.md) records the proposed strategic change; it does not alter completed v0.2 behavior.
 
 - Python 3.11+ and a virtual environment.
 - Install: `python -m pip install -e ".[dev]"`.
