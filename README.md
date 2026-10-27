@@ -2,7 +2,7 @@
 
 **Open-source, evidence-aware equity research.** InvestIQ v0.2.0 introduces opt-in, bring-your-own-key connected issuer analysis and private research-decision snapshots alongside the original offline Python toolkit, five AI-neutral research skills and hash-linked thesis history. The synthetic example and offline replay need no accounts or provider keys.
 
-**Proposed product direction (not shipped):** [InvestIQ's AI-first, open-source roadmap to v1.0](docs/product/product-roadmap.md) starts with a useful local equity research interface (v0.3), then progressively adds source-connected analysis, valid comparisons, configurable screening/scoring, valuation scenarios, thesis monitoring, optional private portfolio research and external-user readiness. **The platform is independent of particular industries, stock selections, research histories and portfolios.** These AI/UI capabilities are not shipped in v0.2.
+**Product direction:** [InvestIQ's AI-first, open-source roadmap to v1.0](docs/product/product-roadmap.md) starts with a useful local equity research interface (v0.3), then progressively adds source-connected analysis, valid comparisons, configurable screening/scoring, valuation scenarios, thesis monitoring, optional private portfolio research and external-user readiness. **The platform is independent of particular industries, stock selections, research histories and portfolios.** **PR 1 adds a local, no-key synthetic UI preview only**; real company discovery, AI orchestration, connected research and decision saving in the UI remain future work.
 
 **This is experimental research software, not investment advice, a trading system, live market-data feed, backtesting engine or managed investment product.** No returns or predictive accuracy are claimed.
 
@@ -17,6 +17,7 @@
 | Research report validation | Structural citations, fact/estimate/hypothesis separation, source timing |
 | Thesis version history | Hash-linked snapshots, differences, JSONL export/import, falsification checkpoints |
 | Offline workflow | Generate and validate a complete **synthetic** research bundle from the CLI |
+| Local research preview (v0.3 PR 1) | Browser-based display of the **existing fictional evidence, deterministic scenarios and thesis history** on loopback; no AI, external providers or persistence |
 | Connected issuer research (opt-in) | SEC annual US-GAAP facts + Twelve Data one-minute CLOSE with unknown declared timeliness, sourced via explicit CIK/listing |
 | Private decision snapshots | Explicit permission-gated save; offline replay and JSON/Markdown exports, not automatic provider retention |
 
@@ -38,6 +39,19 @@ On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`. If shell acti
 The `demo.json` file is locally generated and entirely fictional. `investiq demo` prints JSON to stdout when `--output` is omitted. `python -m investiq_core demo` is an equivalent module entry point. `investiq validate` checks supplied local bundles and prints structured results. It does **not** fetch live prices, execute trades, or certify the meaning of natural-language research conclusions.
 
 For an installed package, use `python -m pip install .` or an official release wheel. No mandatory service or paid dependency.
+
+## Local Research App — synthetic preview (v0.3 PR 1)
+
+Run the same fictional offline workflow in a responsive research interface:
+
+```bash
+python -m pip install -e .
+investiq app
+```
+
+A local browser page opens at `http://127.0.0.1:8765/`; click **Run synthetic research**. If the browser should not open automatically, run `investiq app --no-browser`. Set a different local port with `--port 8766`. Stop the server with Ctrl+C.
+
+**Preview scope:** No financial provider keys, no LLM calls, no saved or shared research, no market prices, no company search, no terminal access beyond installation/startup. The demo's dated values are **fictional** and the validator checks **structure only**; it does not fact-check interpretations. The process binds to **loopback only**, with a fixed read-only HTTP surface. Do not expose it to a public network. Connected company research remains available separately through the existing developer CLI.
 
 ## Connected CLI (v0.2.0)
 
@@ -106,7 +120,7 @@ Source-supported analysis over fabricated certainty. Distinct observed facts, co
 
 The [proposed personal-to-v1.0 AI-first roadmap](docs/product/product-roadmap.md) keeps source-entitled freshness and **immutable saved research**, while planning a **locally runnable research UI as the first personal product (v0.3)**. An assistant/skill/MCP interface is an optional additional distribution channel. Current financial data still come from appropriately entitled provider APIs; local history must **not** masquerade as a live pricing feed.
 
-The v0.2.0 Python/CLI connected vertical slice is **implemented**, but not independently tested against real provider accounts in standard CI. **Verified exchange real-time entitlement, unrestricted price retention, hosted accounts, shared cloud cache, full market coverage, web application and true historical backtesting are not shipped.**
+The v0.2.0 Python/CLI connected vertical slice is **implemented**, but not independently tested against real provider accounts in standard CI. **Verified exchange real-time entitlement, unrestricted price retention, hosted accounts, shared cloud cache, full market coverage, **connected** web research application and true historical backtesting are not shipped.**
 
 ## Contributing and safety
 
