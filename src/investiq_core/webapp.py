@@ -54,6 +54,14 @@ def build_demo_response() -> dict[str, Any]:
     }
 
 
+def _allowed_authorities(port: int) -> set[str]:
+    """Browser Host/Origin may omit :80 for the default HTTP port."""
+    allowed = {f"127.0.0.1:{port}", f"localhost:{port}"}
+    if port == 80:
+        allowed.update({"127.0.0.1", "localhost"})
+    return allowed
+
+
 class ResearchAppHandler(BaseHTTPRequestHandler):
     """Serve a fixed allowlist of static assets and one read-only JSON API."""
 
@@ -63,7 +71,7 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
     def _trusted_request(self) -> bool:
         host = self.headers.get("Host", "")
         port = self.server.server_port
-        allowed = {f"127.0.0.1:{port}", f"localhost:{port}"}
+        allowed = _allowed_authorities(port)
         if host not in allowed:
             return False
         origin = self.headers.get("Origin")
