@@ -1,12 +1,11 @@
 # InvestIQ — Product Scope and User Journey
 
 > **Proposed alignment:** [Product Strategy & Roadmap v3.0 through v1.0](product-roadmap.md) · **Date:** 2026-10-27
-> **Research basis:** [Existing investment research requirements](research-foundations.md)
 > **Current code:** v0.2.0 source release candidate; connected API rights/provider smoke and public tag approval remain separate gates.
 
 ## Mission
 
-Create an **AI-first, open-source, local-first equity investment research workspace** that the original researcher actually uses, then make it usable by anyone with an authorized provider/model configuration within supported coverage. Its primary job is to **discover and evaluate companies, compare meaningful peers, underwrite valuation and entry conditions, document a falsifiable investment thesis, and revisit new evidence** with far less manual prompting and spreadsheet reconciliation.
+Create an **AI-first, open-source, local-first investment research platform** that proves its value in individual equity research before expanding to independently usable open-source distribution and, when justified, additional asset classes. Its functionality is not tied to any sector, company, research history or investment theme. Its primary job is to **discover and evaluate companies, compare meaningful peers, underwrite valuation and entry conditions, document a falsifiable investment thesis, and revisit new evidence** with far less manual prompting and spreadsheet reconciliation.
 
 **AI coordinates research; sourced tools retrieve market/filing facts; deterministic functions calculate; the investor decides.** This is neither a generic chatbot nor an automated stock adviser/brokerage.
 
@@ -17,7 +16,7 @@ Create an **AI-first, open-source, local-first equity investment research worksp
 3. **v0.7–v0.8 personal continuity:** opt-in watchlists, material changes, versioned research, optional private portfolio concentration/risks and multi-currency when supported.
 4. **v0.9–v1.0 external ready:** independently installable and usable open-source product, documented supported markets/providers, safely replaceable personal context, scenario/workspace export, stable contracts and actual external tests.
 
-The repository is already public and MIT-licensed. **External-use readiness is a usability/quality achievement, not a business-model conversion or postponement of open source.**
+The repository is already public and MIT-licensed. **External-use readiness is a usability/quality achievement, not a business-model conversion or postponement of open source.** All examples, research universes, factor models and provider configurations are replaceable and user-defined; no particular market theme is part of InvestIQ's identity.
 
 ## Actual v0.2 source release candidate
 
