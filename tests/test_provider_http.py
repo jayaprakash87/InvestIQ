@@ -3,6 +3,7 @@
 import asyncio
 import io
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from email.utils import format_datetime
 from http.client import IncompleteRead
 from urllib.error import HTTPError, URLError
@@ -147,3 +148,11 @@ def test_truncated_http_body_maps_to_sanitized_retryable_transport_failure(monke
             headers={},
         ))
     assert "SYNTHETIC-SECRET" not in str(error.value)
+
+
+def test_fractional_financial_json_is_parsed_as_exact_decimal(monkeypatch):
+    payload = b'{"annual_diluted_eps": 6.125, "annual_revenue": 150000000}'
+    value = call(monkeypatch, payload)
+    assert value["annual_diluted_eps"] == Decimal("6.125")
+    assert isinstance(value["annual_diluted_eps"], Decimal)
+    assert value["annual_revenue"] == 150000000

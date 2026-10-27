@@ -11,6 +11,7 @@ import json
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from decimal import Decimal
 from email.utils import parsedate_to_datetime
 from http.client import HTTPException
 from math import ceil
@@ -117,6 +118,7 @@ class UrllibJsonTransport:
         try:
             return json.loads(
                 raw.decode("utf-8"),
+                parse_float=Decimal,
                 parse_constant=lambda _value: (_ for _ in ()).throw(ValueError()),
             )
         except (UnicodeDecodeError, json.JSONDecodeError, ValueError):

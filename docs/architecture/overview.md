@@ -36,6 +36,10 @@ There is **no live/delayed price provider, cloud cache, cloud database, web UI o
 
 `application/connected_data.py` provides on-demand quote and filing use cases, source-age validation, bounded retry policy and rights-aware in-process quote caching. The cache is **disabled for provider responses without explicit caching rights**, including the currently integrated Twelve Data adapter. `QuoteCachePort` is a future shared cache contract, not a hosted implementation. No XBRL financial-data normalization, company valuation workflow, historical thesis store or frontend has been added. See [ADR 0006](../decisions/0006-connected-data-service.md) and [usage](../methodology/connected-data-service.md).
 
+### v0.2 PR 4 connected issuer analysis (implemented; constrained)
+
+`adapters/sec_companyfacts.py` fetches and conservatively filters SEC annual 10-K US-GAAP facts. `fundamentals.AnnualMetricFact` and the corresponding `FundamentalsProvider` port preserve accession, filing date, fiscal period, value units and exact `Decimal`. `application/connected_research.py` combines compatible issuer/listing mapping, reported annual EPS and price observations, with explicit freshness/FX/share-basis eligibility. No quote/data persistence, automatic rankings, forward/TTM valuations, complete fiscal normalization or new CLI/web interface is implied. See [ADR 0007](../decisions/0007-connected-research-analysis.md) and [connected research use](../methodology/connected-research.md).
+
 ## 2. Target logical components
 
 ```text
