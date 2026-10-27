@@ -165,6 +165,7 @@ def test_twelve_quote_uses_minute_candle_timestamp_not_unrelated_timestamp():
     assert params["apikey"] == [KEY]
     assert params["timezone"] == ["UTC"]
     assert params["mic_code"] == ["XNAS"]
+    assert params["interval"] == ["1min"]
 
 
 def test_twelve_does_not_call_provider_for_unsupported_or_unverified_request():

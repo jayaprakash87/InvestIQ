@@ -91,6 +91,7 @@ class TwelveDataQuoteProvider:
             {
                 "symbol": ticker,
                 "mic_code": request.instrument.venue,
+                "interval": "1min",
                 "apikey": self._key,
                 "timezone": "UTC",
             }
