@@ -2,6 +2,11 @@ name: CI
 
 on:
   pull_request:
+    # Draft PR events still create a skipped workflow, but run no paid runner.
+    # Full CI executes for the latest head once the PR is ready, and again
+    # on any subsequent update so branch protection cannot accept stale CI.
+    types: [opened, reopened, synchronize, ready_for_review]
+  workflow_dispatch:
   push:
     branches: [main]
 
@@ -14,6 +19,8 @@ concurrency:
 
 jobs:
   python:
+    # Do not provision a runner for WIP draft pull requests.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:

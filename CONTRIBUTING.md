@@ -4,6 +4,9 @@ All contributors are welcome. Propose changes via an issue or pull request.
 
 ## Development
 
+For fewer unnecessary GitHub Actions runs, follow the [draft-to-ready CI policy](docs/engineering/ci-efficiency.md): group local changes, keep unfinished PRs in draft, and make the PR ready only when the head is reviewable. CI still runs on every update **after** ready so the final-commit gate is never bypassed.
+
+
 Follow the [InvestIQ Engineering Blueprint](docs/engineering/engineering-blueprint.md) for architecture, financial correctness, naming, tests, security, AI readiness and future UX requirements. The [connected-research roadmap](docs/product/product-roadmap.md) determines scope and release order; this blueprint determines how we build.
 
 - Python 3.11+ and a virtual environment.
