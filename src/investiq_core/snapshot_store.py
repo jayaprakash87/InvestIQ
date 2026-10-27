@@ -99,6 +99,7 @@ def render_snapshot_markdown(snapshot: ResearchSnapshot) -> str:
         f"# InvestIQ research decision: {_md(snapshot.thesis.thesis_id)}",
         "",
         f"- Revision: {snapshot.thesis.revision}",
+        f"- Research stage: {_md(snapshot.thesis.stage.value)}",
         f"- Instrument: {instrument.ticker} / {instrument.venue} / {instrument.trading_currency}",
         f"- Issuer: {_md(snapshot.issuer.namespace)}:{_md(snapshot.issuer.value)}",
         f"- Recorded: {snapshot.saved_at.isoformat()}",
@@ -111,6 +112,24 @@ def render_snapshot_markdown(snapshot: ResearchSnapshot) -> str:
         _md(snapshot.thesis.statement),
         "",
         f"Revision rationale: {_md(snapshot.thesis.revision_reason)}",
+        "",
+        "## Risks and invalidation conditions",
+        "",
+        "### Risks",
+        "",
+    ]
+    parts.extend(
+        f"- {_md(item)}" for item in snapshot.thesis.risks
+    )
+    if not snapshot.thesis.risks:
+        parts.append("- Not recorded")
+    parts.extend(["", "### Conditions that would invalidate the thesis", ""])
+    parts.extend(
+        f"- {_md(item)}" for item in snapshot.thesis.invalidation_triggers
+    )
+    if not snapshot.thesis.invalidation_triggers:
+        parts.append("- Not recorded")
+    parts.extend([
         "",
         "## Retained SEC annual financial evidence",
         "",
@@ -125,6 +144,21 @@ def render_snapshot_markdown(snapshot: ResearchSnapshot) -> str:
         )
     if not snapshot.annual_facts:
         parts.append("| No eligible annual SEC facts retained | — | — | — | — | — |")
+    parts.extend(["", "## Retained user scenario assumptions", ""])
+    if snapshot.scenarios:
+        parts.append(f"- Hypothetical holding period: {snapshot.scenario_years} years")
+        for item in snapshot.scenarios:
+            parts.append(
+                f"- {_md(item.name)}: annual EPS growth {item.annual_eps_growth:.2%}; "
+                f"terminal P/E {item.terminal_pe:.4g}; "
+                f"subjective weight {item.probability:.2%}"
+            )
+        parts.append(
+            "- These are user-authored assumptions, not independently verified "
+            "forecasts. Numerical replay requires separately eligible price and EPS inputs."
+        )
+    else:
+        parts.append("- No hypothetical scenario parameters retained")
     parts.extend(["", "## Price-sensitive analysis", ""])
     if snapshot.quote is None:
         parts.append(
