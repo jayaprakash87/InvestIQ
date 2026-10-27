@@ -2,7 +2,7 @@
 
 **Open-source, evidence-aware equity research.** InvestIQ v0.2.0 introduces opt-in, bring-your-own-key connected issuer analysis and private research-decision snapshots alongside the original offline Python toolkit, five AI-neutral research skills and hash-linked thesis history. The synthetic example and offline replay need no accounts or provider keys.
 
-**Product direction:** [InvestIQ's AI-first, open-source roadmap to v1.0](docs/product/product-roadmap.md) starts with a useful local equity research interface (v0.3), then progressively adds source-connected analysis, valid comparisons, configurable screening/scoring, valuation scenarios, thesis monitoring, optional private portfolio research and external-user readiness. **The platform is independent of particular industries, stock selections, research histories and portfolios.** **PR 1–4 provide a synthetic UI, issuer candidate discovery, connected public filing/financial evidence and optional BYOK AI assistance.** Full verified industry economics, interactive valuation, source-to-claim semantic evaluation and saving research through the browser remain future work.
+**Product direction:** [InvestIQ's AI-first, open-source roadmap to v1.0](docs/product/product-roadmap.md) starts with a useful local equity research interface (v0.3), then progressively adds source-connected analysis, valid comparisons, configurable screening/scoring, valuation scenarios, thesis monitoring, optional private portfolio research and external-user readiness. **The platform is independent of particular industries, stock selections, research histories and portfolios.** **v0.3 PRs 1–6 implement the local desk:** synthetic demo, SEC issuer discovery, 10-K excerpts, optional BYOK AI interpretations, independent follow-ups, deterministic manual scenarios and explicitly saved private decision history. **Real-provider coverage, independent source-to-claim truth, share-basis validity and investor usability remain unverified.** Full sector-neutral economic/peer research, automated valuation underwriters and monitoring are later milestones.
 
 **This is experimental research software, not investment advice, a trading system, live market-data feed, backtesting engine or managed investment product.** No returns or predictive accuracy are claimed.
 
@@ -26,6 +26,8 @@
 | Connected issuer research (opt-in) | SEC annual US-GAAP facts + Twelve Data one-minute CLOSE with unknown declared timeliness, sourced via explicit CIK/listing |
 | Private decision snapshots | Explicit permission-gated save; offline replay and JSON/Markdown exports, not automatic provider retention |
 
+**Acceptance status:** The implementation is evaluated as an **unreleased v0.3 personal-alpha source milestone**, not a certified live investment research release. The Python package metadata remains `0.2.0` until a separately approved version/publication change. Read the [v0.3 acceptance and open manual gates](docs/engineering/release-acceptance-v0.3.md); real SEC/market/model account smoke, exchange rights, independent financial/source accuracy and user accessibility testing cannot be inferred from CI.
+
 ## Quick start (Python 3.11+)
 
 ```bash
@@ -45,7 +47,7 @@ The `demo.json` file is locally generated and entirely fictional. `investiq demo
 
 For an installed package, use `python -m pip install .` or an official release wheel. No mandatory service or paid dependency.
 
-## Local Research App — synthetic preview (v0.3 PR 1)
+## Local Research Desk — v0.3 personal-alpha code path
 
 Run the same fictional offline workflow in a responsive research interface:
 
@@ -60,7 +62,7 @@ A local browser page opens at `http://127.0.0.1:8765/`; click **Run synthetic re
 
 **Optional real-company research (PR 2):** On the same local page, open **Connected research**; enter your actual SEC contact User-Agent (name and email). Add an entitled Twelve Data API key **only if you want quotes**. Credentials are held in the running Python process memory only, never written to disk or returned to the browser. Search a company name or ticker through the SEC directory, choose a **candidate** Nasdaq/NYSE listing, independently check its current listing and USD trading currency, then submit the connected request.
 
-The research view shows eligible SEC annual US-GAAP facts, the provider's most recent minute-candle **CLOSE** price and source/timestamp/session/freshness qualifications. Delivery timeliness/real-time entitlement are **unknown**; exchange, currency and EPS share-basis agreement are not independently proven by the directory. **Annual P/E remains suppressed** pending share-basis confirmation. The UI does not save quotes or thesis revisions, and cannot claim full economic research, financial accuracy, AI capability or an investment recommendation. Provider access may be charged. Use **Disconnect** to discard keys and directory from memory; server termination also clears them. The app runs on loopback HTTP; do not expose it to other devices or untrusted users, and close the page after using private credentials.
+The research view shows eligible SEC annual US-GAAP facts, the provider's most recent minute-candle **CLOSE** price and source/timestamp/session/freshness qualifications. Delivery timeliness/real-time entitlement are **unknown**; exchange, currency and EPS share-basis agreement are not independently proven by the directory. **Annual P/E remains suppressed** pending share-basis confirmation. The current connected quote view does not save market data. Separately, the **explicit opt-in private history** workflow can save an author-written thesis and limited hypothetical assumptions (PR 6), not quotes or model output. Neither pathway certifies complete economic research, factual AI accuracy or an investment recommendation. Provider access may be charged. Use **Disconnect** to discard keys and directory from memory; server termination also clears them. The app runs on loopback HTTP; do not expose it to other devices or untrusted users, and close the page after using private credentials. In-flight model requests may complete and incur charges even when the browser page is closed or consent is withdrawn after submission.
 
 **SEC document evidence (PR 3):** After choosing and confirming a supported issuer in Connected research, select **Business**, **Risks** or **Management discussion**. InvestIQ fetches the latest supported 10-K primary HTML from SEC public archives on request, extracts up to four small keyword-matching passages and shows its accession, filing date, original SEC document link, normalized extraction offsets and content hashes. This is *not* AI, proven official filing-section segmentation or an assertion that an excerpt supports an investment thesis. The entire filing body is not returned to the browser, cached or saved. HTML larger than the conservative 8 MB limit, unsupported encodings, unavailable recent filings, malformed data and provider restrictions fail closed. SEC fair-access pacing applies. See [SEC accessing EDGAR data](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data).
 
