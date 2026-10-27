@@ -1,20 +1,24 @@
-# InvestIQ Roadmap
+# InvestIQ — Roadmap Summary
 
-> **Planning status:** Proposed [AI-first Product Strategy & Roadmap v3.0](product/product-roadmap.md) (2026-10-27). Earlier v2.0 release priorities are superseded for **future** planning, not past implementation. See [ADR 0009](decisions/0009-ai-first-product-pivot.md).
+> **Status:** Proposed [Research-aligned Product Roadmap v3.0 through v1.0](product/product-roadmap.md) (2026-10-27); not automatically approved or merged. [ADR 0009](decisions/0009-ai-first-product-pivot.md) records the change.
 
-**Product hypothesis:** An accessible, source-linked AI investment **decision workflow** — research, evaluate, challenge, deliberately save and later reassess — provides value beyond generic LLM prompts and incumbent research tools. **This has not yet been validated with users.**
+**Purpose:** Build an **AI-first, open-source, local-first investment research system** that becomes useful to its creator **before** it becomes easy for other investors to install and use. Preserve the tested financial Python core and strict source/freshness/rights rules. Never assume an InvestIQ cloud account or worldwide real-time data coverage is necessary.
 
-| Release | Intended outcome and status |
+**Research foundation:** [AI-infrastructure/physical-AI value-chain mapping, sector-aware ranking, valuation/IRR entry conditions, comparisons, thesis continuity and portfolio research](product/research-foundations.md).
+
+| Release | Status / user outcome |
 | --- | --- |
-| **v0.1.1 — released** | Portable, synthetic offline open-source research toolkit |
-| **v0.2.0 — source release candidate** | BYOK SEC annual facts + Twelve Data CLI research, rights-aware snapshots/replay; live-provider smoke and tag approval not complete |
-| **v0.3 — NEXT / proposed** | Task/conversation-first AI Research Experience, real sourced tool orchestration and an accessible research UI; [PRD](product/ai-research-experience.md) |
-| **v0.4 — conditional** | Opt-in investor context, watchlists, saved thesis continuity and material-change monitoring |
-| **v0.5 — conditional** | Evidence-based discovery, peer/trend analysis and explainable research screens |
-| **v0.6 — conditional** | Opt-in portfolio-context and scenario intelligence |
-| **v0.7+ — conditional** | Point-in-time quant lab only after data, bias, cost and rights gates |
-| **v1.0 — conditional** | Adopted, sustainable, reliable open research platform |
+| **v0.1.1** | Released offline synthetic research toolkit |
+| **v0.2.0** | Source release candidate: BYOK SEC + Twelve Data connected CLI and lawful private snapshots/replay; pending live-provider/manual release gates |
+| **v0.3 — NEXT** | **Personal AI Research Desk:** local UI, simple company selection, guided provider/model connection, one complete sourced AI company-analysis and bear-case workflow |
+| **v0.4** | Business, fundamentals and economically valid peer comparisons |
+| **v0.5** | Sector/value-chain research universes, trend, explainable configurable factors and coverage-aware rankings |
+| **v0.6** | Bear/base/bull underwriting, reverse valuation, hypothetical hurdle return/entry conditions |
+| **v0.7** | Opt-in watchlists, thesis history and source/assumption change review/monitoring |
+| **v0.8** | Private optional portfolio context, thematic allocation overlaps and risk scenarios |
+| **v0.9** | Installable, testable, documented external open-source beta; reliable guided onboarding |
+| **v1.0** | Stable open-source equity research workspace: complete supported research-to-decision-to-reassessment journey |
 
-**Immediate priority:** [validate product experience and standalone vs assistant distribution](product/validation-plan.md), not additional platform-first implementation. v0.2 six PR workstreams are historical work, not the next tasks. The five AI skills are currently instructions, **not** an autonomous deployed AI system.
+**Milestone policy:** Each stage must be usable for its **own** end-to-end task; later functionality is conditional on personal/independent validation and lawful providers. Source-rights integrity, deterministic finance, model grounding, privacy and stable history are hard gates. No stock-return guarantees, trading bot, paid-hosting requirement or compulsory portfolio import.
 
-**Non-negotiable:** truthful data timestamps/entitlements, deterministic arithmetic, versioned lawful research history, explicit consent, independently evaluated AI output, no fabricated performance claims and no trading automation.
+[Read the detailed release gates](product/product-roadmap.md#6-roadmap-to-v10--progressive-independently-usable-releases) · [v0.3 PRD](product/ai-research-experience.md) · [personal and independent-user test plan](product/validation-plan.md) · [engineering requirements](engineering/engineering-blueprint.md)
