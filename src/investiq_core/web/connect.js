@@ -563,6 +563,29 @@
     }
   });
 
+  // A changed confirmation invalidates visible, previously qualified outputs.
+  for (const id of ["confirm-listing", "confirm-currency"]) {
+    $(id).addEventListener("change", () => {
+      scenarioGeneration += 1;
+      aiGeneration += 1;
+      evidenceVersion += 1;
+      $("scenario-results").hidden = true;
+      $("ai-result").hidden = true;
+      $("filing-result").hidden = true;
+      status("scenario-message", "Listing/currency confirmation changed; recalculate if appropriate.");
+    });
+  }
+  $("ai-question").addEventListener("input", () => {
+    aiGeneration += 1;
+    $("ai-result").hidden = true;
+  });
+  $("ai-consent").addEventListener("change", () => {
+    if (!$("ai-consent").checked) {
+      aiGeneration += 1;
+      $("ai-result").hidden = true;
+    }
+  });
+
   // The scenario workbench has no LLM or licensed provider dependency.
   // An edit invalidates the previously displayed scenario and pending response.
   $("scenario-form").addEventListener("input", () => {
