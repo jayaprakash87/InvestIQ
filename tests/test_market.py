@@ -56,6 +56,7 @@ def test_quote_keeps_attribution_exact_precision_and_declared_delay() -> None:
     assert item.timeliness == QuoteTimeliness.DELAYED
     assert item.delay_seconds == 900
     assert item.rights == MarketDataRights()
+    assert item.adjustment == PriceAdjustment.UNKNOWN
     assert not item.rights.allows("cache")
     assert not item.rights.allows("snapshot")
     assert not item.rights.allows("redistribute")
@@ -94,8 +95,8 @@ def test_quote_from_old_session_is_stale_despite_very_recent_retrieval() -> None
 @pytest.mark.parametrize(
     "change,error",
     [
-        ({"price": Decimal("0")}, "positive finite"),
-        ({"price": Decimal("-1")}, "positive finite"),
+        ({"price": Decimal(0)}, "positive finite"),
+        ({"price": Decimal(-1)}, "positive finite"),
         ({"price": Decimal("NaN")}, "positive finite"),
         ({"price": 125.5}, "positive finite"),
         ({"currency": "EUR"}, "trading currency"),
