@@ -162,4 +162,84 @@
   }
   $("history-refresh").addEventListener("click", refreshHistory);
 
+  $("decision-form").addEventListener("submit", async event => {
+    event.preventDefault();
+    if (!enabled || !issuer || !$("confirm-listing").checked ||
+        !$("confirm-currency").checked || !$("decision-consent").checked) {
+      saveMessage("Select and confirm the issuer, then explicitly authorize local saving.");
+      return;
+    }
+    if ($("decision-include-scenarios").checked && !hypothetical) {
+      saveMessage("First recalculate valid hypothetical inputs in the scenario workbench.");
+      return;
+    }
+    const selected = issuer;
+    const button = $("decision-save");
+    button.disabled = true;
+    saveMessage("Recording a new, immutable local revision…");
+    try {
+      const record = await post("/api/v1/decisions/save", {
+        symbol: selected.symbol, venue: selected.venue, cik: selected.cik,
+        currency: selected.currency,
+        confirm_current_listing: $("confirm-listing").checked,
+        confirm_currency: $("confirm-currency").checked,
+        approve_private_save: $("decision-consent").checked,
+        decision: {
+          thesis_id: $("decision-id").value.trim(),
+          statement: $("decision-statement").value,
+          reason: $("decision-reason").value,
+          stage: $("decision-stage").value,
+          risks: lines("decision-risks"),
+          invalidation_triggers: lines("decision-triggers"),
+          hypothetical: $("decision-include-scenarios").checked ? hypothetical : null
+        }
+      });
+      saveMessage("Revision " + record.revision +
+        " saved locally. No licensed quote, AI output or EPS amount stored.");
+      await refreshHistory();
+    } catch (error) {
+      saveMessage(error.message || "Unable to record a private decision.");
+    } finally {
+      $("decision-consent").checked = false;
+      enableSaving();
+    }
+  });
+
+  $("history-revise").addEventListener("click", () => {
+    if (!opened) return;
+    $("decision-id").value = opened.thesis_id;
+    $("decision-statement").value = opened.statement;
+    $("decision-stage").value = opened.stage;
+    $("decision-reason").value = "";
+    $("decision-risks").value = opened.risks.join("\n");
+    $("decision-triggers").value = opened.invalidation_triggers.join("\n");
+    $("decision-include-scenarios").checked = false;
+    $("decision-consent").checked = false;
+    saveMessage("Draft prepared from revision " + opened.revision +
+      ". Reconfirm the SAME issuer and write a fresh reason before saving.");
+    $("decision-reason").focus();
+  });
+
+  async function exportPrivate(format) {
+    if (!opened || !enabled) return;
+    try {
+      const result = await post("/api/v1/decisions/export", {
+        thesis_id: opened.thesis_id, revision: opened.revision, format
+      });
+      const mime = format === "json" ? "application/json" : "text/markdown";
+      const blob = new Blob([result.content], { type: mime + ";charset=utf-8" });
+      const temporaryUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = temporaryUrl;
+      anchor.download = result.filename;
+      anchor.click();
+      setTimeout(() => URL.revokeObjectURL(temporaryUrl), 1000);
+      message("Private file exported. Review its content before sharing.");
+    } catch (error) {
+      message(error.message || "Private export failed.");
+    }
+  }
+  $("history-export-json").addEventListener("click", () => exportPrivate("json"));
+  $("history-export-md").addEventListener("click", () => exportPrivate("markdown"));
+
 })();
