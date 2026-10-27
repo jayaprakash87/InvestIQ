@@ -102,9 +102,16 @@ def harness():
         assert not thread.is_alive()
 
 
-def request(\n    harness, method, path, data=None, *, cookie=None, csrf=None,\n    origin=True, initialize_header=True, fetch_site=None,\n):
+def request(
+    harness, method, path, data=None, *, cookie=None, csrf=None,
+    origin=True, initialize_header=True, fetch_site=None,
+):
     connection = http.client.HTTPConnection("127.0.0.1", harness.port, timeout=5)
-    headers = {"Host": f"127.0.0.1:{harness.port}"}\n    if method == "GET" and path == "/api/v1/session" and initialize_header:\n        headers["X-InvestIQ-Init"] = "1"\n    if fetch_site is not None:\n        headers["Sec-Fetch-Site"] = fetch_site
+    headers = {"Host": f"127.0.0.1:{harness.port}"}
+    if method == "GET" and path == "/api/v1/session" and initialize_header:
+        headers["X-InvestIQ-Init"] = "1"
+    if fetch_site is not None:
+        headers["Sec-Fetch-Site"] = fetch_site
     if origin:
         headers["Origin"] = f"http://127.0.0.1:{harness.port}"
     if cookie:
