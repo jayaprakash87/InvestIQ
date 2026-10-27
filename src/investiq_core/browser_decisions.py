@@ -52,6 +52,8 @@ class BrowserDecisionHistory:
 
     def __init__(self, directory: Path | None):
         self.directory = Path(directory) if directory is not None else None
+        if self.directory is not None and not self.directory.is_absolute():
+            raise ValueError("Private decision folder must be an absolute path")
 
     @property
     def enabled(self) -> bool:
@@ -110,7 +112,7 @@ class BrowserDecisionHistory:
             "thesis_digest": t.digest,
             "parent_digest": t.parent_digest,
             "scenario_assumptions_retained": bool(snapshot.scenarios),
-            "quote_retained": False,
+            "quote_retained": snapshot.quote is not None,
             "ai_analysis_retained": False,
             "annual_facts_retained": len(snapshot.annual_facts),
         }
@@ -128,8 +130,17 @@ class BrowserDecisionHistory:
             ],
             "scenario_years": snap.scenario_years,
             "replay_warnings": list(replay.warnings),
-            "replay_numerical_price_analysis": False,
-            "saved_data_scope": "authored_thesis_and_hypothetical_parameters_only",
+            "replay_numerical_price_analysis": (
+                replay.annual_pe_proxy is not None or replay.scenarios is not None
+            ),
+            "reported_annual_pe_proxy": (
+                str(replay.annual_pe_proxy)
+                if replay.annual_pe_proxy is not None else None
+            ),
+            "saved_data_scope": (
+                "v02_qualified_input_snapshot" if snap.quote is not None or snap.annual_facts
+                else "authored_thesis_and_hypothetical_parameters_only"
+            ),
         }
 
     def export(self, thesis_id: str, revision: int, format: str) -> dict[str, str]:
