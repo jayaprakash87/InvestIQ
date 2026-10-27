@@ -21,9 +21,17 @@ For Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` or run the `.
 
 From the installed repository or wheel, run `investiq app` (or `python -m investiq_core app`) and open the printed `http://127.0.0.1:8765/` address. Use `--no-browser` to disable automatic browser launch or `--port 8766` to choose a different port.
 
-The **Run synthetic research** control invokes InvestIQ's actual existing offline fixture and structural validator. It renders evidence, a source-linked fictional report, deterministic hypothetical scenarios, and two fictional thesis revisions. All numbers and dates are **synthetic**, deliberately historical and **not market data**. The app makes no provider/LLM calls, asks for no keys, permits no data writes and does not yet offer live research or AI reasoning. Stop with Ctrl+C. It binds to IPv4 loopback only; never use it as a public server.
+The **Run synthetic research** control invokes InvestIQ's existing offline fixture and validator. It renders fictional observations, a structured report, deterministic scenarios and fictional thesis history. The synthetic demo makes **no** provider/model calls.
 
-**Planned later PRs:** guided issuer discovery/data entitlement, source-document evidence, bounded AI research, scenario interaction, private deliberate thesis storage and full acceptance. The existing v0.2 developer CLI is not replaced.
+For **opt-in connected issuer research (PR 2)**, use **Connected research** on that local page:
+1. Configure a valid SEC contact User-Agent and your own authorized Twelve Data API key. Credentials are held in this Python server's memory only (not in files, logs or browser storage); remove them using **Disconnect** or by stopping the process.
+2. Search a listed company name or ticker. The SEC company directory supplies **candidates** for XNAS and XNYS, not authoritative historical effective listing dates, currency verification, corporate actions or share-class compatibility.
+3. Independently check and confirm the selected current listing and proposed USD currency. Set your maximum acceptable price age. Submit to retrieve sourced annual US-GAAP SEC facts and a quoted Twelve Data minute-candle close where your key/venue permits.
+4. Inspect explicit source, event time, delay/timeliness classification, staleness, limited fiscal coverage and warnings. Current share-basis confirmation is intentionally unavailable in the browser, so annual P/E is suppressed. All quote snapshot rights default to unknown; the app does not persist connected research.
+
+**No automatic live-provider test, AI research model, secure hosted access, user account, portfolio, broker integration or connected-thesis storage is included.** Quote provider contracts and charges belong to the operator. This preview is loopback HTTP only; do not forward its port, expose it to a network, or run it in a shared untrusted environment. Stop with Ctrl+C.
+
+**Planned later PRs:** cited issuer-document evidence, bounded AI research, interactive valuation, permission-aware private decision storage and complete personal acceptance. The v0.2 developer CLI remains supported.
 
 ## Offline synthetic example
 
