@@ -2,7 +2,7 @@
 
 > **Status:** Proposed planning baseline **v3.0 (product-focused revision)** · **Date:** 2026-10-27
 > **Implementation:** v0.2.0 **source release candidate**, not a completed consumer product; live-provider license smoke and public publication authorization are separate outstanding gates.
-> **Audience:** Individual self-directed investors first, followed by wider independent users and open-source developers. Initial adoption is local-first; product scope is independent of any individual's portfolio, research history, theme or industry.
+> **Audience:** Individual self-directed investors first, followed by wider independent users and open-source developers. Initial adoption is local-first; functionality is industry-neutral and user-configurable.
 > **Companions:** [v0.3 Personal Research Desk PRD](ai-research-experience.md) · [User and OSS Validation](validation-plan.md) · [Engineering Blueprint](../engineering/engineering-blueprint.md) · [Architecture](../architecture/overview.md) · [ADR 0009](../decisions/0009-ai-first-product-pivot.md).
 
 ## 1. Executive decision — what we are building
