@@ -1,23 +1,23 @@
 # InvestIQ v0.3 — Personal AI Research Desk PRD
 
 > **Status:** Proposed personal-alpha release, **not implemented** · **Date:** 2026-10-27
-> **Canonical product path:** [Roadmap through v1.0](product-roadmap.md) · **Prior research:** [Research Foundations](research-foundations.md) · **Testing:** [Validation Plan](validation-plan.md).
+> **Canonical product path:** [Roadmap through v1.0](product-roadmap.md) · **Testing:** [Validation Plan](validation-plan.md).
 
 ## 1. Why v0.3 and what it is *not*
 
-The project owner has repeatedly researched AI infrastructure, semiconductors, optics, power/thermal and other equities using LLM conversations and large manually revised spreadsheets. The first InvestIQ product must **reduce the friction of that research** without hiding fundamental source/valuation errors.
+The first product release after the analytical core must let an individual investor **complete a meaningful, source-backed company research task through a simple local interface**, without repeatedly constructing prompts, editing data files or learning the underlying Python toolkit.
 
-**v0.3 = the first actually useful personal workspace**, not the complete product and not a mass-market SaaS. Deliver **one complete supported company research loop** and an easy local UI. Advanced multi-company screening, 194-company coverage, deep margin trends, full fundamental scoring, entry price models, monitoring and portfolio analytics have explicit later milestones (v0.4–v0.8). Do not imply those are implemented in v0.3.
+**v0.3 is an initial usable vertical slice**, not the whole research platform or a mass-market SaaS. Deliver one complete supported company research loop with clear source coverage, uncertainty and lawful save/replay. Later milestones add deeper financial/peer research, configurable scoring, scenario underwriting, updates, optional portfolio research and external open-source usability.
 
-**Product hypothesis:** a researched answer with trustworthy cited financial inputs, automatically orchestrated analysis and a real bear case requires fewer prompts and corrections than a generic LLM.
+**Product hypothesis:** AI-coordinated financial research with verified evidence, repeatable computation, specific risk challenges and an accessible interface can reduce effort and errors relative to using a general-purpose LLM alone.
 
-## 2. Persona and specific initial job
+## 2. Persona and initial job
 
-**Primary tester:** the project's creator, a self-directed investor who asks nuanced business-moat/valuation questions, checks current price/FCF/margins/debt, compares AI-infrastructure subsectors, questions rankings, revisits investment decisions and currently uses spreadsheet scenarios.
+**Primary user:** An independent equity investor researching a listed company, checking sources and financial quality, testing valuation assumptions, evaluating the strongest contrary argument and deciding what merits further investigation.
 
-**Initial task:** "Analyze **Broadcom** as an AI infrastructure investment over a selected multi-year horizon. Explain the business and key risks, show correctly qualified sourced financial figures and current permitted price, evaluate applicable simple valuation assumptions, produce a *specific* bear case and let me explicitly save the research decision."
+**Representative acceptance task:** "Research a supported listed company for my selected investment horizon. Describe its business and financial condition with cited evidence; explain valuation assumptions, key risks and thesis-breaking conditions; let me inspect sources and deliberately save a dated research note."
 
-Broadcom is an **illustrative supported-candidate** subject, not a pre-certified issuer/feed. Verify CIK/venue/data-plan entitlements independently; if not suitable, use another well-supported SEC 10-K US-GAAP issuer. Do not promise TSMC, Schneider Electric, IFRS or 194-value-chain-name support in v0.3.
+**Coverage constraint:** Choose one company compatible with independently verified existing provider support and rights. The company, sector, theme and user portfolio are **test inputs only**, never hardcoded product requirements. Broader accounting standards and additional exchanges are separate, explicit data-coverage extensions.
 
 ## 3. First-run user journey — no developer workflow during everyday use
 
@@ -68,7 +68,7 @@ Research analysis includes:
 - Deliberately save/reopen eligible private thesis, with price/valuation omissions disclosed when rights forbid snapshot retention.
 - Complete negative paths: ambiguous listing, no eligible quote or EPS, currency mismatch, denied entitlement, stale data, provider failure, model hallucination, prompt injection, interrupted run and private save failure.
 - Run reproducible source/financial semantic evaluations and app integration/accessibility checks; independent real-provider smoke and provider-license review must be documented rather than assumed.
-- Creator compares several actual supported research sessions against current ChatGPT+spreadsheet workflow, records errors/friction/usefulness and decides whether v0.4 is warranted.
+- Initial user compares several supported research sessions against a general-purpose LLM and existing research workflow, records errors/friction/usefulness and decides whether v0.4 is warranted.
 
 **Not a release gate:** global fund-data completeness, broker integration, historical backtesting, full multi-factor stock ranking, portfolio management, unattended scheduled monitoring, installation by unknown external users, or unmeasured claims of superior returns.
 
@@ -79,7 +79,7 @@ Research analysis includes:
 | **A — local task shell + provider onboarding** | Launch simple research interface; select supported issuer; clearly synthetic offline demo or guided lawful BYOK | OS smoke, credential privacy, issuer mapping, entitlement/errors, startup |
 | **B — AI-integrated research** | One natural-language user question → attributable filing/document *and* numeric evidence, business analysis and a specific bear case | Narrow cited issuer text retrieval, typed tools, finite orchestrator, deterministic arithmetic, semantic evidence tests, prompt injection, budget/cancel |
 | **C — interactive scenario + deliberate history** | Follow up, drill down, modify supported assumptions, explicitly save/export/replay | UX tests, financial method/units, immutable snapshots, lawful retention and deletion |
-| **D — personal acceptance** | Creator repeatedly completes the supported real research task and compares it with old workflow | Documented live-provider terms/coverage, performance/cost, usability gaps, unresolved risk register |
+| **D — personal acceptance** | Initial user repeatedly completes the supported real research task and compares it with existing tools | Documented live-provider terms/coverage, performance/cost, usability gaps, unresolved risk register |
 
 Follow GitHub Actions draft-to-ready policy, cohort PRs around outcomes and merge only reviewed green changes. A mock UX may validate early, but the v0.3 release cannot claim "connected" without an approved real source test.
 
