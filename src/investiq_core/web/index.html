@@ -8,6 +8,7 @@
   <title>InvestIQ — Research workspace preview</title>
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
+  <script src="/connect.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to research workspace</a>
@@ -17,6 +18,7 @@
       <div class="side-section-label">WORKSPACE</div>
       <nav aria-label="Research sections" class="side-nav">
         <a class="nav-link active" href="#main" aria-current="page"><span class="nav-glyph" aria-hidden="true">◈</span> Overview</a>
+        <a class="nav-link" href="#connection"><span class="nav-glyph" aria-hidden="true">⌕</span> Connected research</a>
         <a class="nav-link" href="#findings"><span class="nav-glyph" aria-hidden="true">≡</span> Research findings</a>
         <a class="nav-link" href="#scenarios"><span class="nav-glyph" aria-hidden="true">◔</span> Scenarios</a>
         <a class="nav-link" href="#evidence"><span class="nav-glyph" aria-hidden="true">◎</span> Evidence</a>
@@ -24,11 +26,11 @@
       </nav>
       <div class="side-section-label side-secondary">STATUS</div>
       <div class="sidebar-info"><span class="status-dot"></span> Local preview <span class="small-tag">PR 1</span></div>
-      <div class="sidebar-info"><span class="status-dot dim"></span> Provider connection <span class="muted">Not enabled</span></div>
+      <div class="sidebar-info"><span class="status-dot dim"></span> Provider connection <span id="nav-connection-state" class="muted">Not configured</span></div>
       <div class="sidebar-info"><span class="status-dot dim"></span> AI research <span class="muted">Not enabled</span></div>
       <div class="sidebar-foot">
         <span class="foot-eyebrow">DATA POLICY</span>
-        <p>Synthetic research only. This preview makes no market, model or storage requests.</p>
+        <p>The demo is synthetic. Connected research calls providers only on request. Credentials remain in session memory, never on disk.</p>
         <span class="foot-version">Open source · v0.3 preview</span>
       </div>
     </aside>
@@ -36,7 +38,7 @@
     <main class="content" id="main">
       <div class="topbar">
         <div class="breadcrumbs">RESEARCH <span>/</span> OVERVIEW <span>/</span> <strong>SYNTHETIC EXAMPLE</strong></div>
-        <div class="topbar-actions"><span class="offline-label"><span class="pulse"></span> Offline</span><span class="demo-pill">FICTIONAL DATA</span></div>
+        <div class="topbar-actions"><span class="offline-label"><span class="pulse"></span> Local app</span><span class="demo-pill">FICTIONAL DATA</span></div>
       </div>
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-main">
@@ -68,6 +70,55 @@
         <div class="metric-card"><div class="metric-label">THESIS VERSIONS</div><div id="metric-thesis" class="metric-value">—</div><div class="metric-sub">Recorded decisions</div></div>
       </section>
 
+      <section class="connection-panel" id="connection" aria-labelledby="connection-title">
+        <div class="panel-heading"><div><div class="section-overline">CONNECTED / OPT-IN</div><h2 id="connection-title">Research a supported company</h2><p>Search SEC issuer candidates and request sourced annual facts plus a Twelve Data quote. No AI model is used.</p></div><span class="panel-flag" id="provider-status">Not configured</span></div>
+        <p class="trust-note"><strong>Source limits:</strong> The SEC directory provides issuer/listing <em>candidates</em>, not proof of historical listing dates, share basis or exchange entitlements. Only Nasdaq and NYSE candidates are currently supported. Quote delay remains unverified; prices are not saved.</p>
+        <div class="connect-grid">
+          <div class="connect-form-card">
+            <div class="form-step">STEP 01 · SESSION CONFIGURATION</div>
+            <form id="connection-form" autocomplete="off">
+              <label for="sec-contact">SEC contact User-Agent</label>
+              <input id="sec-contact" type="text" maxlength="200" placeholder="Research Tool yourname@example.com" spellcheck="false" required>
+              <span class="field-help">A real contact name and email are required by SEC.</span>
+              <label for="quote-key">Twelve Data API key</label>
+              <input id="quote-key" type="password" maxlength="256" placeholder="Your authorized provider key" autocomplete="new-password" spellcheck="false" required>
+              <span class="field-help">Provider access may cost money. Credentials stay in this local process only; nothing is written to disk.</span>
+              <div class="connect-actions"><button class="primary-button" type="submit" id="setup-button">Configure session</button><button class="quiet-button" type="button" id="clear-session">Disconnect</button></div>
+            </form>
+            <div class="connection-message" id="setup-message" aria-live="polite" role="status">No connected session yet.</div>
+          </div>
+          <div class="connect-form-card">
+            <div class="form-step">STEP 02 · COMPANY DISCOVERY</div>
+            <form id="search-form" autocomplete="off">
+              <label for="company-search">Company name or ticker</label>
+              <input id="company-search" type="search" maxlength="80" minlength="2" placeholder="Search supported Nasdaq / NYSE" required>
+              <span class="field-help">Search runs only when you submit the form.</span>
+              <button class="secondary-button" id="search-button" type="submit" disabled>Search SEC directory</button>
+            </form>
+            <div class="connection-message" id="search-message" role="status" aria-live="polite">Configure your provider session first.</div>
+            <div id="company-results" class="company-results" role="list" aria-label="Candidate companies"></div>
+          </div>
+        </div>
+        <div class="research-select" id="research-select" hidden>
+          <div class="form-step">STEP 03 · REVIEW AND CONFIRM</div>
+          <div id="chosen-company" class="chosen-company"></div>
+          <form id="connected-research-form">
+            <label for="quote-age">Maximum quote age (minutes)</label>
+            <input id="quote-age" type="number" min="1" max="1440" step="1" value="1440" required>
+            <label class="confirm-line"><input id="confirm-listing" type="checkbox" required> I checked the current listing and venue.</label>
+            <label class="confirm-line"><input id="confirm-currency" type="checkbox" required> I confirm the proposed USD trading currency.</label>
+            <button class="primary-button" type="submit" id="research-button">Retrieve connected research <span aria-hidden="true">→</span></button>
+          </form>
+          <p class="field-help">Confirmation does not independently verify historical listing dates, split/share basis or market-data rights.</p>
+        </div>
+        <div class="connection-message" id="research-message" role="status" aria-live="polite"></div>
+        <div class="connected-output" id="connected-output" hidden>
+          <div class="connected-output-head"><h3>Connected research view</h3><span class="current-not-saved">NOT SAVED · NOT VERIFIED LIVE</span></div>
+          <div id="connected-summary" class="connected-summary"></div>
+          <h4>Annual SEC facts</h4><div id="connected-facts" class="connected-facts"></div>
+          <h4>Qualifications and warnings</h4><ul id="connected-warnings" class="connected-warnings"></ul>
+        </div>
+      </section>
       <div class="section-grid">
         <section class="panel panel-wide" id="findings" aria-labelledby="findings-title">
           <div class="panel-heading"><div><div class="section-overline">01 / ANALYSIS</div><h2 id="findings-title">Research findings</h2><p>Every loaded finding retains its evidence or assumption reference.</p></div><span class="panel-flag">Structured</span></div>
@@ -94,11 +145,11 @@
       </div>
 
       <section class="method-panel" id="method" aria-labelledby="method-title">
-        <div class="method-intro"><span class="section-overline">WHAT COMES NEXT</span><h2 id="method-title">A real research experience is built in stages.</h2><p>This PR validates the local application path and evidence display only. It does not claim AI reasoning, live stock coverage or connected financial data.</p></div>
+        <div class="method-intro"><span class="section-overline">WHAT COMES NEXT</span><h2 id="method-title">A real research experience is built in stages.</h2><p>The demo is entirely synthetic. Connected research is opt-in for supported SEC-listed issuers and reports provider limitations. AI reasoning is not implemented.</p></div>
         <div class="method-columns">
           <div><span class="method-num">AVAILABLE NOW</span><strong>Local synthetic workflow</strong><p>Python-derived evidence, deterministic scenarios and fictional thesis history, with no credentials.</p></div>
-          <div><span class="method-num">UPCOMING PRS</span><strong>Verified company research</strong><p>Issuer lookup, authorized providers, document-grounded AI research and guided interaction.</p></div>
-          <div><span class="method-num">LATER v0.3</span><strong>Research decisions</strong><p>Explicit, private, rights-aware save, revisit, scenario controls and end-to-end acceptance.</p></div>
+          <div><span class="method-num">CONNECTED PR 2</span><strong>Opt-in issuer research</strong><p>Candidate company search and qualified annual facts/quote after explicit provider setup. No assumed real-time entitlement.</p></div>
+          <div><span class="method-num">LATER v0.3</span><strong>AI and decisions</strong><p>Document-grounded model assistance, private research history, scenarios and end-to-end acceptance.</p></div>
         </div>
       </section>
       <footer class="main-footer"><span>InvestIQ · Open-source research software</span><span>Experimental — not investment advice</span></footer>
