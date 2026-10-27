@@ -172,6 +172,31 @@ def test_corrupt_file_and_unsafe_permissions_fail_closed(tmp_path):
         journal.list()
 
 
+def test_history_requires_explicit_absolute_directory():
+    with pytest.raises(ValueError, match="absolute"):
+        BrowserDecisionHistory("relative-private-folder")
+
+
+def test_history_reports_separately_qualified_legacy_inputs_truthfully(tmp_path):
+    from types import SimpleNamespace
+
+    journal = BrowserDecisionHistory(tmp_path / "decisions")
+    journal.save(**ISSUER, data=draft())
+    original = LocalSnapshotStore(tmp_path / "decisions").load("example_thesis", 1)
+    # Browser history shares the versioned snapshot infrastructure with the
+    # existing CLI. If a CLI record retained an ALLOWED quote, displaying the
+    # universal statement "no quote retained" would be dangerously false.
+    cli_like = SimpleNamespace(
+        thesis=original.thesis, issuer=original.issuer, saved_at=original.saved_at,
+        digest=original.digest, scenarios=original.scenarios,
+        annual_facts=(object(),), quote=object(),
+    )
+    summary = BrowserDecisionHistory._summary(cli_like)
+    assert summary["quote_retained"] is True
+    assert summary["annual_facts_retained"] == 1
+    assert BrowserDecisionHistory._summary(original)["quote_retained"] is False
+
+
 def test_bounded_filename_validation_and_exports(tmp_path):
     journal = BrowserDecisionHistory(tmp_path / "decisions")
     journal.save(**ISSUER, data=draft())
