@@ -31,8 +31,8 @@ from .application.connected_research import CompanyResearchRequest, ConnectedRes
 from .connected_cli import _render_current
 from .evidence import InstrumentId
 from .filing_evidence import SecFilingEvidenceProvider
-from .issuer_directory import IssuerCandidate, SecDirectoryProvider, search_candidates
 from .interactive_scenarios import evaluate_hypothetical
+from .issuer_directory import IssuerCandidate, SecDirectoryProvider, search_candidates
 from .market import IssuerId, IssuerListing
 
 SESSION_LIFETIME_SECONDS = 60 * 60
