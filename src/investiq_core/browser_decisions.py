@@ -62,9 +62,8 @@ class BrowserDecisionHistory:
             raise PermissionError("Research saving is off; launch the app with --research-dir")
         return LocalSnapshotStore(self.directory)
 
-    def list(self) -> dict[str, Any]:
-        """Read files through the hardened store, not arbitrary filesystem paths."""
-        store = self._store()
+    def _all_snapshots(self, store: LocalSnapshotStore) -> list[dict[str, Any]]:
+        """Inspect ALL existing revisions before computing the next revision."""
         store._check_root()
         files = sorted(store.root.iterdir(), key=lambda x: x.name)
         if len(files) > 1000:
@@ -76,6 +75,11 @@ class BrowserDecisionHistory:
                 continue
             decision = store.load(match.group(1), int(match.group(2)))
             records.append(self._summary(decision))
+        return records
+
+    def list(self) -> dict[str, Any]:
+        store = self._store()
+        records = self._all_snapshots(store)
         return {
             "mode": "local_private_history",
             "enabled": True,
@@ -159,7 +163,7 @@ class BrowserDecisionHistory:
             raise ValueError("Unsupported private decision save payload")
         thesis_id = data["thesis_id"]
         _name(thesis_id, 1)  # existing safe filename contract
-        if _ID.fullmatch(thesis_id) is None:
+        if not isinstance(thesis_id, str) or _ID.fullmatch(thesis_id) is None:
             raise ValueError("Unsafe thesis identifier")
         statement = _line(data["statement"], label="Thesis", maximum=1400)
         reason = _line(data["reason"], label="Revision reason", maximum=400)
@@ -184,7 +188,7 @@ class BrowserDecisionHistory:
                 for s in normalized["scenarios"]
             )
         store = self._store()
-        existing = self.list()["snapshots"]
+        existing = self._all_snapshots(store)
         prior = [
             item for item in existing if item["thesis_id"] == thesis_id
         ]
