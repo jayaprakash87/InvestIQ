@@ -72,28 +72,28 @@ tests/           Public synthetic and negative-case automated tests
 
 **Technical constraints:** keep domain pure, typed ports at actual I/O boundaries, separate AI prompt/model/tool version from economic-method versions, source-to-claim checks, prompt-injection isolation and deterministic math. No unapproved multi-agent, vector store, microservices or unbounded background polling.
 
-## 3. Module boundaries
+## 3. Actual code modules versus planned additions
 
-| Boundary | Responsibility | Not responsible for |
+| Module / boundary | Current implementation | Future progression / exclusions |
 | --- | --- | --- |
-| `domain/evidence` | instrument/issuer identity, units, timestamps, provenance and vintages | Vendor HTTP, broker sessions |
-| `domain/market` (planned) | normalized quote, session, delay/freshness and entitlement semantics | Claiming all prices are live |
-| `providers/*` (planned) | provider API auth, capabilities, normalization, rate limits and failures | Investment scoring |
-| `data_access` (planned) | request orchestration, provider selection, safe fallback, optional cache | Hiding source/delay changes |
-| `research/valuation` | deterministic calculations on qualified inputs | Fetching live quotes during math |
-| `research/snapshot` (planned) | deliberate save/replay, immutable research decisions and version manifests | Capturing every tick |
-| `storage/*` (planned) | adapter for user-controlled durable snapshots | Becoming an exchange-data redistribution backend |
-| `interface/*` | Existing CLI/export; **planned v0.3 AI/task UI or assistant integration** | Duplicating financial calculations or hiding provider/model uncertainty |
+| `evidence.py`, `market.py`, `fundamentals.py` | **Implemented v0.1–v0.2**: `InstrumentId`, `IssuerId`, `IssuerListing`, `MarketQuote`, freshness/permission models, observed financial facts and source vintages | More accounting metrics and supported security coverage only through verified input semantics; never label unknown quote timing live |
+| `ports.py`, `adapters/*` | **Implemented v0.2**: provider-neutral quote/filing/fundamental ports, SEC/Twelve Data adapters, sanitized bounded HTTP | v0.3 cited issuer narrative/document evidence; v0.4+ quarterly/TTM/FCF/FX/market expansions subject to rights |
+| `application/connected_data.py` | **Implemented v0.2**: `ConnectedDataService`, quote/filing on-demand data, freshness, rights-aware optional bounded cache and retries | No unconditional provider fallback, centrally hosted cache or market-feed redistribution |
+| `application/connected_research.py` | **Implemented v0.2**: `ConnectedResearchService` for constrained annual issuer analysis and qualified valuation | Add v0.3 AI research task orchestration separately; v0.4 valid peers and trends |
+| `valuation.py`, `research.py`, `thesis.py` | **Implemented**: deterministic scenario/return helpers, report structure validation and hash-linked thesis records | Sector-specific research comparisons, versioned scoring (v0.5), expanded underwriting (v0.6); never trust LLM generated numeric authority |
+| `research_snapshot.py`, `snapshot_store.py` | **Implemented v0.2**: `ResearchSnapshot`, `LocalSnapshotStore`, explicit lawful capture/immutable offline replay and export | v0.7 source-aware research change analysis, v0.8 private positions; no restricted quote storage |
+| `connected_cli.py`, `cli.py` | **Implemented v0.2**: developer CLI, synthetic demo and explicit connected research/replay | Preserve public CLI compatibility after local UI is added |
+| **Local UI, AI orchestration, source claim evaluation** | **Not implemented** | **v0.3 planned**: local task UI, guided BYOK/model setup, bounded tool coordinator, semantic evidence tests, scenario interaction |
+| **Scoring / monitor / portfolio / OSS packaging** | **Not implemented** | **v0.5/v0.7/v0.8/v0.9–v1.0 respectively**, only after earlier user journeys and source/rights quality gates |
 
-### Distinct record types
+### Research record concepts
 
-**NormalizedQuote** (planned): venue-qualified instrument, quote kind/value/currency, source event timestamp, provider retrieval/ingestion timestamp, session, original provider, as-of/delay classification, adjustment basis and license/entitlement context. The response exposes whether fresh, stale, closed-session, delayed, EOD, historical or unknown **when justified**.
-
-**CurrentResearchView** (planned): transient view with input IDs, freshness flags and deterministic calculations. It can change when provider information changes.
-
-**ResearchSnapshot** (planned): immutable saved input manifest and analyst hypotheses plus calculation version, source vintages and hash-linked thesis reference. Created by explicit save, not by view/price refresh.
-
-**RecordedSource**: filing/consensus observation with economic period, exact public availability or uncertainty qualifier, retrieval time and rights/provenance.
+- **`MarketQuote` (v0.2 existing):** qualified listing, quote kind/value/currency, market event time, session/adjustment, original provider, observed timeliness, reuse rights; caller-supplied freshness check. Provider claims of real-time are not self-verifying.
+- **`CompanyResearchResult` (v0.2 existing):** transient connected company result with attributable quote/annual facts, calculation eligibility and errors. May change when permitted data refresh.
+- **`ResearchSnapshot` (v0.2 existing):** immutably captured, explicitly approved, rights-aware research input manifest/assumptions and thesis lineage. A price and its valuation may be omitted due to default-denied quote retention.
+- **Planned v0.3 `ResearchTask` / AI research run:** supported question, selected instrument, bounded allowlisted tool trace, explainable answer, source-claim relationship, failed/missing evidence and transient model context by default.
+- **Planned v0.5 scoring record:** factor definitions, versioned weights and cutoff, sector/horizon/peer group, source coverage and rank evidence.
+- **Planned v0.7/0.8 investor state:** opt-in private watchlist, checkpoint/delta tracking and separately permissioned holdings; not publicly stored in the open-source repository.
 
 ## 4. Data access, freshness and source semantics
 
