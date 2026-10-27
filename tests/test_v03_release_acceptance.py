@@ -372,3 +372,22 @@ def test_security_and_input_rejection_for_local_release(research_desk):
     }, cookie, csrf)[0] == 404
     assert not private.joinpath("absent-00000001.json").exists()
     assert directory.calls == 0 and filing.calls == [] and model.calls == []
+
+
+def test_private_history_frontend_never_exposes_or_persists_unlock_code():
+    from importlib.resources import files
+
+    ui = files("investiq_core").joinpath("web")
+    history = ui.joinpath("history.js").read_text(encoding="utf-8")
+    connected = ui.joinpath("connect.js").read_text(encoding="utf-8")
+    html = ui.joinpath("index.html").read_text(encoding="utf-8")
+    assert 'post("/api/v1/decisions/unlock", { code })' in history
+    assert 'field.value = ""' in history
+    assert '"investiq:session-disconnected"' in history
+    assert '"investiq:session-disconnected"' in connected
+    assert '"history-unlock-form").hidden = !enabled || unlocked' in history
+    assert 'history-unlock-code' in html
+    for script in (history, connected):
+        assert "localStorage" not in script
+        assert "sessionStorage" not in script
+        assert "innerHTML" not in script
