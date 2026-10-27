@@ -223,6 +223,14 @@
         </div>
         <p class="trust-note">Private history is <strong>disabled by default</strong>. Restart with <code>investiq app --research-dir /your/private/parent/decisions</code> (parent folder must already exist) to opt in. Saved JSON stays on this computer. No quoted price, EPS amount, price-derived valuation, AI-generated text or entire SEC filing is saved from the browser. The SHA-256 chain detects accidental edits, not malicious rewriting or independently verified timestamps. Secure the folder with disk encryption and backups.</p>
         <p class="connection-message" id="history-message" role="status" aria-live="polite">Initializing private history capability…</p>
+        <form id="history-unlock-form" class="connect-form-card" autocomplete="off" hidden>
+          <div class="form-step">PRIVATE LOCAL ACCESS</div>
+          <label for="history-unlock-code">One-time launch code from the InvestIQ terminal</label>
+          <input id="history-unlock-code" type="password" maxlength="128" autocomplete="off" spellcheck="false" required placeholder="Paste the access code shown when the app started">
+          <button type="submit" class="secondary-button">Unlock private history for this browser session</button>
+          <p class="field-help">This code is printed only in the launching terminal, not saved or included in a URL. A new code is generated on every restart. Keep the terminal private.</p>
+          <p id="history-unlock-message" class="connection-message" role="status" aria-live="polite">History locked.</p>
+        </form>
         <div class="history-grid">
           <div class="connect-form-card" id="decision-save-panel" hidden>
             <div class="form-step">AUTHOR AND EXPLICITLY SAVE</div>
