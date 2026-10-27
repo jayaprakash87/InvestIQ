@@ -45,7 +45,7 @@ _FAILURES = (
     TransportTimeoutError,
     TransportUnavailableError,
 )
-_DOCUMENT_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,180}\.(?:htm|html|txt)", re.I)
+_DOCUMENT_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,180}\.(?:htm|html|txt)", re.IGNORECASE)
 _ACCESSION = re.compile(r"[0-9]{10}-[0-9]{2}-[0-9]{6}")
 
 
