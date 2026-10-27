@@ -3,7 +3,7 @@
 > **Status:** Engineering standard, version 2.0 — AI-first strategy alignment · **Date:** 2026-10-27  
 > **Applies to:** current v0.2 source release candidate maintenance and future v0.3+ product development.  
 > **Architecture:** [Connected research](../architecture/overview.md), [ADR 0003](../decisions/0003-connected-data-and-research-history.md), [Proposed AI-first roadmap v3.0](../product/product-roadmap.md), [ADR 0009](../decisions/0009-ai-first-product-pivot.md), and [v0.3 PRD](../product/ai-research-experience.md).  
-> **Intent:** deliver the full **personal-use → independently usable open-source v1.0** roadmap, with an accessible AI-coordinated investor experience and strong source, economic, model and privacy integrity. See [research foundations](../product/research-foundations.md).
+> **Intent:** deliver the full **personal-use → independently usable open-source v1.0** roadmap, with an accessible AI-coordinated investor experience and strong source, economic, model and privacy integrity. See [product roadmap](../product/product-roadmap.md) for the industry-neutral capability scope.
 
 The [v0.1.1 engineering alignment audit](baseline-audit-v0.1.1.md) records the codebase's verified starting point, identified financial-correctness hardening and pre-v0.2 entry criteria.
 
