@@ -1,9 +1,9 @@
-# InvestIQ — Product Strategy, Personal-to-Open-Source Roadmap
+# InvestIQ — AI-First Open-Source Investment Research Platform | Roadmap to v1.0
 
-> **Status:** Proposed planning baseline **v3.0 (research-aligned revision)** · **Date:** 2026-10-27
+> **Status:** Proposed planning baseline **v3.0 (product-focused revision)** · **Date:** 2026-10-27
 > **Implementation:** v0.2.0 **source release candidate**, not a completed consumer product; live-provider license smoke and public publication authorization are separate outstanding gates.
-> **Audience:** First the original independent investor/researcher; then other investors, analysts and OSS developers.
-> **Companions:** [Research Foundations & Requirement Traceability](research-foundations.md) · [v0.3 Personal Research Desk PRD](ai-research-experience.md) · [User and OSS Validation](validation-plan.md) · [Engineering Blueprint](../engineering/engineering-blueprint.md) · [Architecture](../architecture/overview.md) · [ADR 0009](../decisions/0009-ai-first-product-pivot.md).
+> **Audience:** Individual self-directed investors first, followed by wider independent users and open-source developers. Initial adoption is local-first; product scope is independent of any individual's portfolio, research history, theme or industry.
+> **Companions:** [v0.3 Personal Research Desk PRD](ai-research-experience.md) · [User and OSS Validation](validation-plan.md) · [Engineering Blueprint](../engineering/engineering-blueprint.md) · [Architecture](../architecture/overview.md) · [ADR 0009](../decisions/0009-ai-first-product-pivot.md).
 
 ## 1. Executive decision — what we are building
 
@@ -12,58 +12,51 @@
 It is **not** a stock-picking chatbot, a clone of ChatGPT, an Excel-to-dashboard conversion or an infrastructure showcase. A distinctive benefit must be demonstrated in less repetitive prompting, more reliable sourced analysis, useful methodology consistency and history-aware research.
 
 **Development sequence:**
-1. **Personal dogfooding:** creator installs a small app, uses it on real, supported companies and challenges what is missing or misleading. The first usable local UI is required in v0.3, not v0.5.
+1. **Initial usability:** an individual investor runs a local app, researches real supported companies and verifies that the results are useful and reliable. The first usable local UI is required in v0.3, not v0.5.
 2. **Deepen the complete investing workflow:** progressively deliver company/peer intelligence, defensible screening, valuation and entry-condition analysis, historical decisions and optional holdings/context. Each release must stay usable, rather than postponing value until v1.0.
 3. **Open-source adopters:** make setup, coverage, provider/model configuration, privacy, docs and failure recovery intuitive for external users (alpha by v0.9; external contributions can begin earlier).
 4. **v1.0:** stable, reproducible, usable end-to-end research workspace for supported securities, independent of an InvestIQ-hosted SaaS.
 
 **Decision:** Keep the MIT-licensed deterministic Python core and existing v0.2 connected adapters/snapshots. Put AI in the **user-facing orchestration layer**, while retaining provenance/financial arithmetic/licensing in trusted components. Historical snapshots and current quotes remain distinct. Default deployment **local-first with on-demand remotely sourced financial data**, not a static local market database or mandatory hosted cloud service.
 
-## 2. The problem established by prior research
+## 2. Investment research problem and product principles
 
-InvestIQ is motivated by repeated work across:
-- AI infrastructure, optics, foundries, semiconductors, advanced packaging, networking, power/thermal and physical AI value chains;
-- 150-company and 194-company/23-segment thematic research universes, with **uneven** quote/valuation evidence;
-- business-quality, growth, moat, thematic exposure, risk, valuation, rerating and short/long-horizon ranking methods;
-- FCF yield, ROIC, leverage, revenue/earnings trend, forward-vs-trailing multiples, EPS growth and bear/base/bull/terminal multiple scenarios;
-- price-dependent reverse underwriting and hypothetical 15%/20% annualized return hurdle entry levels;
-- company and **not-true-peer** comparisons (e.g. Coherent/Fabrinet/Amkor/Vertiv) and energy/industrial services classifications;
-- portfolio-sector overlap, allocation discipline, research-history continuity and repeated scrutiny of dubious rankings.
+**The problem:** Investment research is fragmented across financial-data tools, documents, screeners, spreadsheets, AI assistants and personal notes. Investors must repeatedly collect and verify evidence, reconcile dates and financial definitions, decide whether companies are genuinely comparable, test uncertain assumptions, explain rankings and track which conclusions changed. A generic LLM can answer individual questions but may not provide a consistent, auditable, user-controlled research-to-decision workflow.
 
-These are **product input/use-case evidence**, not factual stock forecasts or redistributable live datasets. See [research foundations](research-foundations.md) for detailed mapping and sample user tasks. Product examples must never expose actual private holdings or treat prior dated spreadsheet prices as present market truth.
+**InvestIQ's proposed solution:** Automate the research workflow through **AI-guided discovery, research, comparison, valuation, critical challenge and monitoring**, backed by qualified source data, deterministic calculations, configurable methodologies and explicit investor control. The intended improvement in accuracy, effort and sustained usefulness must be validated rather than assumed.
 
-### Product principles learned
-
-- **Sourced before scored.** Data provenance, fiscal periods, listing identity, currency, valuation basis, provider delay/rights and missing evidence govern what may be calculated or ranked.
-- **No magic total rank.** Separate quality, opportunity/valuation, risk, confidence, short-term catalyst and long-term thesis. Let the investor change weights, show sensitivity and preserve model version.
-- **Not everything is a direct competitor.** Compare business models and economic value capture; separate true peer tables from cross-layer value-chain maps.
-- **Scenario is not forecast.** Required entry price, implied growth and conditional return under selected assumptions are not predicted prices, guarantees or instructions to buy.
-- **Transparency and control.** AI is allowed to research, synthesize, explain and challenge but cannot invent financial inputs, silently store private data, change research history or place trades.
-- **Continuous current research, immutable previous decisions.** Prices and news change every session; local/cloud private files are for explicit research history, not today's data source.
-- **Useful on day one.** A narrow set of supported securities with full flows is better than 200 poorly supported securities, empty screens and hand-entered data.
+**Product principles:**
+- **Sector- and thesis-agnostic:** Work with any supported company, industry, investment theme, portfolio or investor methodology. Examples and internal research histories never define product functionality or default rankings. Equity analysis is the **initial supported asset class**, not a permanent architectural restriction.
+- **AI executes the workflow, not just chat:** Natural-language questions and purposeful actions should trigger appropriate permitted retrieval, computation, synthesis, comparison and follow-up without repeated technical prompts or manual spreadsheet assembly.
+- **Evidence before opinion:** Identify issuers/listings correctly; disclose source, market/fiscal date, currency, rights and missing data. Model prose is not a source of financial facts, and LLM mathematics is not authoritative.
+- **Explainable, adaptable models:** Financial quality, business strength, valuation, risk, momentum/catalysts and uncertainty can be evaluated separately; sector-appropriate factors, investor-defined weights and horizons should be versioned and inspectable.
+- **Distinguish research from decisions:** An investment scenario is not a return forecast; explain base/bear/bull assumptions and conditions that could invalidate a thesis. Never automatically place trades or rewrite a saved conclusion.
+- **Current evidence, immutable decisions:** Refresh current inputs from authorized providers; preserve prior approved research only to the extent lawful and never treat a static local file as today's market data.
+- **Local-first open source:** Let an individual use the software before building shared infrastructure. Preserve privacy and portability. Third-party model/data credentials or subscriptions, where needed, are distinct from InvestIQ's open-source license.
+- **Progressively useful releases:** Deliver a coherent, small supported journey early and expand coverage, sophistication and external usability through verified milestones—not a large unfinished set of modules.
 
 ## 3. Intended users and deployment
 
 | Stage | Primary user | Setup / access | Experience expectation |
 | --- | --- | --- | --- |
-| **v0.3–v0.6 personal alpha** | Creator, advanced self-directed researcher | Local app; own authorized market-data/model credentials where required; synthetic offline mode | No CLI/CIK/manual JSON during normal research; clear provider/coverage setup, save/private local records |
-| **v0.7–v0.8 repeat-use alpha** | Creator plus limited interested reviewers | Same local/self-hostable product; private data optional | Timely update/re-underwriting and portfolio/context only if explicitly enabled |
+| **v0.3–v0.6 personal alpha** | Initial self-directed investor | Local app; own authorized market-data/model credentials where required; synthetic offline mode | No CLI/CIK/manual JSON during normal research; clear provider/coverage setup, save/private local records |
+| **v0.7–v0.8 repeat-use alpha** | Initial investor plus limited reviewers | Same local/self-hostable product; private data optional | Timely update/re-underwriting and portfolio/context only if explicitly enabled |
 | **v0.9 external OSS beta** | Independent nontechnical investors and developers | Documented one-command/packaged install; guided setup; portable private data; reproducible samples | First real supported research task without knowing Python or assembling multiple prompts |
 | **v1.0 stable OSS** | Any user within supported markets/asset classes and accepted provider requirements | Local-first, open code and documented plug-in adapters; optional self-host; cloud not required | Complete repeatable, trustworthy research lifecycle and versioned migration/compatibility |
 
-**First-person requirements are not proprietary defaults.** Personal tickers, holdings, buy prices, risk appetite, draft theses and API credentials must never become repository fixtures, global rankings or application defaults. Sample universes and demo data are public/synthetic and editable. Another user must be able to replace everything with their own work.
+**Portable user configuration:** No user's tickers, holdings, buy prices, preferences, theses or credentials become public fixtures, rankings or hardcoded defaults. Demonstration data are redistributable and clearly synthetic. Each installation supports its own research universe, assumptions, preferences and methods.
 
 **Open source from now, consumer-ready later:** The repository is already public/MIT; v0.9 is **usability/beta readiness**, not the first time code is open.
 
 ## 4. Experience — user actions, not modules
 
 A supported investor should open InvestIQ and see:
-- **Ask or Research:** "Analyze Broadcom for a 3-year horizon" — the system resolves a supported security, retrieves lawful current sources, builds financial/business/valuation evidence, shows a specific bear case and allows follow-ups.
-- **Compare:** "Fabrinet vs Coherent vs Amkor vs Vertiv" — explain value-chain differences, economic peer validity, relevant KPIs and investment trade-offs.
-- **Explore:** "Which optical interconnect companies deserve attention?" — define the company universe, data coverage and explainable score/rank breakdown **as of** a dated data snapshot.
-- **Underwrite:** "What assumptions and entry price could support a hypothetical 15% annualized return over 3 years?" — scenarios, reverse valuation, sensitivity and named failure conditions.
+- **Ask or Research:** "Analyze this company for a multi-year horizon" — the system resolves a supported security, retrieves lawful current sources, builds financial/business/valuation evidence, shows a specific bear case and allows follow-ups.
+- **Compare:** "Compare these companies and explain which are genuine peers" — identify differences in business model, economics, financial definitions and investment trade-offs.
+- **Explore:** "Which companies in this industry or investment theme deserve further research?" — define the company universe, data coverage and explainable score/rank breakdown **as of** a dated data snapshot.
+- **Underwrite:** "What assumptions and entry price could support my chosen hypothetical return hurdle and investment horizon?" — scenarios, reverse valuation, sensitivity and named failure conditions.
 - **Revisit:** "What changed since I last assessed it?" — distinguish price, fundamentals, published guidance/estimates, corporate events, assumptions and scoring-method changes under lawful observation retention.
-- **Portfolio context (opt-in):** "Do my selected AI/power allocations overlap? What happens in a downside scenario?" — do not merge watchlists and owned positions.
+- **Portfolio context (opt-in):** "Are my selected investments exposed to overlapping risks? What happens in a downside scenario?" — do not merge watchlists and owned positions.
 
 **No daily user needs to chain six SKILL.md prompts, assemble manual CIK/MIC records, run a CLI or recalculate spreadsheet formulas.** A simple natural-language task interface plus purpose-built tables/charts/controls delivers more than pure chat. The five existing skills become guided research procedures invoked by orchestrator tools; skills alone are not executing agents.
 
@@ -73,9 +66,9 @@ A supported investor should open InvestIQ and see:
 
 **Already implemented (v0.2 source):** portable Python valuation/evidence/thesis contracts; five model-neutral research *instruction* skills; synthetic offline CLI; SEC annual US-GAAP facts and Twelve Data BYOK minute-candle CLOSE; venue-qualified issuer contracts; conservative quote freshness and default-denied reuse rights; dated current analysis; explicit rights-aware private snapshots/replay and CLI acceptance tests.
 
-**Not implemented or not verified:** model execution, research coordinator, company search, graphical interface, multi-company trend/peer workflows, comprehensive FCF/ROIC/quarterly data, full value-chain universe, scorecards, alerts, holdings, open-source consumer installers, secure hosted SaaS, verified provider real-time data rights, independent provider smoke and real-user evaluation.
+**Not implemented or not verified:** model execution, research coordinator, company search, graphical interface, multi-company trend/peer workflows, comprehensive FCF/ROIC/quarterly data, wide-universe research, scorecards, alerts, holdings, open-source consumer installers, secure hosted SaaS, verified provider real-time data rights, independent provider smoke and real-user evaluation.
 
-**Coverage discipline:** v0.2 is a narrow SEC 10-K / US-GAAP slice. Do not claim Schneider Electric, Siemens Energy, TSMC's issuer-level 20-F/IFRS reporting, non-US exchanges or FX-comparable global coverage without corresponding validated adapters. As markets expand, document eligible filing standards, fiscal semantics, corporate actions and entitlements. Unsupported is an honest result.
+**Coverage discipline:** The existing v0.2 implementation supports a narrow SEC annual US-GAAP path, **not** every equity issuer, accounting standard, exchange or asset class. Broaden the supported universe through explicitly tested adapters, fiscal/FX/share-basis normalization, corporate-action semantics and provider rights. The general-purpose product vision must not be confused with universal data coverage at v1.0; unsupported is an honest result.
 
 **Market-data policy:** On-demand permitted feeds for current research. Consumer app may use BYOK when source contracts require it, but a **setup wizard** rather than manual environment variables is required for everyday use. Offline synthetic sample requires **no account or key** and is always visibly fictional. LLM adapters may require their own endpoint/key or supported local model; verify actual quality/cost before claiming turnkey free AI. A public hosted service requires separate licensing/security/business justification.
 
@@ -83,12 +76,12 @@ A supported investor should open InvestIQ and see:
 
 Releases are **outcome milestones, not delivery dates or promises**. Every release inherits source rights, truthful data and security gates. A workflow that fails its earlier release gate blocks dependent scope.
 
-| Version | Theme | What *you* can actually do by that release | Exit gate |
+| Version | Theme | Usable capability by that release | Exit gate |
 | --- | --- | --- | --- |
 | **v0.1.1 — released** | Research primitives | Run fictional evidence/thesis/reverse valuation CLI | Historical release |
 | **v0.2.0 — source release candidate** | Connected analytical core | Optional manual BYOK single-company SEC/quote research and private lawful snapshot/replay | Live provider/account rights smoke + explicit public tag/release authorization outstanding |
-| **v0.3 — Personal Research Desk (NEXT)** | **AI + local UX first** | Install/run local task UI, set up permitted data/model provider once, search a small supported company set, ask for a **complete source-linked company research answer**, inspect bear case, adjust eligible simple scenarios and save an allowed thesis | Creator completes actual supported research without CLI/CIK/JSON; coherent UI/model/source/consent failure states and AI semantic/security tests |
-| **v0.4 — Company & Peer Intelligence** | Business and fundamentals | Inspect company economics, financial trend/quality, margins/cash/leverage **where sourced**, material risks, and compare supported true peers or show economic mismatch | Supported peer/period/units/FX, no invented history; comparison acceptable in owner's daily research |
+| **v0.3 — Personal Research Desk (NEXT)** | **AI + local UX first** | Install/run local task UI, set up permitted data/model provider once, search a small supported company set, ask for a **complete source-linked company research answer**, inspect bear case, adjust eligible simple scenarios and save an allowed thesis | Initial user completes actual supported research without CLI/CIK/JSON; coherent UI/model/source/consent failure states and AI semantic/security tests |
+| **v0.4 — Company & Peer Intelligence** | Business and fundamentals | Inspect company economics, financial trend/quality, margins/cash/leverage **where sourced**, material risks, and compare supported true peers or show economic mismatch | Supported peer/period/units/FX, no invented history; comparison passes representative daily research tasks |
 | **v0.5 — Universe, Screens & Explainable Scores** | Discovery and research prioritization | Maintain sector/theme value-chain lists; evaluate named companies using configurable quality/valuation/growth/moat/risk/confidence factors, compare short vs long horizons and see missing data/rank sensitivity | Coverage-aware rankings, documented weights/method versions, no price-dependent score on stale/unverified price |
 | **v0.6 — Underwriting & Entry Conditions** | Valuation-to-decision | Bear/base/bull, reverse valuation, implied growth, entry-threshold analysis for a **hypothetical** return hurdle, risk/assumption sensitivity and explicit thesis decision record | Correct valuation basis/horizon, no free-form LLM arithmetic, changed price never silently changes past decisions |
 | **v0.7 — Research Continuity & Monitoring** | Why did my thesis change? | Approved watchlists, lawful scheduled/on-demand refresh, saved conditions, material price/fundamental/news/estimate changes if covered; see price-driven vs thesis-driven vs methodology-driven deltas | Point-in-time checks, opt-in schedules, licensed retention, meaningful alerts, no automatic thesis revision, observed repeat usefulness |
@@ -98,7 +91,7 @@ Releases are **outcome milestones, not delivery dates or promises**. Every relea
 
 ### Work sequencing and dependencies
 
-- **v0.3 is intentionally narrow:** one useful, real-company end-to-end personal flow, including **traceable issuer narrative evidence** as needed for business/risk claims; not 194-company coverage or a comprehensive stock screener.
+- **v0.3 is intentionally narrow:** one useful, real-company end-to-end personal flow, including **traceable issuer narrative evidence** as needed for business/risk claims; not broad market coverage or a comprehensive stock screener.
 - **v0.4 requires validated source breadth:** trend/peer only with compatible periods, fiscal filings and sources; narrow alternatives when providers cannot support it.
 - **v0.5 requires score methodology integrity:** no rankings merely because a formula can be calculated. Include confidence, missingness, scenario/sector/horizon distinctions.
 - **v0.6 requires price/valuation rights and completeness:** reverse underwriting is allowed only with compatible current/ref-price and financial assumptions.
@@ -123,10 +116,10 @@ Scope changes can shift features between minor releases, but **must preserve the
 - Provider-permission-aware caching and data costs, offline sample, private lawful snapshots; do not run a server/data warehouse just to maintain static current prices.
 
 ### C. Research methodology and scoring (v0.4–v0.6)
-- Industry templates for semiconductor suppliers, optics/EMS, power/thermal, energy, business services and other sectors **as data validation allows**.
+- Extensible **industry-aware** research templates and valuation methods based on economic characteristics, business model, financial disclosure and data quality—without privileging named sectors or hardcoding a thematic universe.
 - Research scores: business quality, financial trend, sustainable economics, valuation/return potential, risk resilience, catalyst/horizon and evidence coverage **separately**, plus optional explicit-weight composite.
 - Every score stores source vintage, assumptions, weight/model version and peer group; calculate rank shifts due to price, fundamental and scoring-method changes distinctly.
-- Do not reuse old scorecard weights as universally objective truth; establish methods through iterative personal research and backtesting only when valid point-in-time history exists.
+- No default factor weights or historical investor preferences are universally objective; support auditable, editable methodologies, explicit uncertainty and validation with lawful point-in-time data when needed.
 
 ### D. User-controlled state and continuity (v0.3+)
 - Historical decisions saved explicitly; position/watchlist membership, saved scenarios, choices and consent stored locally by default under user-owned data paths.
@@ -145,7 +138,7 @@ Scope changes can shift features between minor releases, but **must preserve the
 | **PR A — first-run research shell** | Simple local research entry, supported company lookup/selection and guided provider/model configuration **or transparent synthetic demo** | On Windows/Linux supported target, local startup, no CLI during normal use, credential and data-rights safeguards; interactive smoke |
 | **PR B — one complete AI research task** | Bounded coordinator combines existing dated SEC/quote tools with trusted valuation, cited business/financial summary, strongest bear case and useful gaps | Model/tool contracts, semantic/source checks, numerical delegation, partial failures, prompt-injection and cost controls |
 | **PR C — interactive answer and lawful decision** | Drill into sources, compare conditional scenarios, answer grounded follow-ups, explicitly create/replay/export private versioned permitted thesis | Scenario correctness, allowed history fields, no stale data or silent writes, local privacy/deletion behavior |
-| **PR D — personal release acceptance** | Repeatable research for an intentionally supported small stock set; offline demo and connected happy/negative paths | Owner uses daily workflow without developer instructions; measure quality, latency/cost and compare against direct LLM research |
+| **PR D — personal release acceptance** | Repeatable research for an intentionally supported small stock set; offline demo and connected happy/negative paths | Initial investor uses the daily workflow without developer instructions; measure quality, latency/cost and compare against direct LLM research |
 
 The first PR may use mocks clearly labeled as such, but **v0.3 release requires a real, independently verified supported case** under actual provider terms. Do not add a generic browser stack or SaaS accounts before the first research journey works.
 
