@@ -573,6 +573,7 @@ def test_ai_browser_does_not_render_untrusted_html_or_stale_results():
     assert "textContent" in js
     assert "generation !== aiGeneration" in js
     assert "consent_external_sec_data" in js
+    assert '$("ai-consent").checked = false' in js
     assert "validatedSecLink" in js
 
 
