@@ -238,6 +238,10 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             self._json(status, {"error": "Connected provider request failed", "code": exc.code.value})
         except FileExistsError:
             self._json(409, {"error": "A revision already exists; reload history before saving"})
+        except FileNotFoundError:
+            self._json(404, {"error": "Private decision revision does not exist"})
+        except OSError:
+            self._json(503, {"error": "Local private decision store is unavailable"})
         except (ValueError, TypeError, KeyError, UnicodeError, json.JSONDecodeError):
             # No exception bodies or request values may be reflected: keys and
             # contact details are present in the setup request.
