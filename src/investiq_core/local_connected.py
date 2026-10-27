@@ -17,13 +17,15 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from .adapters._http import JsonTransport
-from .ai_research import (
-    ALLOWED_MODELS, AiResearchCoordinator, OpenAIResponseModel,
-    default_ai_coordinator,
-)
 from .adapters.sec_companyfacts import SecCompanyFactsProvider
 from .adapters.sec_edgar import SecEdgarFilingProvider
 from .adapters.twelve_data import TwelveDataQuoteProvider
+from .ai_research import (
+    ALLOWED_MODELS,
+    AiResearchCoordinator,
+    OpenAIResponseModel,
+    default_ai_coordinator,
+)
 from .application.connected_data import ConnectedDataService
 from .application.connected_research import CompanyResearchRequest, ConnectedResearchService
 from .connected_cli import _render_current
