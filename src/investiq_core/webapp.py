@@ -27,6 +27,7 @@ _ASSETS = {
     "/styles.css": ("styles.css", "text/css; charset=utf-8"),
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
     "/connect.js": ("connect.js", "text/javascript; charset=utf-8"),
+    "/history.js": ("history.js", "text/javascript; charset=utf-8"),
 }
 _HEADERS = {
     "Cache-Control": "no-store",
