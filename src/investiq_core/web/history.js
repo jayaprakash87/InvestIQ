@@ -93,7 +93,9 @@
       detailRow("Snapshot SHA-256", record.digest_sha256),
       detailRow("Previous thesis SHA-256", record.parent_digest || "First revision"),
       detailRow("AI response retained", "No"),
-      detailRow("Quote retained", "No"),
+      detailRow("Quote retained", record.quote_retained ? "Yes — qualified prior snapshot" : "No"),
+      detailRow("Annual SEC facts retained", String(record.annual_facts_retained)),
+      detailRow("Offline numeric replay eligible", record.replay_numerical_price_analysis ? "Yes" : "No"),
       detailRow("Hypothetical parameters retained",
         record.scenario_assumptions_retained ? "Growth, P/E, weights, years only" : "No")
     );
