@@ -15,6 +15,7 @@ from importlib.resources import files
 from typing import Any
 from urllib.parse import urlsplit
 
+from .ai_research import ModelFailure
 from .local_connected import LocalConnectedResearch
 from .ports import ProviderFailure, ProviderFailureCode
 from .workflow import build_synthetic_bundle, validate_bundle
@@ -168,6 +169,9 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
         if path.query or path.fragment or path.path not in {
             "/api/v1/session/configure",
             "/api/v1/session/clear",
+            "/api/v1/model/configure",
+            "/api/v1/model/clear",
+            "/api/v1/research/ai",
             "/api/v1/companies/search",
             "/api/v1/research/connected",
             "/api/v1/research/filing-evidence",
@@ -193,6 +197,12 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
                 result = self.server.connected.configure(state, body)
             elif path.path == "/api/v1/session/clear":
                 result = self.server.connected.clear(state)
+            elif path.path == "/api/v1/model/configure":
+                result = self.server.connected.configure_model(state, body)
+            elif path.path == "/api/v1/model/clear":
+                result = self.server.connected.clear_model(state)
+            elif path.path == "/api/v1/research/ai":
+                result = self.server.connected.ai_analyze(state, body)
             elif path.path == "/api/v1/companies/search":
                 result = self.server.connected.search(state, body)
             elif path.path == "/api/v1/research/filing-evidence":
@@ -202,6 +212,10 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             self._json(200, result)
         except PermissionError:
             self._json(403, {"error": "Configure this local session first"})
+        except ModelFailure as exc:
+            # Exception messages are fixed by our adapter and never include
+            # provider response bodies, request text or credential values.
+            self._json(502, {"error": str(exc), "code": "model_research_unavailable"})
         except ProviderFailure as exc:
             status = 429 if exc.code == ProviderFailureCode.RATE_LIMITED else 502
             self._json(status, {"error": "Connected provider request failed", "code": exc.code.value})
