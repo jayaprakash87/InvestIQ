@@ -1,59 +1,45 @@
 # InvestIQ Engineering Blueprint
 
-> **Status:** Engineering standard, version 1.0 · **Date:** 2026-10-27  
-> **Applies to:** future production changes and incremental maintenance of existing v0.1.1 code.  
-> **Architecture:** [Connected research](../architecture/overview.md), [ADR 0003](../decisions/0003-connected-data-and-research-history.md), [Product roadmap](../product/product-roadmap.md).  
-> **Intent:** financial correctness, transparency, maintainability, security, thoughtful UX, and AI readiness **without unnecessary infrastructure**.
+> **Status:** Engineering standard, version 2.0 — AI-first strategy alignment · **Date:** 2026-10-27  
+> **Applies to:** current v0.2 source release candidate maintenance and future v0.3+ product development.  
+> **Architecture:** [Connected research](../architecture/overview.md), [ADR 0003](../decisions/0003-connected-data-and-research-history.md), [Proposed AI-first roadmap v3.0](../product/product-roadmap.md), [ADR 0009](../decisions/0009-ai-first-product-pivot.md), and [v0.3 PRD](../product/ai-research-experience.md).  
+> **Intent:** an **accessible, AI-coordinated investment research workflow** while preserving deterministic financial integrity, licensed data, privacy, maintainability and demonstrable user value **without speculative infrastructure**.
 
 The [v0.1.1 engineering alignment audit](baseline-audit-v0.1.1.md) records the codebase's verified starting point, identified financial-correctness hardening and pre-v0.2 entry criteria.
 
 ## 1. Engineering decision and enforcement
 
-InvestIQ follows a **small modular Python monolith with ports and adapters at actual external boundaries**. We invest in good engineering practices **now**, while introducing new infrastructure only after an actual connected-research workflow needs it.
+InvestIQ retains a **small modular financial core and ports/adapters only at actual trust/I-O boundaries**. The next engineering outcome is a **supported, nontechnical investment question → sourced answer → strongest challenge → explicit decision** journey. Measure task completion and source quality before expanding backend breadth. Preserve backward-compatible v0.2 CLI behavior.
 
 - **MUST** means an applicable release-blocking rule, unless a reviewer approves an explicitly documented exception and bounded remediation.
 - **SHOULD** means the default, with alternatives explained in the PR.
 - **CONDITIONAL** means the standard becomes mandatory only when the corresponding feature exists (for instance, browser tests when there is a frontend).
 - **Existing CI gate** means a check currently executed. **Planned gate** means a proposal; this document alone does not switch it on.
 
-### Verified v0.1.1 baseline
+### Current implementation and historical audit
 
-The existing Python package provides evidence, valuation, research, thesis, synthetic workflow and CLI modules. Ruff lint, pytest, wheel/sdist build and installed CLI smoke checks are in GitHub Actions. Five model-neutral research skills have instructions and structural evidence contracts. This is a useful starting point.
+The [v0.1.1 alignment audit](baseline-audit-v0.1.1.md) is a historical baseline. **Current v0.2.0 source release candidate** contains provider-neutral market/issuer contracts; opt-in SEC annual Companyfacts and Twelve Data BYOK quote access; conservative connected analysis; freshness and rights handling; explicit private, rights-aware snapshot/replay; and synthetic end-to-end CLI acceptance. Existing CI includes Ruff, pytest, package build and installed CLI smoke. Automated fixtures are **not proof** of live market/provider entitlement or public release authorization.
 
-Not currently implemented: market-price providers, provider contract tests, live/freshness service, hosted API, cloud or persistent application store, web frontend, AI factuality evaluation runner, and a configured static type-checking or automated security-scanning gate. **Do not claim they already exist.** Their absence is not a v0.1.1 regression.
+**Not implemented:** AI/LLM orchestrator, runnable agent, integrated user chat/browser UI, supported company search, investor preferences/watchlists, monitoring, model factuality evaluation runner, hosted secure multiuser service, verified universal real-time feeds, or measured user retention. The five model-neutral SKILL.md files are portable instructions only.
+
+**v0.3 target:** a bounded tool-using AI research experience that visibly sources claims, delegates arithmetic to deterministic core functions, provides a testable bear case, supports scenario follow-ups and gives a nontechnical investor a usable interface. A standalone web UI and assistant-native integration are competing distribution hypotheses; assess rights, costs, security and user preference before adopting either permanently.
 
 ## 2. Architecture and boundaries
 
-The target dependencies are:
+**Proposed v0.3 runtime (not shipped):**
 
-    CLI / future Web UI / future API / optional AI tools
-                        |
-                Application use cases
-                   /           \
-                  v             v
-          Pure domain core   Abstract ports
-          evidence, quotes   quotes, filings
-          valuation, thesis  cache, storage
-                                   ^
-                                   |
-                             External adapters
-                       HTTP providers / persistence
+1. **Question/task UI:** supported company lookup, investment question, explicit ambiguous security/venue choice and consent.
+2. **Research orchestration:** one bounded model-independent coordinator with typed, allowlisted source/identity/analysis tools, time/step/token budgets, cancellation and meaningful partial failures.
+3. **Trusted financial core:** existing provider-normalized, entitlement-aware evidence and deterministic valuation/thesis functions. Domain logic never imports model/UI/cloud/provider SDKs or performs network calls at import.
+4. **Evidence-linked answer:** claims separated as sourced fact, consensus estimate, calculated result, AI inference, investor assumption or explicit gap; financial citation ID **and semantic fidelity** evaluated.
+5. **User-controlled decision:** optional, affirmatively approved private research snapshot using only lawful retained inputs, never implicit save per question or quote refresh.
+6. **Future continuity (v0.4 planned):** opt-in investor context, watchlists and time-correct material-change checks, not background collection by default.
 
-The financial **domain** never imports vendor SDKs, HTTP clients, database models, cloud libraries, UI frameworks or model providers. Application use cases orchestrate core domain and injected ports. Providers normalize external data to our contracts; interfaces render or transmit data without reimplementing financial formulas.
+**Boundaries:** presentation invokes typed application use cases, not financial formulas in browser code. AI calls only narrow tool ports; source adapters enforce legal scope and freshness. Prohibit invented current quotes, unauthorized retention/egress, cross-user leaks, arbitrary model shell/network calls and trading execution. No generic API → service → repository → model scaffold, multi-agent platform, vector store, queue or microservices without validated demand.
 
-**Create boundaries only when they do work.** Keep cohesive calculation functions in their existing modules. Extract application use cases when fetching, normalization, scenario calculation and/or saving must be coordinated. Define a port for replaceable external I/O, testability or entitlement enforcement. Do not mechanically introduce an API → service → repository → model chain or create directories containing only placeholders.
+**Research concepts:** v0.2 supplies a constrained *transient current view* and explicit immutable *saved decision*. Its historical quotes may be excluded when provider rights are unknown. v0.3 adds *AI research runs* with source/tool traces and ephemeral context by default. v0.4 may add *investor context* only with explicit retention and correction/deletion controls.
 
-**Target naming:** descriptive snake_case modules/functions/variables, PascalCase domain types, explicit business terms and consistently named input/output contracts. No permanent file names like phase_2_final, old_auth_mapping or general-purpose dumping-ground utils. Avoid renaming stable existing symbols solely for cosmetic consistency; public compatibility matters.
-
-### Distinct research concepts
-
-- **CurrentResearchView (planned):** source-entitled market data with source timestamp, retrieval time, market session, actual real-time/delayed/EOD/unknown status and deterministic calculations. It may change on refresh.
-- **ResearchSnapshot (planned):** deliberate, immutable user-approved research record with method version, assumptions, selected licensed/replayable input manifest, source references and linked thesis history. It never changes merely because another market tick arrives.
-- **ResearchAssumption (exists):** investigator hypothesis, separate from sourced observation or provider consensus.
-- **FinancialObservation (exists):** source-backed, date/units-aware evidence, not a statement that the provider was necessarily correct.
-- **ValuationScenario (exists):** conditional arithmetic, not an estimated probability distribution or personalized instruction to trade.
-
-**Current data** comes from a suitably entitled provider and carries freshness. **Saved decisions** come from versioned, lawful retained evidence and must not silently call today's feed during historical replay. Source rights may limit exact replay; those limits are explicitly disclosed.
+**Framework and distribution:** use thin prototypes to compare a lightweight standalone UI and an assistant-native tool/skill interface. Choose browser framework, identity service and hosted boundaries through an ADR **after** confirming usability, financial-data display terms, provider cost and security needs.
 
 ## 3. Financial and data correctness — highest priority
 
@@ -120,7 +106,7 @@ If multiple users share a service, validate authentication, authorization, tenan
 | Application integration tests | Fetch → normalize → compute → refresh; old saved thesis unchanged; offline replay with network disabled | With v0.2 use cases |
 | Installation/release smoke | Wheel/sdist, CLI, source-link output, migration and replay | Every applicable release |
 | Browser/components/accessibility | User journey, keyboard/screen-reader, responsive and error-state tests | When frontend exists |
-| Model evaluation | Factuality, numeric fidelity, citations, prompt injection, missing/conflicting evidence | When AI output is shipped |
+| AI model/tool evaluation | Semantic source-to-claim support, arithmetic delegation, chronology/currency, tool permission, prompt injection, missing data, cost/latency | **Mandatory v0.3 AI release gate** once implemented; not enforced in v0.2 CI |
 
 Tests must be deterministic in normal CI: synthetic or suitably licensed frozen fixtures, fake clocks, fake/recorded provider responses, no dependency on an exchange being open or a market quote having a particular live value. Do not put real provider secrets in standard GitHub Actions.
 
@@ -136,7 +122,7 @@ Coverage reports SHOULD be added early in v0.2 to expose risk gaps per module. D
 
 **Current enforced:** Ruff lint, pytest, distribution build and installed-wheel CLI smoke.
 
-**Planned early v0.2:** formatter gate (after a one-time coherent formatting baseline), one static type checker (mypy **or** pyright, not both without a need), coverage visibility and provider contract tests. Add dependency/secret/license scans with external packages, keys or hosted surfaces. Tests must be added to actual CI before being described as gates.
+**Progressive quality adoption:** formatter, one static type checker (mypy **or** pyright), coverage visibility and provider contract checks as appropriate. For v0.3, establish model/tool evaluation and browser/task-acceptance checks **before** describing them as CI release gates. Add dependency/secret/license scans with external packages, keys or hosted surfaces. Tests must be added to actual CI before being described as gates.
 
 Do not suddenly fail an entire old codebase on a strict new checker without an approved baseline/migration plan. Prioritize changed code and high-risk types; no blanket ignores. Resolve review findings before merge instead of suppressing them to pass CI.
 
@@ -173,48 +159,47 @@ Threats include leaked provider credentials, malicious financial document text, 
 
 **Proportionality:** do not build auth/tenant infrastructure for a small CLI. Full authorization and hosted security controls become mandatory at the real shared-user boundary.
 
-## 8. AI readiness and evaluations
+## 8. AI-first orchestration and release evaluations
 
-InvestIQ already has five portable research skills and a shared ResearchReport structure. AI should **interpret attributed evidence**, not fabricate market facts or perform the authoritative arithmetic.
+AI execution is a **planned product capability**, not merely readiness. Reuse the five portable skills as procedures but do not claim that a research agent exists until an orchestrator is implemented and evaluated.
 
-| Capability | Standard |
+| Area | Mandatory implementation standard for v0.3 |
 | --- | --- |
-| Data in | Versioned observations with venue, source, units, time cutoff, entitlement and assumptions |
-| Research out | Typed finding kind: reported fact, estimate, assumption, inference or explicit gap; traceable citation IDs |
-| Arithmetic | Deterministic InvestIQ domain functions; models explain scenarios but do not supply unchecked returns |
-| Trust | Source-ID existence is only structural validation; independently evaluate semantic source faithfulness |
-| Model independence | Skills and domain logic cannot depend on one LLM provider; optional adapters own the model calls |
-| Tool privileges | Narrow fetch, analyze, export and deliberate save tools; no hidden trade execution or entitlement changes |
-| Privacy/cost | Explicit provider consent, redacted transcripts, model/token budget and no unsolicited private research upload |
-| Prompt injection | Financial text is data, never instructions to change policy, execute shell, steal secrets or write thesis history |
+| Question-to-tools | Typed ResearchTask, resolved issuer/venue, bounded allowlisted calls, explicit partial/errors, cost/step/time limits and cancellation |
+| Financial grounding | Sources and deterministic domain math remain authoritative; reject unsupported calculations, currency/share-class joins, timestamps and data-rights violations |
+| Answer contract | Separate observed fact, provider estimate, calculation, AI interpretation, user assumption and missing evidence; cite material claims and expose a falsifiable bear case |
+| Evidence verification | Source existence and claim-to-source semantic support **both** tested; fabricated references or plausible but unsourced numbers are failures |
+| Model independence | Model-specific API adapters outside core, prompt/model/tool/schema versions and repeatable regression fixtures |
+| Tool privilege | No arbitrary fetching, shell execution, file writes, trade placement, silent snapshot saves or provider-entitlement changes from model output |
+| Privacy | Minimized prompt context, consent for external processing and private persistence, redact transcripts/logs, isolate hosted users, explicit export/deletion |
+| Security | Treat SEC/filings/news/web/model text as untrusted; malicious document instructions may never override tool policy |
+| Failure UX | Clear uncertainty, partial result, timeouts, stale/restricted sources, provider/model failures and instructions to retry/resolve rather than fabricated completion |
 
-### Evaluation protocol, not a live gate yet
+**Evaluation harness required before v0.3 product release:** versioned synthetic/legally frozen golden cases and expert review for missing EPS, fiscal revision, FX/share-basis mismatch, stale/EOD mislabeled live, ambiguous ticker, post-cutoff filing, incompatible peer comparison, fake citations, contradictory bull/bear evidence, malicious financial document, retention-denied quote, token-cost loops and user-data leakage.
 
-Build legally reproducible golden cases: missing EPS, unsupported CAGR, contradictory restatements, dates known only after a historical cutoff, wrong currency or share class, stale EOD quote labeled live, ungrounded market share claim, malicious filing instructing the agent to bypass controls, and user/tenant entitlement mismatch.
+Enforce tool schema and numerical-domain regression in automated tests; evaluate source/claim *semantic* faithfulness and grounded qualitative findings with expert-labelled cases plus manual review. Record observed validity, material error rates, coverage, latency/model and provider costs. Establish thresholds from a baseline, never invent success results or declare "AI verified" from structural checks. Block launch on critical financial misinformation, license breach, unauthorized data persistence or prompt-injection escape.
 
-Measure **schema validity, numeric fidelity, source/citation validity, semantic evidence faithfulness, missing-data behavior, prompt-injection resistance and model cost/latency**. Track prompt/skill/model version and frozen inputs. Use expert review for semantic conclusions. No absolute “AI verified” badge from source-ID checks alone.
+Do not implement complex autonomous multi-agent architecture, RAG database, vector memory or unbounded background jobs simply because the roadmap is AI-first.
 
-These become release gates **only when a specific AI-powered feature is introduced and its evaluation runner is implemented**. Never delay deterministic research features for a nonexistent AI agent suite. Do not build an autonomous multi-agent framework, vector search, RAG database or model gateway without tested user demand.
+## 9. User experience and frontend acceptance (v0.3)
 
-## 9. Frontend, product design and UI/UX
+**A usable interface is now a v0.3 deliverable.** A CLI and JSON export do not satisfy a nontechnical investor. A small standalone UI or assistant-native integration may satisfy this, based on [comparative validation](../product/validation-plan.md).
 
-v0.1.1 has no web frontend. **Design the experience now; pick the stack after validating the workflow.** Do not scaffold a Next.js app or adopt a large design system in the Blueprint PR.
+**Hero task:** Ask a supported investment question → select exact instrument when ambiguous → watch bounded research status → read concise source-grounded business/financial/valuation analysis → inspect strongest bear case and data gaps → drill down to evidence → edit permitted scenario assumptions → explicitly approve any save/export.
 
-Core journey:
+**Critical UX requirements:**
+- No mandatory CIK/MIC, shell commands, developer API key or JSON schema for the supported consumer experience; if lawfully accessible provider data cannot support this, do not release/market it as consumer-ready.
+- Show quote currency, venue, price kind, provider, market timestamp, real-time/delayed/EOD/unknown and stale status. Financial values carry fiscal period, source and method.
+- Separate observation, third-party estimate, calculation, model inference and user assumption. Render unavailable as missing, **never as zero**. Forecast/scenario results are conditional, not advertised alpha.
+- Inline source inspection with claim-level context; prominent specific counter-thesis and unsupported-data questions; comprehensible summary before financial detail.
+- Loading, cancellation, partial output, unsupported company, ticker ambiguity, closed market, rate-limit, model failure, citation failure, declined provider rights and unsafe input recovery.
+- Responsive/accessible semantic UI with keyboard and screen-reader operation, non-color status indicators, understandable language and accuracy-preserving number formatting.
+- Explicit privacy consent for model/provider calls and personal storage; users can inspect and withdraw stored research according to declared retention rules.
+- Browser components, end-to-end usability task tests and accessibility checks must be implemented **if standalone UI is selected**, before release. Assistant-hosted channels must meet comparable evidence, permission and usability standards.
 
-    Find supported company → Inspect source/freshness → Analyze
-                    → Challenge assumptions → Explicitly save/replay thesis
+**v0.4 (not v0.3) return-session outcome:** stored opt-in thesis → supported changed evidence → precise source/assumption deltas → user-approved thesis revision. No silent rewriting from refresh.
 
-**Frontend and report UX rules, applicable when exposed:**
-- Quote, currency, venue, price kind, provider, last market event, session and real-time/delayed/EOD/unknown status must be visible near the price. Closed-market and stale data must not masquerade as “live now”.
-- Every important figure has source, reporting period and calculation/assumption provenance. Unknown, stale and unavailable must not look like zero.
-- Clearly distinguish **Current View** from **Saved Thesis as of [time]**. Refresh current calculations but never silently edit saved research.
-- Show what a bear/base/bull scenario assumes, how changing inputs affects calculated outcomes and what the model omits. No fake predictive certainty or buy/sell pressure.
-- Design success and error states: no coverage, ambiguous ticker, unsupported venue, delayed quote, closed market, missing financials, rate-limit response, permission denied, offline replay failure and provider outage.
-- Accessible semantic controls, keyboard operation, readable contrast, non-color status communication, responsive tables, understandable terminology and measured financial precision.
-- User privacy is visible: report export, external API/AI call and save actions are deliberate and clearly described.
-
-For a future frontend, require shared design tokens, components that present typed view models, API contract tests, accessibility checks and task-based usability testing. Framework selection (React, Next.js, otherwise) gets an ADR after user research and hosting requirements are clearer. Markdown/HTML report export may satisfy early users better than a server-rendered SPA.
+Do not prebuild a complex frontend framework/design system before validating the task. Select framework and hosted auth boundaries by ADR when the operating model is known.
 
 ## 10. Reliability, observability, optimization and cost
 
@@ -240,7 +225,7 @@ Use reviewer *hats* rather than creating an enterprise review board.
 | Security/privacy | Secrets, malicious external input, authorized reuse and private snapshots |
 | Test/quality | Negative paths, deterministic fixtures, replay, meaningful assertions and gates |
 | Product/UX | User journey, source/freshness visibility, missing-data messaging and accessibility |
-| AI readiness | Grounding, prompt injection, tool scopes, versioned model evaluations when applicable |
+| AI execution (v0.3) | Source-claim semantic checks, tool privileges, prompt injection, versioned evaluations and bounded latency/cost |
 | Release/operations | Artifacts, versions, CI, migrations, cost and rollback where applicable |
 
 **Must-pass checklist for each applicable PR:**
@@ -249,23 +234,26 @@ Use reviewer *hats* rather than creating an enterprise review board.
 - [ ] Correct dependency direction and vendor isolation
 - [ ] Deterministic tests plus material negative edge cases, or justified docs-only change
 - [ ] Existing Ruff, pytest, build, installed-wheel smoke checks pass
-- [ ] New capability-specific checks pass **when they actually exist**
+- [ ] New feature-specific gates pass **when implemented**; v0.3 AI/UI requires semantic/financial/tool/UX evaluations
+- [ ] Real-investor usability and differentiation against LLM/incumbent alternatives are assessed before broad feature expansion
 - [ ] Source timestamps, freshness and entitlements truthful where relevant
 - [ ] No secrets, private holdings or nonredistributable provider data
 - [ ] Documentation, migration and release risks updated
 - [ ] No unresolved material review findings; exceptions recorded and approved
 
-## 12. Adoption roadmap — standards without premature infrastructure
+## 12. Engineering release sequencing — user outcomes before scaffolding
 
-| Stage | Action | Non-goals |
+| Stage | Outcome / gates | Do not do |
 | --- | --- | --- |
-| **Now — Blueprint PR** | This document, contributor and PR-template alignment; preserve existing CI and code | No empty framework folders, frontend, database, agent stack or global refactor |
-| **v0.2 PR 1** | Typed market/issuer/freshness/entitlement contracts, versioned errors, negative tests; decide one type checker | No mandatory cloud or live feed in pure domain |
-| **v0.2 PR 2–3** | Provider contract fixtures, networking safeguards, bounded cache, BYOK, source licensing; introduce type/format/security checks progressively | No multi-tenant auth or streaming stack without need |
-| **v0.2 PR 4–5** | Connected use cases, truthfully time-labeled valuations and explicit save/replay adapter; integration/replay tests | No implicit thesis writes per quote |
-| **v0.2 acceptance** | At least one lawfully connected issuer/price source, failure-mode testing, artifact install, user walkthrough and complete source documentation | No universal real-time/global data claim |
-| **When UX/hosted demand appears** | Validate design, choose stack/ADR, browser/API/security/load checks based on actual surface | No premature SaaS infrastructure |
+| **v0.2 source baseline** | Preserve connected CLI, source rights and replay; independently verify live provider entitlement before publication claims | Claim shipped LLM agent or consumer GUI |
+| **v0.3 thin vertical slice** | One usable, supported research-question experience with appropriate provider rights, onboarding and explicit uncertainty | Build large SaaS/auth/cache system before consumer flow |
+| **v0.3 AI research** | Bounded model tools, evidence-linked research/challenge, deterministic valuation and failure control | Free-form LLM numeric facts, uncontrolled agent stack |
+| **v0.3 acceptance** | Evaluated model semantics and tool safety, browser/assistant UX, manual licensed-provider review, measured benchmark with real investors | Declare PMF from a demo or synthetic CI |
+| **v0.4 conditional** | Opt-in memory, structured thesis deltas and lawfully scheduled monitoring | Implicit context capture and always-on worker by default |
+| **v0.5+ conditional** | Proven discovery/portfolio/quant value and economic/legal safety | Expand broad analytics with no return-use validation |
+
+Use outcome-based PRs and [draft-to-ready CI policy](ci-efficiency.md). Keep v0.2 documentation as truthful implementation history, not the current next-action list.
 
 **Stop-and-correct signals:** false live/delay labels, licensed-data leakage, fabricated facts, replay that silently uses current prices, cross-instrument valuation error, entitlement bleed, private secrets committed, or serious unaddressed financial/security review findings.
 
-**Engineering decision:** Implement **v0.2 PR 1 — Provider-neutral market-data contracts and source/entitlement semantics** after adopting this blueprint. Engineering rigor is a constraint on how to build the next working capability, not a reason to postpone it indefinitely.
+**Engineering decision:** Preserve the v0.2 source foundation. Subject to product approval, implement the **v0.3 AI Research Experience** as a bounded, testable user-facing vertical slice with strong data-rights, factuality, security and usability gates.
