@@ -1,21 +1,21 @@
-# Getting started with InvestIQ v0.1
+# Getting started with InvestIQ v0.2.0
 
-InvestIQ is an offline, open-source research library and CLI. Nothing in this quickstart requires credentials, external subscriptions, a model provider, portfolio holdings or a brokerage account.
+InvestIQ has an **offline synthetic workflow** and an **opt-in connected issuer-research workflow**. Python 3.11+ is required. No account or key is necessary for offline use.
 
 ## Installation
 
-Install Python 3.11 or newer and Git, clone the public repository and run:
-
 ```bash
+git clone https://github.com/jayaprakash87/InvestIQ.git
+cd InvestIQ
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev]"
 investiq --help
 ```
 
-Windows PowerShell activation: `.venv\Scripts\Activate.ps1`. Alternatively invoke the virtual environment's Python directly. Install from a release wheel with `python -m pip install investiq_core-0.1.1-py3-none-any.whl`.
+For Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` or run the `.venv\Scripts\python` and `.venv\Scripts\investiq` executables directly. A built `0.2.0` wheel can be installed with `python -m pip install dist/investiq_core-0.2.0-py3-none-any.whl` after running `python -m build`.
 
-## Reproduce the complete research example
+## Offline synthetic example
 
 ```bash
 investiq demo --output demo.json
@@ -23,38 +23,32 @@ investiq validate demo.json --basis public
 investiq validate demo.json --basis recorded
 ```
 
-Or use `python -m investiq_core demo` to print the synthetic bundle to stdout.
+The bundle contains fictional issuer observations, explicit assumptions, source-linked reports, valuation scenarios and a hash-linked thesis. A validator result such as `"validation": "structural_only"` **does not** verify a company's actual fundamentals or forecasts.
 
-The bundle includes:
-- two fictional, attributed financial observations;
-- one explicit, evidence-linked hypothetical growth assumption;
-- a source-cited research report with an acknowledged data gap;
-- two research thesis vintages linked by a content hash;
-- a purely hypothetical valuation scenario with multiple outcomes.
+## Connected one-company research
 
-Validation prints counts, scenario arithmetic and the declaration `"validation": "structural_only"`. It checks referenced IDs, venue-qualified securities, report and thesis time cutoffs, supported assumptions and input shape. It does **not** independently verify statement truth, return forecasts or expected probabilities.
+`investiq research` is optional network access. It needs your authorized `TWELVE_DATA_API_KEY` and a real `INVESTIQ_SEC_USER_AGENT`; specify the **verified** issuer-to-listing source, effective date, ticker, venue/MIC, currency and age policy. Use [the connected CLI guide](methodology/connected-cli.md) for examples, caveats and permissions.
 
-The scenario's `hypothetical_entry_price` is **not** a market quote. All example values are synthetic.
+Connected mode shows a source-attributed quote and selected SEC annual facts, with clear freshness/session/missing-data flags. It does not automatically save data, perform currency conversion, claim a real-time feed or recommend securities. Requested annual P/E is withheld unless the required financial context and an independent share-basis confirmation are supplied.
 
-## Using the research skills
+## Explicit research save and offline replay
 
-Each [skills/](../skills/README.md) directory contains a standalone `SKILL.md`. Provide your chosen assistant with the skill instructions and explicit, authorized financial observations. Have the assistant return the documented `ResearchReport` structure; parse and validate that output using `investiq_core.research`. A report passing validation still requires human/source review for actual correctness.
+Use `investiq research ... --save-dir <private-dir> --thesis-id ... --thesis-statement ... --revision-reason ...` to create a private decision **only when requested**. Then run `investiq replay --store-dir <private-dir> --thesis-id ... --revision 1` offline, optionally with `--format markdown` or `--format manifest`.
 
-## Python APIs
+Market quote prices with UNKNOWN/DENIED snapshot rights—including the current Twelve Data adapter—are **not captured**, and derived prices/valuation are absent in replay. The resulting record still preserves supported SEC public financial facts, authored thesis and eligible assumptions. A GitHub repository is not a private research store.
 
-The package exposes modules `investiq_core.evidence`, `valuation`, `research`, `thesis` and `workflow`. See the executable tests for detailed examples. Use `Decimal` for sourced monetary observations, and explicit hypothetical numeric assumptions for illustrative scenario arithmetic.
+## Five portable research skills
 
-## Privacy and data rights
+Read [skills/](../skills/README.md) to use the business-analysis, financial-analysis, valuation-analysis, peer-comparison and thesis-challenge skills. AI-generated prose remains subject to independent source verification; the structural report validator is not a factuality oracle.
 
-No live data is downloaded and no contents are sent to external services. The program reads and writes local JSON only. Do not commit your research bundles if they contain private information. The MIT software license does not grant redistribution rights to any financial datasets.
+## Known limitations and troubleshooting
 
-## Known limitations
+- `investiq: command not found`: ensure the environment is active or use `python -m investiq_core`.
+- Connected-provider errors: check API key, contact User-Agent, subscription/venue permissions, SEC fair access and the explicitly provided CIK/listing metadata. Never paste keys into issues or PRs.
+- Stale/unknown quote: increase the age policy **only when analytically justified**, not merely to make a red status disappear; the provider/exchange entitlement remains separate.
+- Snapshot save failures: ensure the parent directory exists, your private child directory permissions are suitable and the revision's preceding hash-linked history is present.
+- A missing or incompatible EPS does not justify an invented P/E or forecast. US-GAAP annual 10-K support is intentionally narrow.
+- Run `ruff check .`, `pytest -q`, and `python -m build --sdist --wheel` to check source quality. No keys/network required for CI.
+- The [release acceptance matrix](engineering/release-acceptance-v0.2.md) explicitly separates synthetic automated evidence from manual authorized live-provider verification.
 
-There is no real market-data adapter, persistence database, authentication, PDF ingestion, application UI, stock screener, portfolio tracking, backtesting or trading. Historic public-availability timestamps still depend on the trustworthiness of the source data; a publication date alone cannot prevent every form of historical revision bias.
-
-## Troubleshooting
-
-- `investiq: command not found`: ensure the virtual environment is active or use `python -m investiq_core`.
-- `validation failed`: check source availability, explicit citation IDs, input units, research cutoffs and JSON schema version.
-- A negative/non-meaningful EPS cannot be modeled through simple P/E scenarios; use an appropriate method when available.
-- Check build/test health with `ruff check .`, `pytest -q`, and `python -m build`.
+InvestIQ is research software, **not investment advice, a trading service, or permission to retain/redistribute a commercial data feed**.

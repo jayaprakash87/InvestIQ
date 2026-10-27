@@ -17,7 +17,7 @@ Offline deterministic valuation calculations; precision-aware financial observat
 
 **It does not ingest current real company financials or quotes.** The offline demo is explicitly fictional.
 
-## Planned v0.2 user journey
+## v0.2 implemented user journey
 
 1. Choose a supported instrument/issuer with verified identity, venue, share class and currency.
 2. Request the latest permitted provider quotation and available financial statements; display actual timestamps, source and real-time/delayed/EOD/unknown classification, not invented freshness.
@@ -26,7 +26,7 @@ Offline deterministic valuation calculations; precision-aware financial observat
 5. Explicitly save a dated research snapshot with legally retainable inputs and a versioned research rationale.
 6. Replay the snapshot from its stored evidence/reference, offline when retention rights allow. Never substitute today's prices during historical replay.
 
-## v0.2 minimum deliverables
+## v0.2 minimum deliverables and caveats
 
 Provider-agnostic data and entitlement contract; one permitted market-price provider adapter and one valid filing/fundamental adapter (e.g. SEC filings for US issuers), time-aware refresh and safe bounded cache, a source-linked connected research view, a user-triggered snapshot storage adapter and an end-to-end documented CLI demonstration with real supported source data.
 

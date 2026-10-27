@@ -1,10 +1,10 @@
 # InvestIQ
 
-**Open-source, evidence-aware equity research.** InvestIQ v0.1 provides a Python library, a local command-line workflow, five portable research skills, and an immutable investment-thesis ledger. Anyone can install it and reproduce the synthetic research example without accounts or API keys.
+**Open-source, evidence-aware equity research.** InvestIQ v0.2.0 introduces opt-in, bring-your-own-key connected issuer analysis and private research-decision snapshots alongside the original offline Python toolkit, five AI-neutral research skills and hash-linked thesis history. The synthetic example and offline replay need no accounts or provider keys.
 
 **This is experimental research software, not investment advice, a trading system, live market-data feed, backtesting engine or managed investment product.** No returns or predictive accuracy are claimed.
 
-## What works in v0.1
+## What works
 
 | Capability | Implementation |
 | --- | --- |
@@ -15,6 +15,8 @@
 | Research report validation | Structural citations, fact/estimate/hypothesis separation, source timing |
 | Thesis version history | Hash-linked snapshots, differences, JSONL export/import, falsification checkpoints |
 | Offline workflow | Generate and validate a complete **synthetic** research bundle from the CLI |
+| Connected issuer research (opt-in) | SEC annual US-GAAP facts + Twelve Data one-minute CLOSE with unknown declared timeliness, sourced via explicit CIK/listing |
+| Private decision snapshots | Explicit permission-gated save; offline replay and JSON/Markdown exports, not automatic provider retention |
 
 ## Quick start (Python 3.11+)
 
@@ -34,6 +36,14 @@ On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`. If shell acti
 The `demo.json` file is locally generated and entirely fictional. `investiq demo` prints JSON to stdout when `--output` is omitted. `python -m investiq_core demo` is an equivalent module entry point. `investiq validate` checks supplied local bundles and prints structured results. It does **not** fetch live prices, execute trades, or certify the meaning of natural-language research conclusions.
 
 For an installed package, use `python -m pip install .` or an official release wheel. No mandatory service or paid dependency.
+
+## Connected CLI (v0.2.0)
+
+**Opt-in network:** `investiq research` connects to SEC EDGAR and Twelve Data using `INVESTIQ_SEC_USER_AGENT` (your real contact) and `TWELVE_DATA_API_KEY` (your own authorized provider entitlement). Specify a verified issuer CIK/listing, exchange MIC, currency, effective date and a user-selected freshness policy. Source delay can remain `unknown`; that is not a real-time claim.
+
+**Offline:** `investiq replay` opens a deliberately saved, private research decision without any API key or network calls. The default Twelve Data quote does **not** grant snapshot retention, so its price and price-derived calculations are omitted from saved records.
+
+See the [connected CLI guide](docs/methodology/connected-cli.md) and [release acceptance status](docs/engineering/release-acceptance-v0.2.md) for commands, limitations and tests. **The code is not a provider-licensed hosted feed or financial recommendation service.**
 
 ## Python library example
 
@@ -69,6 +79,7 @@ All numbers are **fictional assumptions**, not estimates of a listed company's f
 - [Connected data service (v0.2 PR 3)](docs/methodology/connected-data-service.md) — on-demand data validation, freshness, licensed caching and bounded retries
 - [Connected current research (v0.2 PR 4)](docs/methodology/connected-research.md) — SEC annual GAAP facts, qualified P/E and user-supplied scenarios; no persistent theses
 - [Private research snapshots (v0.2 PR 5)](docs/methodology/research-snapshots.md) — explicit lawful retention, offline replay and JSON/Markdown outputs
+- [Connected and replay CLI (v0.2 PR 6)](docs/methodology/connected-cli.md) — explicit connected research, optional save, and offline replay
 - [Research report contract](docs/methodology/research-report-contract.md)
 - [Valuation conventions](docs/methodology/valuation.md)
 - [Thesis history](docs/methodology/thesis-history.md)
@@ -86,11 +97,11 @@ Source-supported analysis over fabricated certainty. Distinct observed facts, co
 
 **Important:** A validated bundle is only structurally consistent. It has not been fact-checked against external documents, tested for model accuracy, or approved for personal investing.
 
-## Approved direction after v0.1
+## Connected research status
 
 The [connected-research roadmap](docs/product/product-roadmap.md) targets **provider-agnostic, appropriately current market information** with visible source, session and delay, optional freshness-aware caching, and **immutable saved research decisions**. A local workspace may hold a user's private historic theses, but it must **not** masquerade as a live pricing feed.
 
-These are **planned v0.2+ capabilities**, not included in the v0.1.1 release. Live data, real-time exchange licensing, hosted accounts, a shared cloud cache and a full web application are not shipped today.
+The v0.2.0 Python/CLI connected vertical slice is **implemented**, but not independently tested against real provider accounts in standard CI. **Verified exchange real-time entitlement, unrestricted price retention, hosted accounts, shared cloud cache, full market coverage, web application and true historical backtesting are not shipped.**
 
 ## Contributing and safety
 
