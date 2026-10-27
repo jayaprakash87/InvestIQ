@@ -2,6 +2,8 @@
 
 import asyncio
 import io
+from datetime import UTC, datetime, timedelta
+from email.utils import format_datetime
 from urllib.error import HTTPError, URLError
 
 import pytest
@@ -33,9 +35,9 @@ class DummyOpener:
         return DummyResponse(self.value)
 
 
-def call(monkeypatch, response, *, max_bytes=200):
+def call(monkeypatch, response, *, max_bytes=200, clock=None):
     monkeypatch.setattr(_http, "build_opener", lambda *_args: DummyOpener(response))
-    return asyncio.run(_http.UrllibJsonTransport(max_bytes=max_bytes).get_json(
+    return asyncio.run(_http.UrllibJsonTransport(max_bytes=max_bytes, clock=clock).get_json(
         "https://example.org/api?apikey=SYNTHETIC-SECRET",
         headers={"User-Agent": "InvestIQ Synthetic developer@example.org"},
     ))
@@ -96,3 +98,25 @@ def test_transport_constructor_rejects_unsafe_limits():
         _http.UrllibJsonTransport(timeout_seconds=0)
     with pytest.raises(ValueError):
         _http.UrllibJsonTransport(max_bytes=20_000_000)
+
+
+def test_retry_after_http_date_is_parsed_as_minimum_provider_delay(monkeypatch):
+    now = datetime(2026, 10, 27, 10, tzinfo=UTC)
+    deadline = format_datetime(now + timedelta(minutes=7), usegmt=True)
+    error = HTTPError(
+        "https://example.org/api?apikey=SYNTHETIC-SECRET",
+        429, "SECRET ERROR", {"Retry-After": deadline}, None,
+    )
+    with pytest.raises(_http.TransportStatusError) as exc:
+        call(monkeypatch, error, clock=lambda: now)
+    assert exc.value.retry_after_seconds == 420
+    assert "SYNTHETIC-SECRET" not in str(exc.value)
+
+
+def test_retry_after_past_http_date_has_no_remaining_minimum(monkeypatch):
+    now = datetime(2026, 10, 27, 10, tzinfo=UTC)
+    deadline = format_datetime(now - timedelta(seconds=15), usegmt=True)
+    error = HTTPError("https://example.org/", 429, "rate", {"Retry-After": deadline}, None)
+    with pytest.raises(_http.TransportStatusError) as exc:
+        call(monkeypatch, error, clock=lambda: now)
+    assert exc.value.retry_after_seconds == 0
