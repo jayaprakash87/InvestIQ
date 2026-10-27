@@ -146,6 +146,33 @@ def test_browser_history_save_load_export_and_auth_without_quote_or_ai(app):
     assert catalog.calls == 1  # No provider call from save/replay/export
 
 
+def test_multibyte_thesis_within_documented_limits_can_be_saved(app):
+    port, directory, _ = app
+    cookie, csrf, _ = session(port)
+    assert request(port, "/api/v1/session/configure", {
+        "sec_contact": "Research support@example.org", "twelve_data_api_key": "",
+    }, cookie, csrf)[0] == 200
+    assert request(
+        port, "/api/v1/companies/search", {"query": "EXM"}, cookie, csrf,
+    )[0] == 200
+    payload = save_payload()
+    payload["decision"]["thesis_id"] = "unicode_decision"
+    payload["decision"]["statement"] = "测" * 1400
+    payload["decision"]["reason"] = "变" * 400
+    payload["decision"]["risks"] = ["风" * 189 + str(i) for i in range(5)]
+    payload["decision"]["invalidation_triggers"] = [
+        "险" * 189 + str(i) for i in range(5)
+    ]
+    raw = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    assert 8192 < len(raw) < 32768
+    status, _, data = request(
+        port, "/api/v1/decisions/save", payload, cookie, csrf,
+    )
+    assert status == 200
+    assert data["revision"] == 1
+    assert directory.joinpath("unicode_decision-00000001.json").exists()
+
+
 def test_history_requires_cookie_csrf_origin_and_declared_folder(app):
     port, _, catalog = app
     cookie, csrf, _ = session(port)
