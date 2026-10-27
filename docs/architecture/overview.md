@@ -40,6 +40,10 @@ There is **no live/delayed price provider, cloud cache, cloud database, web UI o
 
 `adapters/sec_companyfacts.py` fetches and conservatively filters SEC annual 10-K US-GAAP facts. `fundamentals.AnnualMetricFact` and the corresponding `FundamentalsProvider` port preserve accession, filing date, fiscal period, value units and exact `Decimal`. `application/connected_research.py` combines compatible issuer/listing mapping, reported annual EPS and price observations, with explicit freshness/FX/share-basis eligibility. No quote/data persistence, automatic rankings, forward/TTM valuations, complete fiscal normalization or new CLI/web interface is implied. See [ADR 0007](../decisions/0007-connected-research-analysis.md) and [connected research use](../methodology/connected-research.md).
 
+### v0.2 PR 5 research snapshots (implemented)
+
+`research_snapshot.py` provides an explicit user-initiated capture from connected analysis, a versioned immutable input manifest and offline valuation replay. It retains SEC annual facts and **only quotes with explicit snapshot rights**, so current Twelve Data prices remain excluded from persisted outputs. `snapshot_store.py` adds private create-only local files, revision lineage checks, corruption detection and JSON/Markdown exporters. It reuses the existing `ThesisSnapshot` chain; no cloud, hosted auth or automatic market data persistence is implied. See [ADR 0008](../decisions/0008-private-research-snapshots.md) and [usage](../methodology/research-snapshots.md).
+
 ## 2. Target logical components
 
 ```text
