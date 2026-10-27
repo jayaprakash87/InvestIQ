@@ -98,7 +98,7 @@ Releases are **outcome milestones, not delivery dates or promises**. Every relea
 
 ### Work sequencing and dependencies
 
-- **v0.3 is intentionally narrow:** one useful, real-company end-to-end personal flow; not 194-company coverage or a comprehensive stock screener.
+- **v0.3 is intentionally narrow:** one useful, real-company end-to-end personal flow, including **traceable issuer narrative evidence** as needed for business/risk claims; not 194-company coverage or a comprehensive stock screener.
 - **v0.4 requires validated source breadth:** trend/peer only with compatible periods, fiscal filings and sources; narrow alternatives when providers cannot support it.
 - **v0.5 requires score methodology integrity:** no rankings merely because a formula can be calculated. Include confidence, missingness, scenario/sector/horizon distinctions.
 - **v0.6 requires price/valuation rights and completeness:** reverse underwriting is allowed only with compatible current/ref-price and financial assumptions.
@@ -111,7 +111,7 @@ Scope changes can shift features between minor releases, but **must preserve the
 ## 7. Detailed roadmap capabilities and method evolution
 
 ### A. AI and interaction (starts v0.3, improves every release)
-- Single bounded, replaceable model coordinator with narrow retrieval, calculation, source inspection, challenge and explicit-save tools; agent run costs, failures, citations and model version visible where useful.
+- Single bounded, replaceable model coordinator with narrow **issuer filing/document passage retrieval** (for business model, concentration and risks), numerical evidence/quote retrieval, calculation, source inspection, challenge and explicit-save tools; agent run costs, failures, citations and model version visible where useful.
 - Context-aware follow-ups within approved tasks; never need to restate every factor/stock/timestamp. Do not persist conversations or investor preferences without opt-in.
 - Report-first UI plus purposeful comparison tables, scoring breakdowns, charts and sliders. AI **orchestrates**; the product isn't an unstructured prompt box.
 - Source-to-claim semantic checks, confidence calibrated to evidence coverage (not fabricated numerical probability), prompt-injection defenses and bounded retries.
