@@ -74,12 +74,38 @@ class FakeResearchService:
         )
 
 
+class FakeFilingEvidence:
+    def __init__(self):
+        self.calls = []
+
+    async def inspect(self, issuer, *, topic):
+        self.calls.append((issuer, topic))
+        return {
+            "mode": "filing_passage_inspection_not_ai", "issuer": issuer.value,
+            "topic": topic, "document": {
+                "form": "10-K", "accession": "0000012345-26-000007",
+                "filed_on": "2026-03-04",
+                "source_url": "https://www.sec.gov/Archives/edgar/data/12345/"
+                              "000001234526000007/annual10k.htm",
+                "document_sha256": "a" * 64,
+            },
+            "passages": [{
+                "evidence_id": "sec:test-excerpt", "topic": topic,
+                "excerpt": "The issuer describes hypothetical competition risks.",
+                "extracted_start": 123, "extracted_end": 174,
+                "excerpt_sha256": "b" * 64,
+            }],
+            "limitations": ["Keyword matches are not verified sections."],
+        }
+
+
 @dataclass
 class Harness:
     port: int
     connected: LocalConnectedResearch
     directory: FakeDirectoryTransport
     research: FakeResearchService
+    evidence: FakeFilingEvidence
     server: object
 
 
@@ -87,14 +113,17 @@ class Harness:
 def harness():
     directory = FakeDirectoryTransport()
     research = FakeResearchService()
+    evidence = FakeFilingEvidence()
     connected = LocalConnectedResearch(
-        directory_transport=directory, research_factory=lambda contact, key: research
+        directory_transport=directory,
+        research_factory=lambda contact, key: research,
+        evidence_factory=lambda contact: evidence,
     )
     server = create_app_server(0, connected=connected)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
-        yield Harness(server.server_port, connected, directory, research, server)
+        yield Harness(server.server_port, connected, directory, research, evidence, server)
     finally:
         server.shutdown()
         thread.join(timeout=4)
@@ -339,6 +368,72 @@ def test_provider_failure_is_categorized_without_secrets(harness):
     assert err["code"] in {"entitlement_denied", "unauthorized", "invalid_response"}
     assert "test_key_fake" not in json.dumps(err)
     harness.connected._directory_transport = original
+
+
+def test_filing_inspection_requires_confirmed_issuer_and_topic(harness):
+    cookie, csrf, _, _ = initialize(harness)
+    data = {
+        "symbol": "EXM", "venue": "XNAS", "cik": "0000012345",
+        "currency": "USD", "confirm_current_listing": True,
+        "confirm_currency": True, "topic": "risks",
+    }
+    assert request(
+        harness, "POST", "/api/v1/research/filing-evidence", data,
+        cookie=cookie, csrf=csrf,
+    )[0] == 403
+    assert configure(harness, cookie, csrf)[0] == 200
+    assert request(
+        harness, "POST", "/api/v1/research/filing-evidence", data,
+        cookie=cookie, csrf=csrf,
+    )[0] == 400
+    assert request(
+        harness, "POST", "/api/v1/companies/search", {"query": "EXM"},
+        cookie=cookie, csrf=csrf,
+    )[0] == 200
+    for bad in (
+        {**data, "topic": "anything"},
+        {**data, "cik": "0000012346"},
+        {**data, "venue": "XNYS"},
+        {**data, "confirm_currency": False},
+        {**data, "confirm_current_listing": False},
+        {**data, "currency": "EUR"},
+    ):
+        assert request(
+            harness, "POST", "/api/v1/research/filing-evidence", bad,
+            cookie=cookie, csrf=csrf,
+        )[0] == 400
+    assert harness.evidence.calls == []
+    code, _, result = request(
+        harness, "POST", "/api/v1/research/filing-evidence",
+        {**data, "untrusted_url": "https://evil.invalid"},
+        cookie=cookie, csrf=csrf,
+    )
+    assert code == 200
+    assert result["mode"] == "filing_passage_inspection_not_ai"
+    assert result["passages"][0]["evidence_id"] == "sec:test-excerpt"
+    assert harness.evidence.calls[0][0].value == "0000012345"
+    assert harness.evidence.calls[0][1] == "risks"
+    assert "test_key_fake" not in json.dumps(result)
+    assert request(
+        harness, "POST", "/api/v1/session/clear", {}, cookie=cookie, csrf=csrf,
+    )[0] == 200
+    assert request(
+        harness, "POST", "/api/v1/research/filing-evidence", data,
+        cookie=cookie, csrf=csrf,
+    )[0] == 403
+
+
+def test_filing_browser_avoids_html_injection_and_stale_company_evidence():
+    from importlib.resources import files
+
+    js = files("investiq_core").joinpath("web", "connect.js").read_text(
+        encoding="utf-8"
+    )
+    assert "innerHTML" not in js
+    assert "filing-evidence" in js
+    assert "textContent" in js
+    assert "generation !== selectionVersion" in js
+    assert "selected !== candidate" in js
 
 
 def test_app_does_not_require_connection_for_existing_synthetic_demo(harness):
