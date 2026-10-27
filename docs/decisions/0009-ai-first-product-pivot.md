@@ -2,13 +2,13 @@
 
 **Status:** Proposed (PR review; not accepted by repository merge) · **Date:** 2026-10-27
 **Scope:** Future priorities and release sequencing, preserving prior v0.2 code/ADRs as factual history.
-**References:** [Full Product Roadmap v3.0](../product/product-roadmap.md) · [Research History](../product/research-foundations.md) · [v0.3 PRD](../product/ai-research-experience.md) · [Validation](../product/validation-plan.md).
+**References:** [Full Product Roadmap v3.0](../product/product-roadmap.md) · [v0.3 PRD](../product/ai-research-experience.md) · [Validation](../product/validation-plan.md).
 
 ## Context
 
 v2.0 engineered sound source/issuer contracts, compliant market-data access, deterministic research and deliberate history, but the v0.2 source release candidate still requires CLI/BYOK knowledge, provides only a narrow US annual research slice and has no model runtime or approachable UI. The first v3 draft put AI-first user experience at v0.3 but **underrepresented the extensive earlier research and the full desired personal-to-v1.0 open-source maturity path**.
 
-Earlier investment work crossed broad AI infrastructure and physical AI universes (150 and 194 names / 23 segments), factor scoring, fundamental trends, true versus complementary peers, FCF/ROIC/debt quality, forward valuations and hypothetical entry-price return hurdles, multiple time horizons, thesis challenges, user portfolio themes and repeated corrections of questionable rankings. Such research dictates future functional requirements. A generic LLM chatbot or a single company research page does not address the full job.
+An investment research platform should be **problem- and capability-defined**, not derived from an individual investor's historical sector choices, stock comparisons or portfolio. The general problem is fragmented market/fundamental research, inconsistent source dates and definitions, opaque models, repeated manual prompting, weak research continuity and a difficult path from evidence to an auditable decision. The first version should focus on supported equities while keeping sector and methodology choice configurable.
 
 ## Decision proposed
 
@@ -25,10 +25,10 @@ Earlier investment work crossed broad AI infrastructure and physical AI universe
 - **Only ship a model-independent research API and skills:** insufficient for daily personal use; still forces prompts/code.
 - **Build a large standalone SaaS immediately:** too expensive and ignores open-source/privacy/licensing requirements.
 - **Focus solely on v0.3 chat then revisit:** omits prior scoring/underwriting/portfolio research and lacks definition of a stable usable v1.0.
-- **Deploy a 194-company scorecard with prior worksheet values now:** risks fabricated/stale rankings and unlicensed data; build source/coverage/method governance first.
+- **Embed any previously researched stock universe or dated worksheet in product defaults:** risks sector bias, stale figures, unlicensed data and unwanted private context; build source/coverage/method governance first.
 
 ## Consequences and gates
 
-Pros: preserves investment methodology context, creates usable personal stages, keeps technology choices proportionate and specifies eventual external OSS readiness. Costs: sustained source/fundamental integration, quality evaluations, UI/test/install/migration work and model provider economics.
+Pros: preserves investment-research capabilities, creates usable personal stages, keeps technology choices proportionate and specifies eventual external OSS readiness. Costs: sustained source/fundamental integration, quality evaluations, UI/test/install/migration work and model provider economics.
 
 Stop/narrow if the creator does not use the early product, material calculations/citations are unreliable, licensed data insufficient or other users cannot install a supported workflow. Product success is evidence-based, not proof of profitable returns. **Documentation PR does not implement these features, approve hosting, tag release or authorize a merge.**
