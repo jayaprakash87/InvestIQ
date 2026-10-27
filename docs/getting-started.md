@@ -1,4 +1,4 @@
-# Getting started with InvestIQ v0.2.0
+# Getting started with InvestIQ (v0.2 core and v0.3 synthetic UI preview)
 
 InvestIQ has an **offline synthetic workflow** and an **opt-in connected issuer-research workflow**. Python 3.11+ is required. No account or key is necessary for offline use.
 
@@ -16,6 +16,14 @@ investiq --help
 ```
 
 For Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` or run the `.venv\Scripts\python` and `.venv\Scripts\investiq` executables directly. A built `0.2.0` wheel can be installed with `python -m pip install dist/investiq_core-0.2.0-py3-none-any.whl` after running `python -m build`.
+
+## Local read-only research preview — v0.3 PR 1
+
+From the installed repository or wheel, run `investiq app` (or `python -m investiq_core app`) and open the printed `http://127.0.0.1:8765/` address. Use `--no-browser` to disable automatic browser launch or `--port 8766` to choose a different port.
+
+The **Run synthetic research** control invokes InvestIQ's actual existing offline fixture and structural validator. It renders evidence, a source-linked fictional report, deterministic hypothetical scenarios, and two fictional thesis revisions. All numbers and dates are **synthetic**, deliberately historical and **not market data**. The app makes no provider/LLM calls, asks for no keys, permits no data writes and does not yet offer live research or AI reasoning. Stop with Ctrl+C. It binds to IPv4 loopback only; never use it as a public server.
+
+**Planned later PRs:** guided issuer discovery/data entitlement, source-document evidence, bounded AI research, scenario interaction, private deliberate thesis storage and full acceptance. The existing v0.2 developer CLI is not replaced.
 
 ## Offline synthetic example
 

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="InvestIQ local fictional research preview. No live market data or AI processing.">
+  <title>InvestIQ — Research workspace preview</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to research workspace</a>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Workspace navigation">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">IQ</span><span>invest<span class="brand-highlight">IQ</span></span></div>
+      <div class="side-section-label">WORKSPACE</div>
+      <nav aria-label="Research sections" class="side-nav">
+        <a class="nav-link active" href="#main" aria-current="page"><span class="nav-glyph" aria-hidden="true">◈</span> Overview</a>
+        <a class="nav-link" href="#findings"><span class="nav-glyph" aria-hidden="true">≡</span> Research findings</a>
+        <a class="nav-link" href="#scenarios"><span class="nav-glyph" aria-hidden="true">◔</span> Scenarios</a>
+        <a class="nav-link" href="#evidence"><span class="nav-glyph" aria-hidden="true">◎</span> Evidence</a>
+        <a class="nav-link" href="#thesis"><span class="nav-glyph" aria-hidden="true">◇</span> Thesis history</a>
+      </nav>
+      <div class="side-section-label side-secondary">STATUS</div>
+      <div class="sidebar-info"><span class="status-dot"></span> Local preview <span class="small-tag">PR 1</span></div>
+      <div class="sidebar-info"><span class="status-dot dim"></span> Provider connection <span class="muted">Not enabled</span></div>
+      <div class="sidebar-info"><span class="status-dot dim"></span> AI research <span class="muted">Not enabled</span></div>
+      <div class="sidebar-foot">
+        <span class="foot-eyebrow">DATA POLICY</span>
+        <p>Synthetic research only. This preview makes no market, model or storage requests.</p>
+        <span class="foot-version">Open source · v0.3 preview</span>
+      </div>
+    </aside>
+
+    <main class="content" id="main">
+      <div class="topbar">
+        <div class="breadcrumbs">RESEARCH <span>/</span> OVERVIEW <span>/</span> <strong>SYNTHETIC EXAMPLE</strong></div>
+        <div class="topbar-actions"><span class="offline-label"><span class="pulse"></span> Offline</span><span class="demo-pill">FICTIONAL DATA</span></div>
+      </div>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-main">
+          <div class="eyebrow"><span class="overline-rule"></span> YOUR RESEARCH WORKSPACE, IN PROGRESS</div>
+          <h1 id="hero-title">Understand the evidence.<br><em>Challenge the thesis.</em></h1>
+          <p class="intro">Explore InvestIQ's first local research workflow using a fully fictional company. Every finding, assumption and calculation comes from the existing validated Python research core.</p>
+          <div class="hero-actions">
+            <button class="primary-button" id="run-demo" type="button">Run synthetic research <span aria-hidden="true">→</span></button>
+            <a href="#method" class="secondary-link">What this preview can do <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="run-state" id="run-state" role="status" aria-live="polite">Ready. No research has been loaded.</div>
+        </div>
+        <div class="instrument-card" aria-label="Fictional demonstration instrument">
+          <div class="instrument-top"><span>DEMO INSTRUMENT</span><span class="fake-label">SYNTHETIC</span></div>
+          <div class="ticker">DEMO<span class="ticker-slash"> / </span><span class="ticker-venue">XNAS</span></div>
+          <div class="instrument-subtitle">Fictional research subject</div>
+          <div class="instrument-divider"></div>
+          <div class="instrument-row"><span>Reporting currency</span><strong>USD</strong></div>
+          <div class="instrument-row"><span>Research cutoff</span><strong>March 2025*</strong></div>
+          <div class="instrument-row"><span>Market feed</span><strong class="unavailable">Not connected</strong></div>
+          <div class="instrument-foot">* Historical timestamps are synthetic, not market history.</div>
+        </div>
+      </section>
+
+      <section class="metrics" aria-label="Loaded research summary">
+        <div class="metric-card"><div class="metric-label">RESEARCH FINDINGS</div><div id="metric-findings" class="metric-value">—</div><div class="metric-sub">Evidence and hypotheses</div></div>
+        <div class="metric-card"><div class="metric-label">EVIDENCE RECORDS</div><div id="metric-evidence" class="metric-value">—</div><div class="metric-sub">Attributed observations</div></div>
+        <div class="metric-card"><div class="metric-label">SCENARIOS</div><div id="metric-scenarios" class="metric-value">—</div><div class="metric-sub">Conditional valuations</div></div>
+        <div class="metric-card"><div class="metric-label">THESIS VERSIONS</div><div id="metric-thesis" class="metric-value">—</div><div class="metric-sub">Recorded decisions</div></div>
+      </section>
+
+      <div class="section-grid">
+        <section class="panel panel-wide" id="findings" aria-labelledby="findings-title">
+          <div class="panel-heading"><div><div class="section-overline">01 / ANALYSIS</div><h2 id="findings-title">Research findings</h2><p>Every loaded finding retains its evidence or assumption reference.</p></div><span class="panel-flag">Structured</span></div>
+          <div class="empty-state" id="findings-empty">Run the synthetic workflow to inspect the report generated by InvestIQ's existing research contracts.</div>
+          <div id="finding-list" class="finding-list" hidden></div>
+          <div class="panel-footer" id="followup" hidden></div>
+        </section>
+        <section class="panel" id="scenarios" aria-labelledby="scenarios-title">
+          <div class="panel-heading"><div><div class="section-overline">02 / SENSITIVITY</div><h2 id="scenarios-title">Scenario outcomes</h2><p>Hypothetical price-only values. Not forecasts.</p></div></div>
+          <div class="empty-state" id="scenarios-empty">Scenario outcomes will appear here after validation.</div>
+          <div id="scenario-list" hidden></div>
+          <p class="context-note" id="scenario-note" hidden></p>
+        </section>
+        <section class="panel" id="evidence" aria-labelledby="evidence-title">
+          <div class="panel-heading"><div><div class="section-overline">03 / PROVENANCE</div><h2 id="evidence-title">Financial evidence</h2><p>Data definitions, units and sources remain visible.</p></div></div>
+          <div class="empty-state" id="evidence-empty">Evidence records will appear here after validation.</div>
+          <div class="evidence-list" id="evidence-list" hidden></div>
+        </section>
+        <section class="panel panel-wide" id="thesis" aria-labelledby="thesis-title">
+          <div class="panel-heading"><div><div class="section-overline">04 / DECISION HISTORY</div><h2 id="thesis-title">Thesis evolution</h2><p>Immutable fictional revisions; nothing is saved from this preview.</p></div></div>
+          <div class="empty-state" id="thesis-empty">A synthetic thesis and its challenge will appear here after validation.</div>
+          <div id="thesis-list" class="thesis-list" hidden></div>
+        </section>
+      </div>
+
+      <section class="method-panel" id="method" aria-labelledby="method-title">
+        <div class="method-intro"><span class="section-overline">WHAT COMES NEXT</span><h2 id="method-title">A real research experience is built in stages.</h2><p>This PR validates the local application path and evidence display only. It does not claim AI reasoning, live stock coverage or connected financial data.</p></div>
+        <div class="method-columns">
+          <div><span class="method-num">AVAILABLE NOW</span><strong>Local synthetic workflow</strong><p>Python-derived evidence, deterministic scenarios and fictional thesis history, with no credentials.</p></div>
+          <div><span class="method-num">UPCOMING PRS</span><strong>Verified company research</strong><p>Issuer lookup, authorized providers, document-grounded AI research and guided interaction.</p></div>
+          <div><span class="method-num">LATER v0.3</span><strong>Research decisions</strong><p>Explicit, private, rights-aware save, revisit, scenario controls and end-to-end acceptance.</p></div>
+        </div>
+      </section>
+      <footer class="main-footer"><span>InvestIQ · Open-source research software</span><span>Experimental — not investment advice</span></footer>
+    </main>
+  </div>
+</body>
+</html>

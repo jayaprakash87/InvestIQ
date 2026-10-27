@@ -24,6 +24,16 @@ def _parser() -> argparse.ArgumentParser:
         description="Evidence-aware research: offline examples/replay; optional BYOK connected access.",
     )
     commands = parser.add_subparsers(dest="command", required=True)
+    app = commands.add_parser(
+        "app", help="Start the local offline synthetic research preview (no provider keys)"
+    )
+    app.add_argument(
+        "--port", type=int, default=8765, help="Loopback TCP port; default 8765"
+    )
+    app.add_argument(
+        "--no-browser", action="store_true", help="Do not launch a web browser automatically"
+    )
+
     demo = commands.add_parser("demo", help="Create and validate a fictional research bundle")
     demo.add_argument("--output", type=Path, help="Write the synthetic bundle as JSON")
 
@@ -84,7 +94,12 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        if args.command == "demo":
+        if args.command == "app":
+            # Delay the import to keep the historical CLI and offline tests unchanged.
+            from .webapp import serve_app
+
+            serve_app(port=args.port, open_browser=not args.no_browser)
+        elif args.command == "demo":
             bundle = build_synthetic_bundle()
             validate_bundle(bundle, basis="recorded")
             serialized = _json(bundle) + "\n"
