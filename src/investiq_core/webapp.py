@@ -82,7 +82,10 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
         origin = self.headers.get("Origin")
         return origin is None or origin in {f"http://{item}" for item in allowed}
 
-    def _send(\n        self, status: int, body: bytes, content_type: str,\n        *, extra_headers: dict[str, str] | None = None,\n    ) -> None:
+    def _send(
+        self, status: int, body: bytes, content_type: str,
+        *, extra_headers: dict[str, str] | None = None,
+    ) -> None:
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
