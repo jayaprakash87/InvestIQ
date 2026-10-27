@@ -117,7 +117,7 @@ def research_desk(tmp_path):
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
-        yield server.server_port, directory, filing, fundamentals, model, private
+        yield server.server_port, directory, filing, fundamentals, model, private, connected.history_access_code
     finally:
         server.shutdown()
         thread.join(timeout=4)
@@ -194,9 +194,12 @@ def authored():
 
 
 def test_entire_local_research_journey_with_purposeful_save_and_no_provider_leak(research_desk):
-    port, directory, filing, fundamentals, model, private = research_desk
+    port, directory, filing, fundamentals, model, private, access_code = research_desk
     cookie, csrf, initial = authenticated(port)
     assert initial["private_history_enabled"] is True
+    assert initial["private_history_unlocked"] is False
+    assert access_code not in json.dumps(initial)
+    assert send(port, "/api/v1/decisions/list", {}, cookie, csrf)[0] == 403
     assert not private.exists()
     assert directory.calls == 0
     code, _, demo = request(port, "/api/v1/demo", method="GET")
@@ -270,6 +273,13 @@ def test_entire_local_research_journey_with_purposeful_save_and_no_provider_leak
     assert scenarios["weighted_terminal_price"] > 0
     assert len(model.calls) == 2  # scenario calculation did NOT call the model
 
+    assert send(port, "/api/v1/decisions/save", {
+        **selected(), "approve_private_save": True, "decision": authored(),
+    }, cookie, csrf)[0] == 403
+    assert send(port, "/api/v1/decisions/unlock", {
+        "code": access_code,
+    }, cookie, csrf)[0] == 200
+
     # Saving is deliberate. It does not store source text, quote, price/EPS
     # assumptions, computed valuation or AI response; it is a valid offline
     # historical authored decision.
@@ -298,7 +308,13 @@ def test_entire_local_research_journey_with_purposeful_save_and_no_provider_leak
     assert "fictional-secret-token" not in exported["content"]
 
     assert send(port, "/api/v1/session/clear", {}, cookie, csrf)[0] == 200
-    # Offline history is accessible after clearing provider credentials.
+    # Disconnect re-locks history; offline reopening requires pairing again.
+    assert send(port, "/api/v1/decisions/open", {
+        "thesis_id": "issuer_exm", "revision": 1,
+    }, cookie, csrf)[0] == 403
+    assert send(port, "/api/v1/decisions/unlock", {
+        "code": access_code,
+    }, cookie, csrf)[0] == 200
     assert send(port, "/api/v1/decisions/open", {
         "thesis_id": "issuer_exm", "revision": 1,
     }, cookie, csrf)[0] == 200
@@ -337,7 +353,7 @@ def test_fabricated_model_citation_fails_at_http_boundary_without_saving(researc
 
 
 def test_security_and_input_rejection_for_local_release(research_desk):
-    port, directory, filing, _, model, private = research_desk
+    port, directory, filing, _, model, private, access_code = research_desk
     cookie, csrf, _ = authenticated(port)
     assert request(port, "/api/v1/decisions/list", data={}, cookie=cookie, csrf=csrf,
                    host="bad.example")[0] == 403
@@ -345,6 +361,9 @@ def test_security_and_input_rejection_for_local_release(research_desk):
                    origin=False)[0] == 403
     assert request(port, "/api/v1/decisions/list", data={}, cookie=cookie)[0] == 403
     assert request(port, "/api/v1/decisions/list", data={}, csrf=csrf)[0] == 403
+    assert send(port, "/api/v1/decisions/unlock", {
+        "code": access_code,
+    }, cookie, csrf)[0] == 200
     assert send(port, "/api/v1/decisions/open", {
         "thesis_id": "../escape", "revision": 1,
     }, cookie, csrf)[0] == 400
