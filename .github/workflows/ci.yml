@@ -42,3 +42,6 @@ jobs:
           python -m pip install --force-reinstall --no-deps dist/*.whl
           investiq demo --output /tmp/investiq-demo.json
           investiq validate /tmp/investiq-demo.json --basis recorded
+          investiq research --help
+          investiq replay --help
+          python -c 'from importlib.metadata import version; assert version("investiq-core") == "0.2.0"'

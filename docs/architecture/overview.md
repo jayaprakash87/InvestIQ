@@ -44,6 +44,10 @@ There is **no live/delayed price provider, cloud cache, cloud database, web UI o
 
 `research_snapshot.py` provides an explicit user-initiated capture from connected analysis, a versioned immutable input manifest and offline valuation replay. It retains SEC annual facts and **only quotes with explicit snapshot rights**, so current Twelve Data prices remain excluded from persisted outputs. `snapshot_store.py` adds private create-only local files, revision lineage checks, corruption detection and JSON/Markdown exporters. It reuses the existing `ThesisSnapshot` chain; no cloud, hosted auth or automatic market data persistence is implied. See [ADR 0008](../decisions/0008-private-research-snapshots.md) and [usage](../methodology/research-snapshots.md).
 
+### v0.2 PR 6 connected CLI and acceptance
+
+`connected_cli.py` and the legacy-compatible `cli.py` provide an explicit, user-supplied listing/CIK research command and a network-free saved-decision replay command. Importing CLI code and running the synthetic demo never starts network calls. `tests/test_release_acceptance.py` exercises actual SEC/quote adapters with injected synthetic HTTP and the full CLI save/replay sequence. Real provider entitlements are **not** validated by fake HTTP. See [connected CLI guide](../methodology/connected-cli.md) and [release acceptance](../engineering/release-acceptance-v0.2.md).
+
 ## 2. Target logical components
 
 ```text

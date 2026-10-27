@@ -2,6 +2,16 @@
 
 The software is under active development. The public API may evolve; use versioned research bundles.
 
+## [0.2.0] — source release candidate (2026-10-27)
+
+Connected Company Research vertical slice: SEC EDGAR/Companyfacts and Twelve Data BYOK provider adapters, explicit instrument/issuer contracts, freshness/entitlement metadata, conservative annual financial analysis and P/E eligibility, researcher-authored scenario assumptions, private rights-gated snapshots and deterministic offline replay.
+
+Added an opt-in connected `investiq research` command and an offline `investiq replay` command. Existing synthetic demo/validate remain compatible. New synthetic end-to-end adapters/CLI/replay acceptance; bounded no-redirect HTTPS, sanitized errors and precise Decimal computations.
+
+**No automatic public GitHub release or package-index publication from this change.** The v0.2.0 source version and notes are prepared; actual publication still requires an explicit release-intent manifest after manual acceptance.
+
+**Not included:** verified real-time exchange feed, unlimited cache/snapshot license, historic backtest, cloud/hosted UI, public company search, quarterly/TTM finance normalization or stock recommendations. No live-provider credentials used in CI.
+
 ## [0.1.1] — 2026-10-26
 
 Maintenance release improving provenance validation and safe, repeatable release publication.
