@@ -14,6 +14,9 @@
   let aiGeneration = 0;
   let scenarioGeneration = 0;
   let questionHistory = [];
+  let privateHistoryEnabled = false;
+  let lastValidatedHypothesis = null;
+  let openedPrivateDecision = null;
   let selectionVersion = 0;
   let evidenceVersion = 0;
   let searchVersion = 0;
@@ -204,6 +207,11 @@
       csrf = session.csrf;
       setConfigured(session.configured, session.quote_configured);
       setModelConfigured(session.model_configured, session.model_name);
+      privateHistoryEnabled = session.private_history_enabled === true;
+      $("history-status").textContent = privateHistoryEnabled ? "Local store enabled" : "History disabled";
+      $("decision-save-panel").hidden = !privateHistoryEnabled;
+      $("decision-list-panel").hidden = !privateHistoryEnabled;
+      if (privateHistoryEnabled) await refreshPrivateHistory();
       status("setup-message", session.configured ?
         "Provider credentials are configured in server memory." :
         "Configure your own provider credentials to begin connected research.");
