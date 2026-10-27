@@ -11,9 +11,10 @@ import asyncio
 import secrets
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
-from typing import Any, Callable
+from typing import Any
 
 from .adapters._http import JsonTransport
 from .adapters.sec_companyfacts import SecCompanyFactsProvider
@@ -95,7 +96,7 @@ class LocalConnectedResearch:
         contact = data.get("sec_contact")
         key = data.get("twelve_data_api_key")
         if not isinstance(contact, str) or not isinstance(key, str):
-            raise ValueError("SEC contact and Twelve Data API key are required")
+            raise TypeError("SEC contact and Twelve Data API key are required")
         if not 8 <= len(contact) <= 200 or not 1 <= len(key) <= 256:
             raise ValueError("Provider credentials do not meet supported length limits")
         # Validate syntactic contracts with existing providers, WITHOUT network I/O.
