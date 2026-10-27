@@ -2,6 +2,8 @@
 
 InvestIQ has an **offline synthetic workflow** and an **opt-in connected issuer-research workflow**. Python 3.11+ is required. No account or key is necessary for offline use.
 
+**What this is not:** The current v0.2.0 source release candidate is developer-oriented CLI software, **not an integrated LLM research assistant or consumer UI**. The [proposed v0.3 AI Research Experience](product/ai-research-experience.md) aims to remove API/CIK/terminal setup for a supported nontechnical user; it is not implemented. See the [AI-first roadmap](product/product-roadmap.md) and [user validation protocol](product/validation-plan.md).
+
 ## Installation
 
 ```bash
