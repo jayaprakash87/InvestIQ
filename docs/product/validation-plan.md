@@ -1,49 +1,58 @@
-# InvestIQ — Product Validation and Distribution Decision
+# InvestIQ — Product Validation, Dogfooding and External Adoption
 
-> **Status:** Proposed research protocol · **Date:** 2026-10-27 · **No tests conducted or outcomes claimed.**
-> See [Roadmap v3.0](product-roadmap.md) and [v0.3 PRD](ai-research-experience.md).
+> **Status:** Proposed evidence protocol · **Date:** 2026-10-27 · **No user-study or model-evaluation outcome is claimed.**
+> **Scope:** [Complete v0.3→v1.0 roadmap](product-roadmap.md) · [Research use cases](research-foundations.md) · [Personal Desk PRD](ai-research-experience.md).
 
-## Decision to make
+## 1. Validate in the right order
 
-Is the incremental value of InvestIQ's **research → challenge → explicit decision → eventual reassessment** greater than asking a general-purpose LLM or using an existing research tool? Does that value justify a standalone application, or should InvestIQ distribute primarily as an assistant-native integration/toolkit?
+InvestIQ is **already open-source**, but its source release candidate is still developer-oriented. Validate usefulness with the original research user **first**, then validate whether independent investors can install/use it without developer assistance.
 
-## Competing prototypes
+- **Personal dogfood (v0.3–v0.6):** owner uses actual supported companies and scores the product against their current LLM+spreadsheets workflow; records errors, repeated prompting, sourced detail, coverage gaps, time saved and whether conclusions changed after correct data.
+- **Personal repeat use (v0.7–v0.8):** user revisits tracked hypotheses across real filings/price changes, sees relevant material deltas and optionally uses private portfolio context.
+- **External OSS beta (v0.9):** small independent group configures, uses, evaluates, exports and attempts to extend the same supported code with their own watchlists and data.
+- **v1.0 gate:** stable installation, end-to-end research tasks, maintained schemas/security/permission constraints and observed repeat engagement; not arbitrary GitHub star counts or feature checklist alone.
 
-- **A: Standalone task UI** — one natural-language question, bounded research orchestration, evidence drawer and scenario controls. May start with synthetic data strictly labeled as prototype; never market it as a live-data product.
-- **B: Assistant/skill/MCP tool integration** — same evidence, source, valuation and privacy contracts delivered in an existing conversational host where technically permitted.
-- **C: Control** — general-purpose LLM and at least one incumbent stock research tool, under the same stated coverage, data access and time constraints.
+## 2. Ground tests in prior real research
 
-Do **not** build A and B as complete production systems in parallel; use thin comparable prototypes first, minimize sunk cost and choose a primary channel based on results.
+| Task | Existing-workflow pain | Expected product value | First milestone |
+| --- | --- | --- | --- |
+| Deep analyze supported AI infrastructure business | Repeated source collection and prompts, stale quotes, weak historical continuity | One bounded, cited AI/finance research flow with risks and explicit data gaps | v0.3 |
+| Compare economically different AI subsegments | Misleading single PE/score and subjective comparable lists | Explain cross-layer exposure, comparable KPIs and inappropriate comparison cases | v0.4 |
+| Rank a theme/industry universe | Manually updated large spreadsheet, opaque weights and rank instability | Versioned factor methods, dated coverage, uncertainty and sensitivity | v0.5 |
+| Test valuation/entry price | Return scenarios manually recalculated using approximate forward EPS and assumed terminal multiples | Transparent exact, dated reverse underwriting with explicit conditional limits | v0.6 |
+| Revisit research thesis | No reliable answer to "what changed since my last work?" | Distinguish market/financial/source/method and assumption changes; original thesis preserved | v0.7 |
+| Assess overlapping exposures | Holdings, thematic allocations and watchlists managed separately | Private optional portfolio/context comparison | v0.8 |
+| Install independently | Developers' CIK/MIC, API env vars, shell commands and opaque data terms | Documented package, guided setup, synthetic demo and complete browser/task UX | v0.9–v1.0 |
 
-## Study setup
+## 3. Personal weekly acceptance log
 
-1. Recruit independent equity investors with varied research skill, including nontechnical users; record experience, workflow, research horizon and current preferred tools with consent.
-2. Give the same scripted company/compare/thesis-revisit research tasks and the same known-as-of information boundaries. Counterbalance tool order to reduce learning effects.
-3. Include contradictions, stale data, ambiguous symbols, missing financials, inapplicable valuations and misleading bullish narratives.
-4. Capture user steps, prompts, time-to-first-useful-answer, successful task completion, uncorrected financial/source errors, perceived trust and follow-up quality.
-5. Separately have reviewers assess citation-faithfulness, arithmetic, risk/contradiction quality, calibration and handling of missing evidence. Reviewers should not know the generating tool where practicable.
-6. Test decision-memory/revisit usefulness on a later session or scripted changed-evidence replay (mark simulated evidence as synthetic).
-7. Compare product willingness-to-switch/pay, qualitative objections, API/model/provider costs per successful result and actual rights/compliance barriers. No performance claims from unblinded anecdotes.
+For each product milestone record **research session date, qualified instrument, question, exact supported data period, expected output, actual result, missing data, corrections, task time, provider/model usage/cost, usability friction and follow-up decision** in a *private* notebook/test record, never public Git.
 
-## Metric definitions (thresholds require observed baseline)
+Do not silently turn this personal log into a persistent cloud service or require sending private holdings to an LLM. Publish sanitized issue summaries with synthetic or permitted fixtures only.
 
-| Metric | Measurement |
-| --- | --- |
-| First-task activation | Fraction of eligible users completing an evidence-supported research task without developer/CLI setup |
-| Time and friction | Median task time, manual prompts, corrections and navigation steps |
-| Grounded correctness | Unsupported material claims, incorrect values/units/periods, citation-to-claim mismatches per study |
-| Challenge quality | Specific, testable bear-case conditions vs generic risk boilerplate |
-| Research continuity | Correctly identify source/assumption changes vs untouched historical thesis; value on revisit |
-| Preference/retention | Independently reported preferred workflow, intention to return and observed follow-up use where feasible |
-| Economics | Provider/data rights, model calls, inference and compute cost per successfully completed task |
+**Proposed personal success criteria (qualitative until baseline):** the owner independently chooses InvestIQ rather than repeatedly returning to ChatGPT plus manual spreadsheet assembly for at least the bounded supported job; major numeric/source errors are absent and unsupported-data warnings are credible. Record failures openly. No performance/accuracy threshold invented before tests.
 
-**Proposed hard safety gates:** no fabricated official-looking prices/returns; no unauthorized source-data retention; no silent cross-instrument or time-travel valuation; no unapproved persistent personal context. Define comparative benefit and economics thresholds after the baseline, not retrospectively.
+## 4. Matched-task comparison with alternatives
 
-## Decision options
+Compare the same dated research question through (a) InvestIQ, (b) generic ChatGPT or comparable model with permitted research access and (c) a credible financial research tool. Use the same supported universe, task times and source information where feasible; counterbalance order and disclose differential provider entitlements.
 
-- **Proceed standalone** only if accessible UI and repeat-use benefit outperform alternatives enough to justify licensing/operations.
-- **Proceed assistant-first** if existing host distribution achieves comparable value at materially lower acquisition/engineering burden.
-- **Narrow niche** if only a specific company segment, technique or user category values the workflow.
-- **Stop** if source coverage, quality, commercial rights or user preference fail and a plausible corrective experiment is absent.
+Collect **first-useful-answer time**, prompts/corrections, source-to-claim correctness, numerics/units, valid peer choice, meaningful bear-case quality, missing-data honesty, usability, model/data cost and repeat research reuse. Use independent, partially blinded expert review for unsupported numbers, citations and financial implications.
 
-Publish the decision record with sample sizes, task definitions, dates, limitations and adverse findings. No implied PMF, alpha or adviser authorization.
+**Distribution decision:** The planned personal default is a **simple locally runnable task UI**; an assistant-native plugin/skill/MCP integration may supplement it or become a preferred external distribution channel if real evidence justifies it. Do not use undecided distribution as an excuse to postpone the user's personal app.
+
+## 5. External OSS testing (v0.9)
+
+Recruit a small mix of independent equity researchers and less technical investors; test fresh install on declared supported OS, no-key synthetic demo, one authorized market/model setup path, supported company research, scenario analysis, lawful private save/replay, watchlist and export. Verify no need to code or manually fill CIK/MIC during normal user use.
+
+Capture completion, time, comprehension of real-time/delayed status and missing data, whether source restrictions are understood, privacy controls, provider/model cost transparency and user preference. Record sample size, bugs, drop-off, quote licensing, and corrections instead of claiming PMF from a few anecdotes.
+
+Test plugin/adapter extensibility by having an external contributor follow documented interfaces and synthetic fixtures without accessing private credentials or live licensed datasets.
+
+## 6. Stop/go decision criteria
+
+- **Proceed** when personal weekly use and correct sourced research justify the next dependent milestone; external adoption supports release stabilization.
+- **Reduce scope** when a selected source or geographic accounting regime cannot reliably support advanced comparisons/valuation.
+- **Change channel** when assistant-native delivery provides comparable value with much less user effort and maintenance cost.
+- **Stop** when material hallucinations, wrong financial comparisons, source rights, costs, privacy or sustained nonuse make a trustworthy product impractical.
+
+**Hard safety constraints at every milestone:** zero knowingly fabricated "official" prices/financials; no unsupported current/live status; no unlicensed retention or distribution; no silent thesis/holdings modification or automated trade execution; privacy of real positions and model credentials.
