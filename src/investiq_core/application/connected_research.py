@@ -112,11 +112,24 @@ class ConnectedResearchService:
         observations = await self._fundamentals.get_annual_metrics(
             AnnualMetricsRequest(issuer=issuer, as_of=now_utc)
         )
+        # The SEC adapter stamps retrieval AFTER its awaited HTTP call.
+        # Validate that stamp against a fresh post-fetch clock, while retaining
+        # the original pre-fetch instant as the calendar filing cutoff.
+        after_fetch = self._clock()
+        if (
+            not isinstance(after_fetch, datetime)
+            or after_fetch.tzinfo is None
+            or after_fetch.utcoffset() is None
+        ):
+            raise ValueError("clock must return a timezone-aware datetime")
+        fetch_utc = after_fetch.astimezone(UTC)
+        if fetch_utc < now_utc:
+            raise ValueError("system clock moved backwards during research retrieval")
         if not isinstance(observations, tuple) or any(
             not isinstance(item, AnnualMetricFact)
             or item.issuer != issuer
             or item.filed_on >= now_utc.date()
-            or item.retrieved_at.astimezone(UTC) > now_utc
+            or item.retrieved_at.astimezone(UTC) > fetch_utc
             for item in observations
         ):
             raise ProviderFailure(

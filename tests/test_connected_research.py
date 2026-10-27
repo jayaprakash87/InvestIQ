@@ -257,3 +257,33 @@ def test_annual_fact_is_reported_only_no_estimated_eps_guessed():
     assert result.annual_facts == ()
     assert result.annual_pe_proxy is None
     assert result.scenarios is None
+
+
+def test_provider_post_fetch_retrieval_time_is_not_rejected_by_prefetch_cutoff():
+    """SEC timestamps the result after HTTP; advancing clocks must work."""
+    advancing = [NOW]
+
+    class AdvancingFacts(FakeFundamentals):
+        async def get_annual_metrics(self, request):
+            assert request.as_of == NOW
+            advancing[0] += timedelta(seconds=2)
+            return (replace(fact(), retrieved_at=advancing[0]),)
+
+    q = FakeQuote()
+    data = ConnectedDataService(
+        quote_provider=q, filing_provider=FakeFilings(),
+        principal_scope="local", clock=lambda: advancing[0],
+    )
+    app = ConnectedResearchService(
+        data=data, fundamentals=AdvancingFacts(), clock=lambda: advancing[0],
+    )
+    result = run(app.analyze(request(confirmed=True, rationale="verified share basis")))
+    assert result.annual_pe_proxy == Decimal("125.50") / Decimal("6.125")
+    assert result.annual_facts[0].retrieved_at == NOW + timedelta(seconds=2)
+
+
+def test_future_filing_retrieval_timestamp_is_still_rejected():
+    absurd = replace(fact(), retrieved_at=NOW + timedelta(hours=3))
+    app, _, _ = research(facts_provider=FakeFundamentals((absurd,)))
+    with pytest.raises(ProviderFailure, match="date context"):
+        run(app.analyze(request()))
