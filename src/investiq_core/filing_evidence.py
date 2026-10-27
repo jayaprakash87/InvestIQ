@@ -130,7 +130,7 @@ def select_annual_document(payload: Any, *, issuer: IssuerId) -> FilingDocument:
     filings = payload.get("filings")
     recent = filings.get("recent") if isinstance(filings, dict) else None
     if not isinstance(recent, dict):
-        raise ValueError("SEC submissions recent filings missing")
+        raise TypeError("SEC submissions recent filings missing")
     keys = ("accessionNumber", "form", "filingDate", "primaryDocument")
     arrays = [recent.get(k) for k in keys]
     if not all(isinstance(a, list) for a in arrays):
@@ -144,7 +144,7 @@ def select_annual_document(payload: Any, *, issuer: IssuerId) -> FilingDocument:
         if not isinstance(acc, str) or _ACCESSION.fullmatch(acc) is None:
             raise ValueError("SEC annual accession invalid")
         if not isinstance(filed, str):
-            raise ValueError("SEC annual filing date invalid")
+            raise TypeError("SEC annual filing date invalid")
         try:
             filed_on = date.fromisoformat(filed)
         except ValueError:
@@ -291,7 +291,7 @@ class SecFilingEvidenceProvider:
             payload = await self._json.get_json(
                 url, headers={"User-Agent": self._user_agent}
             )
-        except _FAILS as exc:
+        except _FAILURES as exc:
             raise translate_error("SEC EDGAR", exc) from None
         try:
             doc = select_annual_document(payload, issuer=issuer)
@@ -307,7 +307,7 @@ class SecFilingEvidenceProvider:
             html = await self._html.get_html(
                 doc.url, headers={"User-Agent": self._user_agent}
             )
-        except _FAILS as exc:
+        except _FAILURES as exc:
             raise translate_error("SEC EDGAR", exc) from None
         try:
             text = extract_filing_text(html)
