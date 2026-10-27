@@ -22,7 +22,6 @@ from investiq_core.market import (
     QuoteKind,
     QuoteTimeliness,
 )
-from investiq_core.ports import ProviderFailure, ProviderFailureCode
 from investiq_core.webapp import create_app_server
 
 DIRECTORY = {
