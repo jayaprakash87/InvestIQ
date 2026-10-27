@@ -69,6 +69,7 @@ All numbers are **fictional assumptions**, not estimates of a listed company's f
 - [Thesis history](docs/methodology/thesis-history.md)
 - [Portable AI skills](skills/README.md)
 - [Project architecture](docs/architecture/overview.md)
+- [Engineering Blueprint](docs/engineering/engineering-blueprint.md) — code quality, architecture, testing, security, AI readiness, future UX and PR gates
 - [Approved Product Roadmap v2.0](docs/product/product-roadmap.md) — connected research, truthful quote freshness, provider strategy and releases
 - [Architecture Decision: Connected Data](docs/decisions/0003-connected-data-and-research-history.md)
 - [Roadmap Summary](docs/roadmap.md)
@@ -88,7 +89,7 @@ These are **planned v0.2+ capabilities**, not included in the v0.1.1 release. Li
 
 ## Contributing and safety
 
-Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md). Use fictional or appropriately redistributable examples only; do not upload positions, account statements, tokens, confidential research or licensed vendor datasets. Local generated bundles should be kept out of Git.
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), the [Engineering Blueprint](docs/engineering/engineering-blueprint.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md). Use fictional or appropriately redistributable examples only; do not upload positions, account statements, tokens, confidential research or licensed vendor datasets. Local generated bundles should be kept out of Git.
 
 ## License
 

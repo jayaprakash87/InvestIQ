@@ -4,6 +4,8 @@
 >
 > **Approved target direction (not yet built):** provider-agnostic connected investment data, freshness-aware access and optional caching; explicit, immutable research snapshots stored locally **or** in a properly governed cloud service. See [Product Roadmap v2.0](../product/product-roadmap.md) and [ADR 0003](../decisions/0003-connected-data-and-research-history.md).
 
+Engineering practices for these boundaries are defined by the [Engineering Blueprint](../engineering/engineering-blueprint.md). It is a policy for future work, not evidence that conditional tooling or services already exist.
+
 ## 1. Current implemented modules (v0.1.1)
 
 ```text
