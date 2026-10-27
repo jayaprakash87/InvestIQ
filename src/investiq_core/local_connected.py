@@ -290,6 +290,8 @@ class LocalConnectedResearch:
             raise PermissionError("Unlock private history using the launch-terminal code")
 
     def list_decisions(self, session: BrowserSession) -> dict[str, Any]:
+        if not self._decisions.enabled:
+            raise PermissionError("Private history is disabled")
         with session.lock:
             self._require_history_unlock(session)
             return self._decisions.list()
