@@ -127,7 +127,7 @@ def research_desk(tmp_path):
 
 def request(port, path, *, data=None, cookie=None, csrf=None, method="POST",
             origin=True, referer=None, host=None):
-    http = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
     headers = {"Host": host or f"127.0.0.1:{port}"}
     if origin:
         headers["Origin"] = f"http://127.0.0.1:{port}"
@@ -143,12 +143,12 @@ def request(port, path, *, data=None, cookie=None, csrf=None, method="POST",
     if payload is not None:
         headers["Content-Type"] = "application/json"
     try:
-        http.request(method, path, body=payload, headers=headers)
-        response = http.getresponse()
+        connection.request(method, path, body=payload, headers=headers)
+        response = connection.getresponse()
         body = response.read()
         return response.status, dict(response.getheaders()), json.loads(body)
     finally:
-        http.close()
+        connection.close()
 
 
 def authenticated(port):
