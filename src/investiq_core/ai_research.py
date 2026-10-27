@@ -21,7 +21,7 @@ from urllib.request import Request, build_opener
 from .adapters._http import _RejectRedirect
 from .filing_evidence import SecFilingEvidenceProvider
 from .market import IssuerId
-from .ports import AnnualMetricsRequest, FundamentalsProvider, ProviderFailure
+from .ports import AnnualMetricsRequest, FundamentalsProvider
 
 MODEL_ENDPOINT = "https://api.openai.com/v1/responses"
 ALLOWED_MODELS = frozenset({"gpt-4.1-mini", "gpt-4.1"})
@@ -155,9 +155,11 @@ class OpenAIResponseModel:
             if not isinstance(message, dict) or message.get("type") != "message":
                 continue
             for part in message.get("content", []):
-                if isinstance(part, dict) and part.get("type") == "output_text":
-                    if isinstance(part.get("text"), str):
-                        texts.append(part["text"])
+                if (
+                    isinstance(part, dict) and part.get("type") == "output_text"
+                    and isinstance(part.get("text"), str)
+                ):
+                    texts.append(part["text"])
         if len(texts) != 1:
             raise ModelFailure("Model response missing one structured answer")
         try:
@@ -267,14 +269,9 @@ class AiResearchCoordinator:
             f["evidence_id"] for f in trusted_facts
         }
         model = self.model_factory(model_key, model_name)
-        try:
-            candidate = await model.generate(
-                instructions=_INSTRUCTIONS, evidence=evidence, question=question
-            )
-        except ProviderFailure:
-            raise
-        except ModelFailure:
-            raise
+        candidate = await model.generate(
+            instructions=_INSTRUCTIONS, evidence=evidence, question=question
+        )
         answer = validate_answer(candidate, valid_ids)
         # Provenance is always rebuilt from the trusted SEC input, never model URLs.
         return {
