@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-from datetime import UTC, datetime
 
 import pytest
 
