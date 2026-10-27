@@ -149,3 +149,23 @@ def test_valuation_only_assumption_rejects_late_recorded_support() -> None:
     assert validate_bundle(bundle, basis="public")["validation"] == "structural_only"
     with pytest.raises(ValueError, match="not recorded at creation"):
         validate_bundle(bundle, basis="recorded")
+
+def test_valuation_rejects_cross_currency_earnings_without_fx_conversion() -> None:
+    """Valid reported EUR EPS must not be divided by a USD share price."""
+    bundle = build_synthetic_bundle()
+    bundle["evidence"][0]["currency"] = "EUR"
+    with pytest.raises(ValueError, match="explicit FX conversion"):
+        validate_bundle(bundle)
+
+
+def test_valuation_rejects_declared_price_currency_that_disagrees_with_instrument() -> None:
+    bundle = build_synthetic_bundle()
+    bundle["valuation"]["hypothetical_entry_price_currency"] = "EUR"
+    with pytest.raises(ValueError, match="instrument trading currency"):
+        validate_bundle(bundle)
+
+
+def test_historical_bundle_without_optional_price_currency_remains_compatible() -> None:
+    bundle = build_synthetic_bundle()
+    del bundle["valuation"]["hypothetical_entry_price_currency"]
+    assert validate_bundle(bundle)["valuation_currency"] == "USD"
