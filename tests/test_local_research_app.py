@@ -59,6 +59,7 @@ def test_local_http_assets_are_packaged_and_available(app_port):
         ("/index.html", "text/html"),
         ("/styles.css", "text/css"),
         ("/app.js", "text/javascript"),
+        ("/connect.js", "text/javascript"),
     ):
         status, headers, body = _request(app_port, "GET", path)
         assert status == 200
@@ -80,6 +81,11 @@ def test_local_http_assets_are_packaged_and_available(app_port):
     assert "model" in html.lower()
     assert "textContent" in js
     assert "innerHTML" not in js
+    connector_js = files("investiq_core").joinpath("web", "connect.js").read_text(
+        encoding="utf-8"
+    )
+    assert "textContent" in connector_js
+    assert "innerHTML" not in connector_js
 
 
 def test_offline_api_is_structurally_valid_and_explicit(app_port):
@@ -96,15 +102,15 @@ def test_offline_api_is_structurally_valid_and_explicit(app_port):
     assert status == 200
     assert json.loads(raw) == {
         "status": "ok",
-        "mode": "synthetic",
-        "network": "disabled",
+        "mode": "local_app",
+        "network": "opt_in_only",
     }
 
 
 def test_preview_rejects_mutation_cross_origin_and_unexpected_paths(app_port):
     status, _, raw = _request(app_port, "POST", "/api/v1/demo")
-    assert status == 405
-    assert "Read-only" in raw.decode()
+    assert status == 403
+    assert "trusted browser origin" in raw.decode()
     for path in ("/api/v1/research", "/.env", "/../../secret", "/src/investiq_core/cli.py"):
         status, _, _ = _request(app_port, "GET", path)
         assert status == 404
