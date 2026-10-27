@@ -69,7 +69,8 @@ All numbers are **fictional assumptions**, not estimates of a listed company's f
 - [Thesis history](docs/methodology/thesis-history.md)
 - [Portable AI skills](skills/README.md)
 - [Project architecture](docs/architecture/overview.md)
-- [Roadmap](docs/roadmap.md)
+- [Product Roadmap](docs/product/product-roadmap.md) — priorities, v0.2 requirements and future release gates
+- [Roadmap Summary](docs/roadmap.md)
 - [Changelog](CHANGELOG.md)
 
 ## Principles
