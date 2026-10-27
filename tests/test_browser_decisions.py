@@ -237,10 +237,8 @@ def test_history_browser_never_reads_ai_response_or_licensed_quote_markup():
     connected_script = files("investiq_core").joinpath("web", "connect.js").read_text(
         encoding="utf-8"
     )
-    assert (
-        'resetInteractions();'
-        + '\\n    selected = null;'
-        + '\\n    document.dispatchEvent(new Event("investiq:issuer-cleared"));'
-    ) in connected_script
+    assert connected_script.count(
+        'document.dispatchEvent(new Event("investiq:issuer-cleared"));'
+    ) >= 2
     assert 'document.getElementById("connected-output")' not in script
     assert 'document.getElementById("ai-result")' not in script
