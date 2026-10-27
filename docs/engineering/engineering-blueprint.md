@@ -3,13 +3,13 @@
 > **Status:** Engineering standard, version 2.0 — AI-first strategy alignment · **Date:** 2026-10-27  
 > **Applies to:** current v0.2 source release candidate maintenance and future v0.3+ product development.  
 > **Architecture:** [Connected research](../architecture/overview.md), [ADR 0003](../decisions/0003-connected-data-and-research-history.md), [Proposed AI-first roadmap v3.0](../product/product-roadmap.md), [ADR 0009](../decisions/0009-ai-first-product-pivot.md), and [v0.3 PRD](../product/ai-research-experience.md).  
-> **Intent:** an **accessible, AI-coordinated investment research workflow** while preserving deterministic financial integrity, licensed data, privacy, maintainability and demonstrable user value **without speculative infrastructure**.
+> **Intent:** deliver the full **personal-use → independently usable open-source v1.0** roadmap, with an accessible AI-coordinated investor experience and strong source, economic, model and privacy integrity. See [research foundations](../product/research-foundations.md).
 
 The [v0.1.1 engineering alignment audit](baseline-audit-v0.1.1.md) records the codebase's verified starting point, identified financial-correctness hardening and pre-v0.2 entry criteria.
 
 ## 1. Engineering decision and enforcement
 
-InvestIQ retains a **small modular financial core and ports/adapters only at actual trust/I-O boundaries**. The next engineering outcome is a **supported, nontechnical investment question → sourced answer → strongest challenge → explicit decision** journey. Measure task completion and source quality before expanding backend breadth. Preserve backward-compatible v0.2 CLI behavior.
+InvestIQ retains a **small modular financial core and ports/adapters only at actual trust/I-O boundaries**. The immediate v0.3 outcome is a **local, supported, nontechnical investment question → sourced answer → strongest challenge → explicit decision** journey; later releases add defensible company/peer intelligence, scoring, valuation entry scenarios, monitoring, portfolio context and OSS release operations. Measure task completion and source quality before expanding backend breadth. Preserve backward-compatible v0.2 CLI behavior.
 
 - **MUST** means an applicable release-blocking rule, unless a reviewer approves an explicitly documented exception and bounded remediation.
 - **SHOULD** means the default, with alternatives explained in the PR.
@@ -39,7 +39,7 @@ The [v0.1.1 alignment audit](baseline-audit-v0.1.1.md) is a historical baseline.
 
 **Research concepts:** v0.2 supplies a constrained *transient current view* and explicit immutable *saved decision*. Its historical quotes may be excluded when provider rights are unknown. v0.3 adds *AI research runs* with source/tool traces and ephemeral context by default. v0.4 may add *investor context* only with explicit retention and correction/deletion controls.
 
-**Framework and distribution:** use thin prototypes to compare a lightweight standalone UI and an assistant-native tool/skill interface. Choose browser framework, identity service and hosted boundaries through an ADR **after** confirming usability, financial-data display terms, provider cost and security needs.
+**Framework and distribution:** default v0.3 user path is a **locally runnable, browser-based task UI**, not a mandatory SaaS or undecided UI postponement. An assistant-native tool/skill adapter is an optional additional interface. Choose browser framework, local API lifecycle, credential storage and hosted boundaries through an ADR after assessing source licenses, install/OS needs and security.
 
 ## 3. Financial and data correctness — highest priority
 
@@ -183,12 +183,12 @@ Do not implement complex autonomous multi-agent architecture, RAG database, vect
 
 ## 9. User experience and frontend acceptance (v0.3)
 
-**A usable interface is now a v0.3 deliverable.** A CLI and JSON export do not satisfy a nontechnical investor. A small standalone UI or assistant-native integration may satisfy this, based on [comparative validation](../product/validation-plan.md).
+**A locally runnable, accessible task interface is a v0.3 deliverable.** The existing CLI and JSON export remain supported developer paths but do not satisfy an investor's daily workflow. An assistant-native integration is an optional supplementary distribution surface, not a reason to defer the local UI. Evaluate the two channels with [comparative validation](../product/validation-plan.md).
 
 **Hero task:** Ask a supported investment question → select exact instrument when ambiguous → watch bounded research status → read concise source-grounded business/financial/valuation analysis → inspect strongest bear case and data gaps → drill down to evidence → edit permitted scenario assumptions → explicitly approve any save/export.
 
 **Critical UX requirements:**
-- No mandatory CIK/MIC, shell commands, developer API key or JSON schema for the supported consumer experience; if lawfully accessible provider data cannot support this, do not release/market it as consumer-ready.
+- No mandatory CIK/MIC, shell commands, JSON schema or manual prompt orchestration during **normal** supported research. Authorized market/model credentials may be required **once** and should be configured through a transparent local setup wizard; the no-key synthetic demo must always be distinguishable from current connected data.
 - Show quote currency, venue, price kind, provider, market timestamp, real-time/delayed/EOD/unknown and stale status. Financial values carry fiscal period, source and method.
 - Separate observation, third-party estimate, calculation, model inference and user assumption. Render unavailable as missing, **never as zero**. Forecast/scenario results are conditional, not advertised alpha.
 - Inline source inspection with claim-level context; prominent specific counter-thesis and unsupported-data questions; comprehensible summary before financial detail.
@@ -197,7 +197,7 @@ Do not implement complex autonomous multi-agent architecture, RAG database, vect
 - Explicit privacy consent for model/provider calls and personal storage; users can inspect and withdraw stored research according to declared retention rules.
 - Browser components, end-to-end usability task tests and accessibility checks must be implemented **if standalone UI is selected**, before release. Assistant-hosted channels must meet comparable evidence, permission and usability standards.
 
-**v0.4 (not v0.3) return-session outcome:** stored opt-in thesis → supported changed evidence → precise source/assumption deltas → user-approved thesis revision. No silent rewriting from refresh.
+**Return-session research-change intelligence belongs to v0.7**, after v0.4 peer/fundamentals, v0.5 explainable screening and v0.6 underwriting workflows. v0.3 already permits reopening deliberately saved compatible snapshots; it does **not** promise automated monitoring or complete historical repricing. No silent rewriting from refresh.
 
 Do not prebuild a complex frontend framework/design system before validating the task. Select framework and hosted auth boundaries by ADR when the operating model is known.
 
@@ -241,19 +241,46 @@ Use reviewer *hats* rather than creating an enterprise review board.
 - [ ] Documentation, migration and release risks updated
 - [ ] No unresolved material review findings; exceptions recorded and approved
 
-## 12. Engineering release sequencing — user outcomes before scaffolding
+## 12. Engineering roadmap and v1.0 quality maturity
 
-| Stage | Outcome / gates | Do not do |
-| --- | --- | --- |
-| **v0.2 source baseline** | Preserve connected CLI, source rights and replay; independently verify live provider entitlement before publication claims | Claim shipped LLM agent or consumer GUI |
-| **v0.3 thin vertical slice** | One usable, supported research-question experience with appropriate provider rights, onboarding and explicit uncertainty | Build large SaaS/auth/cache system before consumer flow |
-| **v0.3 AI research** | Bounded model tools, evidence-linked research/challenge, deterministic valuation and failure control | Free-form LLM numeric facts, uncontrolled agent stack |
-| **v0.3 acceptance** | Evaluated model semantics and tool safety, browser/assistant UX, manual licensed-provider review, measured benchmark with real investors | Declare PMF from a demo or synthetic CI |
-| **v0.4 conditional** | Opt-in memory, structured thesis deltas and lawfully scheduled monitoring | Implicit context capture and always-on worker by default |
-| **v0.5+ conditional** | Proven discovery/portfolio/quant value and economic/legal safety | Expand broad analytics with no return-use validation |
+The [canonical roadmap v3.0](../product/product-roadmap.md) owns stage outcomes and acceptance. This table maps each **independently usable milestone** to required engineering investments. Do not implement later features as a generalized platform ahead of need.
 
-Use outcome-based PRs and [draft-to-ready CI policy](ci-efficiency.md). Keep v0.2 documentation as truthful implementation history, not the current next-action list.
+| Stage | User outcome | Required architecture, tests and operations | Deliberately postponed |
+| --- | --- | --- | --- |
+| **v0.2 source release candidate (existing)** | Connected BYOK CLI with constrained US annual facts and legal private replay | Preserve public Python API and negative numeric/provider/rights tests; verify live-provider credentials/rights outside CI before real-market claims | No claim of current AI UI, world coverage or public hosted feed |
+| **v0.3 Personal AI Research Desk** | Local browser/task UI, guided source/model setup and one complete reliable supported company research | Minimal single-user frontend ↔ thin application API/adapter, supported instrument search, allowlisted tool orchestration, semantic AI evaluation, secrets storage, errors/cancellation, end-to-end local OS smoke, accessibility | Heavy SaaS auth, global stock universe, scores, portfolio, background agents |
+| **v0.4 Company & Peer** | Dated business/financial trend and true peer/cross-layer comparisons | Extended *needed* statement metric adapters, fiscal/FX/share and corporate-action normalization, domain-specific comparisons, negative mismatch tests, source/period panel UX | Pretend unrelated firms have comparable accounting; fabricate unavailable FCF |
+| **v0.5 Universe & Scoring** | Theme maps, editable weighted factors, meaningful rankings and horizon separation | Versioned score/method contracts, coverage confidence and rank reason codes, partial ranking, reproducible snapshot of eligible inputs, sensitive weight/price methods tests | Generic universal "AI score", pretend all market prices verified |
+| **v0.6 Underwriting & Entry** | Scenarios, reverse growth/valuation and hypothetical return-hurdle entry prices | Sector-appropriate valuation engines, terminal multiple/share/FX/dilution/FCF conventions, explainable sensitivity and deterministic numerical/property tests | LLM price predictions or guaranteed 15%/20% returns |
+| **v0.7 Continuity & Monitoring** | Opt-in watchlist, structured thesis checkpoints and meaningful sourced deltas | Licensed incremental refresh/polling, optional local background scheduler **only with consent**, lawful history input references, differentiated market vs fundamentals vs method vs assumption changes, notification suppression/expiry | Always-on agent or illegal archived paid quote feed |
+| **v0.8 Portfolio Context** | Optional private exposure, sector overlap and risk/scenario questions | Private user-owned position store and import validation, cost basis/currency definitions, issuer/listing deduplication, at-rest protection/backups/deletion, no broker order scopes | Mandatory brokerage link, cloud sharing, automated rebalancing |
+| **v0.9 External OSS Beta** | Other investors install/configure/use within supported coverage | Documented Windows/Linux target packaging and smoke; no-key synthetic walkthrough; guided BYOK; stable migration/export/restore; setup diagnostics, UX/accessibility tests, security/dependency licensing checks and contributor extension tests | Claim universal OS/market support without tests |
+| **v1.0 Stable OSS Product** | End-to-end research → decision → dated reassessment without Python or hand-built prompts | Versioned supported API/files/method schema; backward compatibility and migrations; independent real-user task and return-use study; supply-chain/licensing documentation; reliable release artifact/rollback and documented provider limits | Guaranteed alpha, unlicensed global real-time quotes, trading execution or mandatory InvestIQ-hosted SaaS |
+
+### Code and data shape at product maturity
+
+- **Core:** independent deterministic Python evidence, financial normalization, valuation/underwriting, scoring, thesis and permission/time contracts. A score function takes explicit versioned weights and dated qualified inputs; no implicit today's price, unknowns-as-zero or mutable global defaults.
+- **Use cases:** research question, company deep dive, economic compare, score universe, scenario entry conditions, watchlist delta, private portfolio exposure. Orchestrate domain tools; avoid duplicated formula engines in frontend or prompts.
+- **Adapters:** provider quote/filing/estimates/news/data rights; LLM APIs/local-compatible models where validated; local encrypted/keyring-backed secrets and persistence; optional input-file import; future opted-in scheduler.
+- **UI:** local guided setup, concise evidence-first answers, true peer/value-chain distinction, multi-horizon score breakdown, scenarios/charts and source drill-down, explicit consent/history/portfolio privacy and clear unsupported states.
+- **OSS distribution:** public deterministic fixtures and demo datasets only; scoped model/data credentials, documented provider terms, local export/migrations, no central account, cross-platform reproducible packaging, one-click/one-command startup goal by v0.9.
+
+### Quality gates by boundary
+
+**All releases:** existing lint/tests/build/CLI compatibility, financial/rights/identity/currency invariants, no private/licensed redistribution, security review, documentation with actual (not aspirational) status and no new unreviewed critical defects.
+
+**AI releases:** independent source-to-claim semantic evaluations, tool-permission/adversarial tests, answer/metadata versioning, deterministic arithmetic checks, bounded token/model/provider costs and honest uncertainty.
+
+**Screening/ranking:** cross-horizon/industry compatibility, missing-data/wrong-time penalty rather than fabricated completeness, explicit weight version and score decomposition, confidence calibration and sensitivity tests.
+
+**Portfolio/continuity:** strictly opt-in private state, lawful and dated inputs, correct FX/share identity, no silent updates to saved decisions, useful notification materiality and license-controlled polling.
+
+**External OSS:** documented fresh installs, environment/secrets isolation, data migrations, restore/export/delete, dependency/security scans, licence redistribution, accessibility/UX tasks, contribution API contracts and observed external user feedback.
+
+**Stop-and-correct tests** apply at each stage; no release passes simply because a green CI test suite emits a convincing answer.
+
+Use outcome-based PRs and [draft-to-ready CI policy](ci-efficiency.md). Preserve the v0.2 release timeline, code and provider/financial ADRs; do not rewrite historical implementation to match future aspirations.
 
 **Stop-and-correct signals:** false live/delay labels, licensed-data leakage, fabricated facts, replay that silently uses current prices, cross-instrument valuation error, entitlement bleed, private secrets committed, or serious unaddressed financial/security review findings.
 
-**Engineering decision:** Preserve the v0.2 source foundation. Subject to product approval, implement the **v0.3 AI Research Experience** as a bounded, testable user-facing vertical slice with strong data-rights, factuality, security and usability gates.
+**Engineering decision:** Maintain a trustworthy v0.2 core and deliver the full **v0.3 personal → v0.9 external OSS beta → v1.0 stable** path incrementally, starting with a bounded, independently useful local AI Research Desk rather than additional speculative abstractions.
