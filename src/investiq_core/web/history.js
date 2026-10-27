@@ -59,6 +59,23 @@
       message("History is disabled. Restart with --research-dir to opt in.");
     }
   });
+  document.addEventListener("investiq:session-disconnected", () => {
+    // The server revokes access on disconnect; also hide any opened local text.
+    unlocked = false;
+    opened = null;
+    generation += 1;
+    $("history-list").replaceChildren();
+    $("history-open-details").replaceChildren();
+    $("history-warnings").replaceChildren();
+    $("history-open").hidden = true;
+    $("decision-save-panel").hidden = true;
+    $("decision-list-panel").hidden = true;
+    $("history-unlock-form").hidden = !enabled;
+    $("history-unlock-code").value = "";
+    $("history-status").textContent = enabled ? "History locked" : "Saving disabled";
+    message("Private history locked after disconnect. Enter the launch code again.");
+    enableSaving();
+  });
   document.addEventListener("investiq:issuer-selected", event => {
     issuer = event.detail;
     hypothetical = null;
