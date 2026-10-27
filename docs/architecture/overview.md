@@ -2,7 +2,7 @@
 
 > **Current implementation:** v0.2.0 source release candidate: portable Python core, opt-in BYOK connected CLI, constrained annual facts, deliberate rights-aware snapshots and offline replay. **No shipped LLM agent or consumer UI.**
 >
-> **Proposed v0.3 direction (not built):** an accessible AI-first, source-grounded investment research journey with bounded model tools, reliable deterministic math, critical thesis challenge and explicit private-history control. Existing provider rights/freshness/snapshot contracts remain mandatory. See [Roadmap v3.0](../product/product-roadmap.md), [v0.3 PRD](../product/ai-research-experience.md), [ADR 0009](../decisions/0009-ai-first-product-pivot.md) and historical [ADR 0003](../decisions/0003-connected-data-and-research-history.md).
+> **Proposed v0.3→v1.0 direction (not built):** an **open-source local-first AI investment research workspace** covering source-grounded company analysis, industry/peer economics, explainable scoring, valuation/entry scenarios, historical research review, optional private portfolio context and external installation. Start with a bounded personal AI research desk at v0.3. Existing provider rights/freshness/snapshot contracts remain mandatory. See [Roadmap v3.0](../product/product-roadmap.md), [v0.3 PRD](../product/ai-research-experience.md), [ADR 0009](../decisions/0009-ai-first-product-pivot.md) and historical [ADR 0003](../decisions/0003-connected-data-and-research-history.md).
 
 Engineering practices for these boundaries are defined by the [Engineering Blueprint](../engineering/engineering-blueprint.md). It is a policy for future work, not evidence that conditional tooling or services already exist.
 
@@ -48,29 +48,29 @@ tests/           Public synthetic and negative-case automated tests
 
 `connected_cli.py` and the legacy-compatible `cli.py` provide an explicit, user-supplied listing/CIK research command and a network-free saved-decision replay command. Importing CLI code and running the synthetic demo never starts network calls. `tests/test_release_acceptance.py` exercises actual SEC/quote adapters with injected synthetic HTTP and the full CLI save/replay sequence. Real provider entitlements are **not** validated by fake HTTP. See [connected CLI guide](../methodology/connected-cli.md) and [release acceptance](../engineering/release-acceptance-v0.2.md).
 
-## 2. Target AI-first logical architecture (v0.3 — not deployed)
+## 2. Target AI-first architecture and stages (not yet deployed)
 
-**Top-down investor journey:** Natural-language investment question or supported company search → qualified issuer/security selection → bounded AI research orchestration → entitled dated evidence and deterministic calculations → integrated answer with source drill-down, strongest counterargument and data gaps → explicit user-controlled decision save.
+**First personal path (v0.3):** Start local task UI → synthetic sample or one-time guided entitled market/model connection → supported company search/question → security listing resolution → bounded AI coordinator → sourced/current data + deterministic calculations → integrated answer and bear case → explicit private, lawful thesis save.
 
-**Execution and trust boundaries:**
+**Separation of concerns:**
 
-1. **UI or assistant-native integration (planned):** simple question entry, responsive answer and scenario controls, source timing, uncertainty, consent and research-save actions. No mandatory CIK/API key/CLI for a supported nontechnical consumer flow.
-2. **ResearchTask / bounded coordinator (planned):** choose narrow allowlisted tools, operate within step/time/token/API budgets, return typed success/partial/error outputs, and never treat external text as commands.
-3. **Existing financial core (v0.2):** issuer identity, permitted data adapters, source freshness/entitlements, qualified fundamentals, deterministic valuation and research-report/thesis contracts. Domain logic never calls the LLM.
-4. **Claims and thesis challenge (planned):** checked source IDs, time/currency semantics, semantic evidence faithfulness and specific falsifiable bear-case reasoning; a cited ID alone is not enough.
-5. **Research continuity:** existing **explicit, immutable, rights-aware** historical snapshots remain separate from transient current quotations. v0.4 may introduce opt-in investor context and material-change monitoring only after v0.3 validation.
-
-**Runtime distribution not decided:** Test a thin standalone task UI against an assistant/skill/MCP integration using the same core tools. Cloud identity, shared licensed cache, relational storage and encryption controls are required if hosted user data make them necessary; no assumed free global real-time feed. Avoid queues, microservices, complex agents and vector infrastructure without demonstrated use.
-
-### Planned boundary contracts
-
-| Boundary | Purpose | Must not do |
+| Logical component | Status / responsibility | Cannot do |
 | --- | --- | --- |
-| ResearchTask and UI | Typed question, supported instrument resolution, as-of scope, user approvals and evidence/status rendering | Require developers' setup or hide ambiguous securities |
-| AI orchestration tools | Allowlisted identity, sourced retrieval, deterministic analysis, scenario follow-ups, challenge and deliberate save | Make up quotes, perform authoritative free-form calculations, execute trades or bypass consent |
-| Semantic evidence check | Material source-to-claim support, numerical/time/issuer fidelity, missing and conflicting sources | Claim semantic certainty from citation ID validation |
-| Financial domain core | Stable, versioned evidence/calculations and licensed-source controls | Depend on model SDKs, browsers or provider network logic |
-| Optional investor context (v0.4) | Private approved watchlists/preferences, saved thesis-delta evidence and deletion/export | Continuously collect private holdings or rewrite prior theses |
+| **User task UI / setup wizard** | **Planned v0.3**: supported company lookup, clear coverage, question bar, source drill-down, scenario controls, user approval | Demand CIK/MIC/JSON or manual multi-prompt workflows for an otherwise supported issuer |
+| **Bounded AI coordinator** | **Planned v0.3**: typed ResearchTask, allowlisted tool dispatch, consent, wall-time/steps/tokens limits, cancellation, source-linked interpretation | Invent official figures, perform authoritative arithmetic, bypass rights, execute trades or retain text silently |
+| **Existing connected source adapters** | **v0.2**: SEC annual facts, Twelve Data BYOK close and rights/time/issuer semantics; expand **only when needed** for later financial/market coverage | Pretend source timeliness/retention is verified when UNKNOWN |
+| **Existing deterministic research core** | **v0.2**: numeric evidence/valuation/history; future company quality, comparable metrics, scoring, entry conditions as typed domain functions | Depend on model SDKs, web frontend, prompt instructions or unrestricted provider APIs |
+| **Evidence and claim evaluation** | **Planned v0.3+**: validate material financial source claims semantically, periods, units, price/session state and contradictions; version reports | Treat a correct citation identifier as proof the claim is supported |
+| **Private research and user context** | v0.2 explicit lawful immutable snapshot; **v0.7** opt-in watchlist updates; **v0.8** optional private holdings | Use current quotes as past decision data or publish personal holdings |
+| **Open-source packaging** | **v0.9–v1.0**: guided OS install, no-key synthetic walkthrough, permitted BYOK, secure export/import, versioned migrations and contributor adapters | Require central paid InvestIQ cloud service |
+
+**Evolution:** v0.4 expands business/financial trend and economically valid peers; v0.5 adds versioned theme universes and factor scoring; v0.6 adds reverse-underwriting/conditional return hurdles; v0.7 adds lawful material-change intelligence; v0.8 adds private portfolio context. These are **separate progressively usable capability slices**, not a speculative full-service cloud platform.
+
+**Deployment default:** local browser/task UI backed by minimal Python application/server code as justified. Assistant/skill/MCP interface is **optional additional distribution**, not an indefinite decision replacing the personal UI. Hosted accounts, licensed shared quote cache, identity/tenant isolation, remote private storage and streaming require separate demonstrated rights/economics/security authorization.
+
+**Current vs past:** on-demand entitled quotes are refreshed provider inputs; immutable decisions record only lawful approved historical inputs. Quote licensing can prevent exact replay and must be reported as a limitation; never refill historical valuations from today's price.
+
+**Technical constraints:** keep domain pure, typed ports at actual I/O boundaries, separate AI prompt/model/tool version from economic-method versions, source-to-claim checks, prompt-injection isolation and deterministic math. No unapproved multi-agent, vector store, microservices or unbounded background polling.
 
 ## 3. Module boundaries
 
@@ -104,15 +104,22 @@ tests/           Public synthetic and negative-case automated tests
 - Cache key isolation must include provider, symbol/venue, data shape, quote kind, market session, adjustment, currency and entitlement scope. A premium cached response must not be shared with an unauthorized user.
 - Use bounded refresh, rate-limit/backoff, timeout, provenance and fail-closed behavior. A shared cache or streaming system is justified only by usage measurements and licenses.
 
-## 5. Deployment and persistence
+## 5. Local-first open-source deployment and storage
 
-**First vertical slice:** direct provider calls from an optional client/adapter with BYOK and bounded in-process caching. No mandatory cloud. The portable core still works offline on synthetic/user-supplied evidence.
+**Existing v0.2:** The offline synthetic example needs no keys; connected CLI uses the user's authorized provider credentials, direct permitted API access and private explicit snapshots.
 
-**Conditional cloud service:** self-hosted or managed data-access gateway, centrally controlled secrets, provider licensing, cache, tenant/entitlement partitioning, monitoring and cost controls. No commitment to hosted real-time market distribution before exchange rights are established.
+**v0.3 local Research Desk:**
+1. Locally launch an accessible browser interface on supported Windows/Linux target environments. Use a small typed application/API boundary; do not move valuation arithmetic or source-entitlement decisions into the frontend.
+2. Offer a clearly marked synthetic no-key demo or **one-time guided configuration** of authorized market-data and AI-model access. Do not imply the open-source MIT license grants exchange data rights or model usage credits. Never place secrets in the frontend bundle, logs, test fixtures or Git.
+3. Use provider APIs to refresh current company inputs; provider/plan/market/session license policies control retrieval, caches and display. Save private research only when explicitly requested and legal; show missing replay inputs.
+4. Local single-user mode should avoid false SaaS auth scaffolding. Bind local service to loopback only, defend origin/CSRF and secret leakage, and protect OS-local stored research. Hosted external access is a separate audited deployment.
+5. Future optional quote caches, schedules, model adapters and portfolio stores require genuine demand, validated provider permissions and isolated/private storage.
 
-**Durable research:** pluggable, separately secured storage (local for an individual's private snapshots, managed cloud for permitted team/hosted usage). Local persistence for saved *research history* is valid and portable; local-only static copies should **never** be treated as the primary continuously current market feed.
+**User-owned history and portability:** before external beta, provide versioned local data schemas, export/import, backup/restore, migration and explicit retention/deletion. Secrets are not exported by default. Research notes, user weights, saved scenarios, watchlists and holdings are not part of the public repository.
 
-**Replay boundary:** capture lawful input values or durable permitted reference; preserve original quote times, assumptions, source and model versions. If an input cannot legally be retained/replayed, state the limitation instead of claiming perfect reproducibility.
+**v0.9/v1.0:** documented supported OS installation, no-key synthetic example, authorized BYOK wizard, accessible complete research-to-reassessment experience, open-source extension points, reproducible build/release and honest coverage matrix. No InvestIQ cloud backend is mandatory.
+
+**Historical rule:** Old saved valuation cannot claim exact replay when a source forbids retention. Do not silently use a newer quote, adjusted series or revised fiscal value during replay.
 
 ## 6. Security, legal and quality gates
 
@@ -124,3 +131,9 @@ tests/           Public synthetic and negative-case automated tests
 - Preserve architecture-level contract tests and v0.1 synthetic offline regression suite. A docs-only plan does not change the released API behavior.
 
 **The v0.2 source/price contract exists. v0.3 architecture now starts at a validated, safe, accessible investor task and bounded research-tool boundary — not another platform-first backend expansion.**
+
+## 7. Stable v1.0 technical definition
+
+The open-source app and deterministic Python core support complete **company research → valid comparison → explainable screening → conditional valuation/entry analysis → approved thesis → documented change review** for a truthful set of supported issuers, with opt-in private portfolio context. Nontechnical daily operation requires no shell/programming once locally installed. External adopters can replace universes, weights, providers, supported model adapters and private state without modifying the core or sending data to InvestIQ servers.
+
+Public API/schema and methodology versions, provider/time/rights controls, model semantic evaluation, installer/browser/accessibility tests, secure storage/migration/export, dependency/supply-chain rights checks and independent user acceptance are **release gates**. Worldwide market coverage, guaranteed alpha, full historical backtesting, unlicensed real-time public feeds and automated trading are outside v1.0.
