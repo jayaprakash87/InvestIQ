@@ -1,29 +1,34 @@
-# ADR 0009 — AI-first investor research and distribution validation pivot
+# ADR 0009 — Personal-First AI Investment Research Through Open-Source v1.0
 
-**Status:** Proposed — requires product review before merge · **Date:** 2026-10-27
-**Decision scope:** Future product releases and v0.3+ user-facing prioritization only.
-**References:** [Product Roadmap v3.0](../product/product-roadmap.md), [v0.3 PRD](../product/ai-research-experience.md), [Validation Plan](../product/validation-plan.md), [Engineering Blueprint](../engineering/engineering-blueprint.md).
+**Status:** Proposed (PR review; not accepted by repository merge) · **Date:** 2026-10-27
+**Scope:** Future priorities and release sequencing, preserving prior v0.2 code/ADRs as factual history.
+**References:** [Full Product Roadmap v3.0](../product/product-roadmap.md) · [Research History](../product/research-foundations.md) · [v0.3 PRD](../product/ai-research-experience.md) · [Validation](../product/validation-plan.md).
 
 ## Context
 
-Roadmap v2.0 prioritized provider-neutral research, financial correctness, immutable history, progressively wider financial analysis and a GUI only at v0.5; model execution and AI UX were optional. v0.2 implementation produced a credible CLI research foundation, but no integrated AI agent or nontechnical user experience.
+v2.0 engineered sound source/issuer contracts, compliant market-data access, deterministic research and deliberate history, but the v0.2 source release candidate still requires CLI/BYOK knowledge, provides only a narrow US annual research slice and has no model runtime or approachable UI. The first v3 draft put AI-first user experience at v0.3 but **underrepresented the extensive earlier research and the full desired personal-to-v1.0 open-source maturity path**.
 
-General LLMs and existing financial research tools already answer financial questions, offer AI analysis, compare companies and maintain watchlists. A library of calculations, model-agnostic research instructions or a basic chatbot is **not** proven differentiation. Requiring a user to learn APIs or engineer prompts defeats the intended consumer job.
+Earlier investment work crossed broad AI infrastructure and physical AI universes (150 and 194 names / 23 segments), factor scoring, fundamental trends, true versus complementary peers, FCF/ROIC/debt quality, forward valuations and hypothetical entry-price return hurdles, multiple time horizons, thesis challenges, user portfolio themes and repeated corrections of questionable rankings. Such research dictates future functional requirements. A generic LLM chatbot or a single company research page does not address the full job.
 
-## Proposed decision
+## Decision proposed
 
-1. Make v0.3 a **bounded AI-first Research Experience** with a usable conversation/task UI, clear sourced output, thesis challenge and explicit research control; not just a fundamentals/peer backend expansion.
-2. Reprioritize v0.4 structured investor context and thesis continuity; v0.5 discovery and intelligence; v0.6 optional portfolio context; v0.7+ conditional quant.
-3. Evaluate **standalone vs assistant-native** distribution with user trials. Do not presume a full web SaaS is required.
-4. Maintain independent deterministic financial core; tools own financial facts/calculations; models own bounded interpretation and reasoning. Add semantic AI evaluation, privacy and consent.
-5. Retain all enforceable data-rights, source freshness, point-in-time, reproducible snapshot and provider entitlement decisions in ADRs 0003–0008. Do not reinterpret historical v0.2 release records.
+1. InvestIQ is an **AI-first, open-source, local-first equity research workspace**, personally useful before packaged external adoption. The default next experience is a **thin, locally runnable research task UI**, not a mandatory SaaS or an indefinite "maybe app / maybe plugin" choice.
+2. Define a **full, dependency-ordered v0.3→v1.0 roadmap**, with an independently usable job and release gate at each version. v0.3 is only the first personal AI research desk, not the finished product.
+3. Research capabilities follow actual prior work: company/peers (v0.4), evidence-aware universe screening/scoring (v0.5), reverse underwriting/entry scenarios (v0.6), explicit history and monitoring (v0.7), private optional portfolio (v0.8), independent open-source onboarding (v0.9), stable complete supported workflow (v1.0).
+4. AI coordinates well-bounded tools and grounded interpretation; permitted providers/deterministic financial modules remain the authoritative data and calculation sources. Scores are versioned, horizon-specific, transparent and confidence/coverage-aware.
+5. Research storage is user-owned local/private by default; today's price comes from entitled on-demand providers. Nontechnical use must not demand shell, CIK/MIC, JSON or prompt engineering; external provider/model keys may be necessary and should have transparent guided setup; a no-key synthetic demo always works.
+6. Assistant-native plugins/skills/MCP remain possible **additional** OSS distribution interfaces, subject to comparative validation, without indefinitely delaying the personal UI.
+7. Preserve ADRs 0003–0008 and completed v0.2 CLI/release records unchanged. Do not treat personal historical spreadsheets, positions, prices or research rankings as public default datasets.
 
-## Consequences and unknowns
+## Alternatives considered
 
-**Benefits:** First useful answer sooner; a testable differentiation hypothesis; prevents further platform-first scope expansion.
+- **Only ship a model-independent research API and skills:** insufficient for daily personal use; still forces prompts/code.
+- **Build a large standalone SaaS immediately:** too expensive and ignores open-source/privacy/licensing requirements.
+- **Focus solely on v0.3 chat then revisit:** omits prior scoring/underwriting/portfolio research and lacks definition of a stable usable v1.0.
+- **Deploy a 194-company scorecard with prior worksheet values now:** risks fabricated/stale rankings and unlicensed data; build source/coverage/method governance first.
 
-**Costs/risks:** Model errors, unlicensed hosted financial displays, inference cost, personal research privacy, onboarding/identity complexities, UX and semantic-evaluation work. A lightweight integration may win over a custom web app.
+## Consequences and gates
 
-**Gates:** Underlying provider permissions, rigorous claim-to-source evaluation, usable first-session workflow, real user comparison and repeat-use evidence. No development authorization, alpha claim or public hosted entitlement arises merely from this ADR.
+Pros: preserves investment methodology context, creates usable personal stages, keeps technology choices proportionate and specifies eventual external OSS readiness. Costs: sustained source/fundamental integration, quality evaluations, UI/test/install/migration work and model provider economics.
 
-**Rejected:** postpone UI to v0.5; market five AI skills as an autonomous agent; add a generic multi-agent stack; build SaaS accounts or continuous data infrastructure before validating the research workflow.
+Stop/narrow if the creator does not use the early product, material calculations/citations are unreliable, licensed data insufficient or other users cannot install a supported workflow. Product success is evidence-based, not proof of profitable returns. **Documentation PR does not implement these features, approve hosting, tag release or authorize a merge.**
