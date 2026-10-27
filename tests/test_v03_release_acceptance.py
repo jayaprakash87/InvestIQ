@@ -75,6 +75,7 @@ class EmptyAnnualFacts:
 class FictionalModel:
     def __init__(self):
         self.calls = []
+        self.fabricate_citation = False
 
     async def generate(self, *, instructions, evidence, question):
         self.calls.append({
@@ -84,7 +85,7 @@ class FictionalModel:
             "overview": "Fictional disclosures mention risks; no financial conclusion follows.",
             "findings": [{
                 "claim": "The presented fictional filing describes supplier risks.",
-                "evidence_ids": [PASSAGE_ID],
+                "evidence_ids": ["sec:invented-source"] if self.fabricate_citation else [PASSAGE_ID],
             }],
             "bear_case": {
                 "claim": "A decline in supplier resilience could weaken operations.",
@@ -305,6 +306,34 @@ def test_entire_local_research_journey_with_purposeful_save_and_no_provider_leak
     assert filing.calls.count("all") == 2
     assert fundamentals.calls == 2
     assert len(model.calls) == 2
+
+
+def test_fabricated_model_citation_fails_at_http_boundary_without_saving(research_desk):
+    port, directory, filing, fundamentals, model, private = research_desk
+    cookie, csrf, _ = authenticated(port)
+    assert send(port, "/api/v1/session/configure", {
+        "sec_contact": "InvestIQ Test researcher@example.org",
+        "twelve_data_api_key": "",
+    }, cookie, csrf)[0] == 200
+    assert send(port, "/api/v1/companies/search", {
+        "query": "EXM",
+    }, cookie, csrf)[0] == 200
+    assert send(port, "/api/v1/model/configure", {
+        "model_api_key": "fictional-secret-token", "model": "gpt-4.1-mini",
+    }, cookie, csrf)[0] == 200
+    model.fabricate_citation = True
+    code, _, payload = send(port, "/api/v1/research/ai", {
+        **selected(), "consent_external_sec_data": True,
+        "question": "Are there any substantiated disclosures?",
+    }, cookie, csrf)
+    assert code == 502
+    assert payload["code"] == "model_research_unavailable"
+    assert "fictional-secret-token" not in json.dumps(payload)
+    assert "sec:invented-source" not in json.dumps(payload)
+    assert not private.exists()
+    assert len(model.calls) == 1
+    assert directory.calls == 1 and filing.calls == ["all"]
+    assert fundamentals.calls == 1
 
 
 def test_security_and_input_rejection_for_local_release(research_desk):
