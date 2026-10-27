@@ -33,7 +33,7 @@ async def main():
 # asyncio.run(main())
 ```
 
-SEC endpoints use ten-digit zero-padded CIKs in the URL. The adapter verifies the response CIK. It returns only the `recent` part of the submissions feed and a requested number of records (up to 100); older archives are not paginated. Filing dates are retained as dates and `publicly_available_at` stays `None`. Data may change throughout the day. Default per-instance request pacing is one per second; hosted/multi-process systems need shared throttling as well. See [SEC API](https://www.sec.gov/search-filings/edgar-application-programming-interfaces) and [fair access](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data).
+SEC endpoints use ten-digit zero-padded CIKs in the URL. The adapter accepts numeric or numeric-string CIK responses (including zero padding) and verifies the returned entity. It returns only the `recent` part of the submissions feed and a requested number of records (up to 100); older archives are not paginated. Filing dates are retained as dates and `publicly_available_at` stays `None`. Data may change throughout the day. Default per-instance request pacing is one per second; hosted/multi-process systems need shared throttling as well. See [SEC API](https://www.sec.gov/search-filings/edgar-application-programming-interfaces) and [fair access](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data).
 
 ## Twelve Data — BYOK price observation
 

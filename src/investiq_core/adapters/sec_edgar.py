@@ -128,8 +128,15 @@ def _parse_recent(
     if not isinstance(payload, dict):
         raise TypeError("expected object")
     actual = payload.get("cik")
-    # SEC responds with a numeric CIK. Do not associate another entity's data.
-    if isinstance(actual, bool) or not isinstance(actual, int) or actual != cik:
+    # SEC submissions CIK may be a string (with leading zeros) or an integer.
+    # Never accept booleans or nonnumeric/truncated identifiers.
+    if type(actual) is int:
+        normalized_cik = actual
+    elif isinstance(actual, str) and re.fullmatch(r"[0-9]{1,10}", actual):
+        normalized_cik = int(actual)
+    else:
+        raise ValueError("invalid SEC CIK type or format")
+    if normalized_cik != cik:
         raise ValueError("CIK mismatch")
     filings = payload["filings"]
     if not isinstance(filings, dict):

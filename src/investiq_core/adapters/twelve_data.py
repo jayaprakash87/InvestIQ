@@ -88,7 +88,12 @@ class TwelveDataQuoteProvider:
             )
         ticker = request.instrument.ticker
         url = TWELVE_DATA_ORIGIN + "?" + urlencode(
-            {"symbol": ticker, "apikey": self._key, "timezone": "UTC"}
+            {
+                "symbol": ticker,
+                "mic_code": request.instrument.venue,
+                "apikey": self._key,
+                "timezone": "UTC",
+            }
         )
         try:
             payload = await self._transport.get_json(url, headers={})
