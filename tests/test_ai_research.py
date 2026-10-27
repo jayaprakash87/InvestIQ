@@ -6,7 +6,6 @@ import asyncio
 import json
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from types import SimpleNamespace
 from unittest.mock import patch
 from urllib.error import HTTPError
 
