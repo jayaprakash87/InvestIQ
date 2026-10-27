@@ -191,8 +191,8 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             self.headers.get("Transfer-Encoding")
             or not length.isascii()
             or not length.isdigit()
-            or len(length) > 4
-            or not 2 <= int(length) <= 8192
+            or len(length) > 5
+            or not 2 <= int(length) <= 32768
             or self.headers.get("Content-Type") != "application/json"
         ):
             self._json(400, {"error": "Expected a bounded JSON request body"})
