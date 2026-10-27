@@ -11,7 +11,7 @@ from unittest.mock import patch
 import pytest
 
 from investiq_core.cli import main
-from investiq_core.webapp import build_demo_response, create_app_server
+from investiq_core.webapp import _allowed_authorities, build_demo_response, create_app_server
 from investiq_core.workflow import validate_bundle
 
 
@@ -129,6 +129,13 @@ def test_preview_rejects_cross_site_origin_and_supports_head(app_port):
     assert status == 200
     assert raw == b""
     assert int(headers["Content-Length"]) > 0
+
+
+def test_default_http_port_authorities_do_not_reject_browser_host():
+    assert _allowed_authorities(80) == {
+        "localhost", "127.0.0.1", "localhost:80", "127.0.0.1:80"
+    }
+    assert _allowed_authorities(8765) == {"localhost:8765", "127.0.0.1:8765"}
 
 
 def test_only_loopback_host_and_valid_ports():
