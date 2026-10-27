@@ -2,7 +2,7 @@
 
 **Open-source, evidence-aware equity research.** InvestIQ v0.2.0 introduces opt-in, bring-your-own-key connected issuer analysis and private research-decision snapshots alongside the original offline Python toolkit, five AI-neutral research skills and hash-linked thesis history. The synthetic example and offline replay need no accounts or provider keys.
 
-**Proposed next product direction (not shipped):** [AI-first Research Experience v0.3](docs/product/ai-research-experience.md): a nontechnical investor asks a question, receives source-linked research, inspects a specific bear case, and controls what is saved. This is a hypothesis under comparative user validation, **not** a deployed research agent, browser app, live research feed or evidence of product-market fit. See [roadmap v3.0](docs/product/product-roadmap.md) and [validation plan](docs/product/validation-plan.md).
+**Proposed personal-to-open-source product direction (not shipped):** [Research-aligned Roadmap v3.0 through v1.0](docs/product/product-roadmap.md) starts with a **local AI Personal Research Desk in v0.3** for the original investor, then adds company/peer analysis, explainable screening, underwriting/entry conditions, monitoring, optional portfolio context, and externally installable OSS beta before stable v1.0. The [research foundations](docs/product/research-foundations.md) trace these features to earlier AI-infrastructure/physical-AI and valuation workflows. **No integrated research agent, GUI, scoring/portfolio product, provider-entitled public feed or PMF claim exists in v0.2.**
 
 **This is experimental research software, not investment advice, a trading system, live market-data feed, backtesting engine or managed investment product.** No returns or predictive accuracy are claimed.
 
@@ -88,9 +88,10 @@ All numbers are **fictional assumptions**, not estimates of a listed company's f
 - [Portable AI skills](skills/README.md)
 - [Project architecture](docs/architecture/overview.md)
 - [Engineering Blueprint](docs/engineering/engineering-blueprint.md) — code quality, architecture, testing, security, AI readiness, future UX and PR gates
-- [Proposed Product Strategy and Roadmap v3.0](docs/product/product-roadmap.md) — AI-first product positioning, release order and gates
-- [v0.3 AI Research Experience PRD](docs/product/ai-research-experience.md) — planned user journey, bounded tools and acceptance
-- [Product Validation Plan](docs/product/validation-plan.md) — comparison with LLM/research tools, standalone vs assistant distribution
+- [Proposed Research-Aligned Product Roadmap v3.0 → v1.0](docs/product/product-roadmap.md) — personal dogfooding, phased investing capabilities and independent OSS release gates
+- [Research Foundations & Traceability](docs/product/research-foundations.md) — prior AI/physical-AI universe maps, scoring, company comparisons, entry models, portfolio workflows
+- [v0.3 Personal AI Research Desk PRD](docs/product/ai-research-experience.md) — first usable local app, supported company research and bounded tools
+- [Product Validation Plan](docs/product/validation-plan.md) — first personal daily use, then external install/repeat-use and LLM/tool comparisons
 - [ADR 0009 — AI-first product pivot](docs/decisions/0009-ai-first-product-pivot.md) — proposed roadmap decision
 - [Architecture Decision: Connected Data](docs/decisions/0003-connected-data-and-research-history.md)
 - [Roadmap Summary](docs/roadmap.md)
@@ -104,7 +105,7 @@ Source-supported analysis over fabricated certainty. Distinct observed facts, co
 
 ## Connected research status
 
-The [proposed AI-first roadmap](docs/product/product-roadmap.md) preserves provider-entitled data freshness and **immutable research decisions**, while moving an accessible, bounded model-assisted research experience to the next product milestone. A standalone app versus an assistant-native interface remains an **unresolved, testable distribution decision**. A local workspace may hold a user's private historic theses, but it must **not** masquerade as a live pricing feed.
+The [proposed personal-to-v1.0 AI-first roadmap](docs/product/product-roadmap.md) keeps source-entitled freshness and **immutable saved research**, while planning a **locally runnable research UI as the first personal product (v0.3)**. An assistant/skill/MCP interface is an optional additional distribution channel. Current financial data still come from appropriately entitled provider APIs; local history must **not** masquerade as a live pricing feed.
 
 The v0.2.0 Python/CLI connected vertical slice is **implemented**, but not independently tested against real provider accounts in standard CI. **Verified exchange real-time entitlement, unrestricted price retention, hosted accounts, shared cloud cache, full market coverage, web application and true historical backtesting are not shipped.**
 
