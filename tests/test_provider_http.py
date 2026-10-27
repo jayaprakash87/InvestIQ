@@ -4,6 +4,7 @@ import asyncio
 import io
 from datetime import UTC, datetime, timedelta
 from email.utils import format_datetime
+from http.client import IncompleteRead
 from urllib.error import HTTPError, URLError
 
 import pytest
@@ -120,3 +121,29 @@ def test_retry_after_past_http_date_has_no_remaining_minimum(monkeypatch):
     with pytest.raises(_http.TransportStatusError) as exc:
         call(monkeypatch, error, clock=lambda: now)
     assert exc.value.retry_after_seconds == 0
+
+
+def test_truncated_http_body_maps_to_sanitized_retryable_transport_failure(monkeypatch):
+    class InterruptedBody:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def read(self, amount):
+            raise IncompleteRead(b'{"private":', 100)
+
+    class InterruptedOpener:
+        def open(self, request, timeout):
+            return InterruptedBody()
+
+    monkeypatch.setattr(
+        _http, "build_opener", lambda *_args: InterruptedOpener()
+    )
+    with pytest.raises(_http.TransportUnavailableError) as error:
+        asyncio.run(_http.UrllibJsonTransport().get_json(
+            "https://example.org/api?apikey=SYNTHETIC-SECRET",
+            headers={},
+        ))
+    assert "SYNTHETIC-SECRET" not in str(error.value)

@@ -12,6 +12,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
+from http.client import HTTPException
 from math import ceil
 from typing import Any, Protocol
 from urllib.error import HTTPError, URLError
@@ -107,7 +108,9 @@ class UrllibJsonTransport:
             raise TransportStatusError(exc.code, retry_after) from None
         except TimeoutError:
             raise TransportTimeoutError() from None
-        except (URLError, OSError):
+        except (URLError, OSError, HTTPException):
+            # Truncated chunked/body responses (e.g. IncompleteRead) must
+            # become typed, safely retryable provider failures.
             raise TransportUnavailableError() from None
         if len(raw) > self._max_bytes:
             raise TransportInvalidResponseError("provider JSON exceeds response limit")
