@@ -70,7 +70,7 @@ class FakeFacts:
         self.calls.append(request)
         return (
             AnnualMetricFact(
-                issuer=request.issuer, metric="revenue", value=Decimal("3500000"),
+                issuer=request.issuer, metric="revenue", value=Decimal(3500000),
                 unit=ValueUnit.MONEY, currency="USD",
                 period_start=date(2024, 1, 1), period_end=date(2024, 12, 31),
                 accession="0000012345-26-000007", filed_on=date(2026, 3, 4),
@@ -226,9 +226,11 @@ def test_model_http_error_does_not_reflect_key_or_provider_body():
         def open(self, request, timeout):
             raise HTTPError(request.full_url, 401, "private-model-key", {}, None)
 
-    with patch("investiq_core.ai_research.build_opener", return_value=Opener()):
-        with pytest.raises(ModelFailure) as err:
-            model._post({"input": "bounded"})
+    with (
+        patch("investiq_core.ai_research.build_opener", return_value=Opener()),
+        pytest.raises(ModelFailure) as err,
+    ):
+        model._post({"input": "bounded"})
     assert "private-model-key" not in str(err.value)
     assert "credential" in str(err.value)
 
