@@ -1,6 +1,6 @@
 """Loopback-only local Research Desk: offline demo and explicitly opted-in providers.
 
-No startup network, persistent keys, hosted access, background polling or AI.
+No startup network, persistent keys, hosted access or background polling.
 Connected endpoints require origin, session cookie and anti-CSRF controls.
 """
 
@@ -176,6 +176,7 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             "/api/v1/model/clear",
             "/api/v1/research/ai",
             "/api/v1/research/scenarios",
+            "/api/v1/decisions/unlock",
             "/api/v1/decisions/list",
             "/api/v1/decisions/save",
             "/api/v1/decisions/open",
@@ -209,14 +210,16 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
                 result = self.server.connected.configure_model(state, body)
             elif path.path == "/api/v1/model/clear":
                 result = self.server.connected.clear_model(state)
+            elif path.path == "/api/v1/decisions/unlock":
+                result = self.server.connected.unlock_history(state, body)
             elif path.path == "/api/v1/decisions/list":
-                result = self.server.connected.list_decisions()
+                result = self.server.connected.list_decisions(state)
             elif path.path == "/api/v1/decisions/save":
                 result = self.server.connected.save_decision(state, body)
             elif path.path == "/api/v1/decisions/open":
-                result = self.server.connected.open_decision(body)
+                result = self.server.connected.open_decision(state, body)
             elif path.path == "/api/v1/decisions/export":
-                result = self.server.connected.export_decision(body)
+                result = self.server.connected.export_decision(state, body)
             elif path.path == "/api/v1/research/ai":
                 result = self.server.connected.ai_analyze(state, body)
             elif path.path == "/api/v1/research/scenarios":
@@ -310,7 +313,12 @@ def serve_app(
         url = f"http://127.0.0.1:{server.server_port}/"
         print(f"InvestIQ local research desk: {url}", flush=True)
         print("Demo is fictional; connected data requires session setup; Ctrl+C to stop.", flush=True)
-        print("Private history: " + ("opt-in enabled" if research_dir else "disabled"), flush=True)
+        if server.connected.history_available():
+            print("Private history enabled; unlock code (local terminal only):", flush=True)
+            print(server.connected.history_access_code, flush=True)
+            print("Enter this code in the app history panel. Do not share it.", flush=True)
+        else:
+            print("Private history disabled", flush=True)
         if open_browser:
             webbrowser.open(url)
         try:
