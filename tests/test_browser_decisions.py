@@ -70,6 +70,7 @@ def test_save_reopen_export_and_offline_replay_after_new_app_instance(tmp_path):
         assert stat.S_IMODE(filename.stat().st_mode) == 0o600
     restored = BrowserDecisionHistory(directory)
     assert restored.list()["snapshots"][0]["digest_sha256"] == saved["digest_sha256"]
+    assert "older qualified CLI snapshots may retain" in restored.list()["retention"]
     opened = restored.load("example_thesis", 1)
     assert opened["statement"] == "My authored business thesis"
     assert opened["mode"] == "offline_replay_of_private_decision"

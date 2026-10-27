@@ -89,7 +89,11 @@ class BrowserDecisionHistory:
                 records, key=lambda x: (x["saved_at"], x["thesis_id"], x["revision"]),
                 reverse=True,
             )[:_MAX_VERSIONS],
-            "retention": "user_authored_only_no_licensed_quotes_or_ai_output",
+            "retention": (
+                "Browser saves omit quotes, AI output, EPS and entry prices; "
+                "older qualified CLI snapshots may retain permitted public facts "
+                "or explicitly licensed quotes. Inspect quote_retained on each record."
+            ),
         }
 
     @staticmethod

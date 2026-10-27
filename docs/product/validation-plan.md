@@ -17,7 +17,7 @@ InvestIQ is **already open-source**, but its source release candidate is still d
 | Task | Existing-workflow pain | Expected product value | First milestone |
 | --- | --- | --- | --- |
 | Analyze a supported listed company | Repeated source collection and prompts, stale quotes, weak historical continuity | One bounded, cited AI/finance research flow with risks and explicit data gaps | v0.3 |
-| Compare economically different AI subsegments | Misleading single PE/score and subjective comparable lists | Explain cross-layer exposure, comparable KPIs and inappropriate comparison cases | v0.4 |
+| Compare economically different companies and business models | Misleading one-size-fits-all P/E/score and subjective comparable lists | Explain industry/value-chain exposure, appropriate unit economics and inappropriate comparison cases | v0.4 |
 | Rank a theme/industry universe | Manually updated large spreadsheet, opaque weights and rank instability | Versioned factor methods, dated coverage, uncertainty and sensitivity | v0.5 |
 | Test valuation/entry price | Return scenarios manually recalculated using approximate forward EPS and assumed terminal multiples | Transparent exact, dated reverse underwriting with explicit conditional limits | v0.6 |
 | Revisit research thesis | No reliable answer to "what changed since my last work?" | Distinguish market/financial/source/method and assumption changes; original thesis preserved | v0.7 |
