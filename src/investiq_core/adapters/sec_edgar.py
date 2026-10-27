@@ -115,7 +115,7 @@ class SecEdgarFilingProvider:
             raise ValueError("clock must provide timezone-aware datetime")
         try:
             return _parse_recent(payload, issuer, cik, retrieved, request.limit, url)
-        except (ValueError, TypeError, KeyError, IndexError):
+        except (ValueError, TypeError, KeyError, IndexError) as exc:
             raise ProviderFailure(
                 "SEC EDGAR", ProviderFailureCode.INVALID_RESPONSE,
                 "SEC EDGAR submissions schema is invalid",
@@ -126,24 +126,17 @@ def _parse_recent(
     payload: Any, issuer, cik: int, received: datetime, limit: int, url: str
 ) -> tuple[FilingReference, ...]:
     if not isinstance(payload, dict):
-        raise TypeError("expected object")
+        raise ValueError("expected object")
     actual = payload.get("cik")
-    # SEC submissions CIK may be a string (with leading zeros) or an integer.
-    # Never accept booleans or nonnumeric/truncated identifiers.
-    if type(actual) is int:
-        normalized_cik = actual
-    elif isinstance(actual, str) and re.fullmatch(r"[0-9]{1,10}", actual):
-        normalized_cik = int(actual)
-    else:
-        raise ValueError("invalid SEC CIK type or format")
-    if normalized_cik != cik:
+    # SEC responds with a numeric CIK. Do not associate another entity's data.
+    if isinstance(actual, bool) or not isinstance(actual, int) or actual != cik:
         raise ValueError("CIK mismatch")
     filings = payload["filings"]
     if not isinstance(filings, dict):
-        raise TypeError("filings must be an object")
+        raise ValueError("filings must be an object")
     recent = filings["recent"]
     if not isinstance(recent, dict):
-        raise TypeError("recent must be an object")
+        raise ValueError("recent must be an object")
     accessions = recent["accessionNumber"]
     forms = recent["form"]
     dates = recent["filingDate"]
@@ -162,7 +155,7 @@ def _parse_recent(
         if not isinstance(form, str) or not form.strip():
             raise ValueError("invalid form")
         if not isinstance(filed, str):
-            raise TypeError("invalid filing date")
+            raise ValueError("invalid filing date")
         filed_on = date.fromisoformat(filed)
         result.append(
             FilingReference(

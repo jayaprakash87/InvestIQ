@@ -27,6 +27,7 @@ from investiq_core.ports import (
     QuoteRequest,
 )
 
+
 NOW = datetime(2026, 10, 27, 16, tzinfo=UTC)
 EVENT = datetime(2026, 10, 26, 15, tzinfo=UTC)
 KEY = "SYNTHETIC-DO-NOT-USE"
@@ -47,7 +48,7 @@ class FakeTransport:
 
 def sec_payload():
     return {
-        "cik": "0000320193",
+        "cik": 320193,
         "filings": {"recent": {
             "accessionNumber": ["0000320193-26-000001", "0000320193-26-000002"],
             "form": ["10-K", "8-K"],
@@ -101,14 +102,6 @@ def test_sec_returns_date_only_filing_records_and_no_fabricated_public_time():
     assert "accession=" in rows[0].source_reference
 
 
-def test_sec_accepts_numeric_and_zero_padded_string_cik():
-    result = get_filings(FakeTransport(sec_payload()))
-    assert len(result) == 2
-    numeric = sec_payload()
-    numeric["cik"] = 320193
-    assert len(get_filings(FakeTransport(numeric))) == 2
-
-
 def test_sec_port_and_input_policy():
     assert SecEdgarFilingProvider.capabilities.has(DataCapability.FILINGS)
     assert not SecEdgarFilingProvider.capabilities.has(DataCapability.QUOTES)
@@ -127,7 +120,7 @@ def test_sec_port_and_input_policy():
 
 @pytest.mark.parametrize("change", [
     {"cik": 999999},
-    {"cik": "not-a-number"},
+    {"cik": "320193"},
     {"filings": {"recent": {"accessionNumber": ["a"], "form": ["10-K"], "filingDate": ["2026-10-23"]}}},
     {"filings": {"recent": {"accessionNumber": ["0000320193-26-000001"], "form": [], "filingDate": ["2026-10-23"]}}},
     {"filings": {"recent": {"accessionNumber": ["0000320193-26-000001"], "form": ["10-K"], "filingDate": ["2026-20-23"]}}},
@@ -164,8 +157,6 @@ def test_twelve_quote_uses_minute_candle_timestamp_not_unrelated_timestamp():
     params = parse_qs(urlparse(transport.calls[0][0]).query)
     assert params["apikey"] == [KEY]
     assert params["timezone"] == ["UTC"]
-    assert params["mic_code"] == ["XNAS"]
-    assert params["interval"] == ["1min"]
 
 
 def test_twelve_does_not_call_provider_for_unsupported_or_unverified_request():

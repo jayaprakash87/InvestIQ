@@ -32,6 +32,10 @@ There is **no live/delayed price provider, cloud cache, cloud database, web UI o
 
 `adapters/sec_edgar.py` lists recent SEC submissions by explicit CIK; `adapters/twelve_data.py` fetches a BYOK, venue-verified minute-candle CLOSE price with **UNKNOWN** plan timeliness and default-denied reuse. `adapters/_http.py` provides bounded, no-redirect HTTPS JSON transport and synthetic-test injection. No provider calls occur at import. **No cache, account management, financial-statement mapper, saved research workflow, or public hosted service has been added.** See [ADR 0005](../decisions/0005-provider-selection.md) and [provider setup/limitations](../methodology/provider-adapters.md).
 
+### v0.2 PR 3 connected source orchestration (implemented)
+
+`application/connected_data.py` provides on-demand quote and filing use cases, source-age validation, bounded retry policy and rights-aware in-process quote caching. The cache is **disabled for provider responses without explicit caching rights**, including the currently integrated Twelve Data adapter. `QuoteCachePort` is a future shared cache contract, not a hosted implementation. No XBRL financial-data normalization, company valuation workflow, historical thesis store or frontend has been added. See [ADR 0006](../decisions/0006-connected-data-service.md) and [usage](../methodology/connected-data-service.md).
+
 ## 2. Target logical components
 
 ```text
