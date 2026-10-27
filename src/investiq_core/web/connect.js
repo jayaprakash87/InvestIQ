@@ -27,6 +27,8 @@
     selected = null;
     $("research-select").hidden = true;
     $("connected-output").hidden = true;
+    $("filing-evidence-panel").hidden = true;
+    $("filing-result").hidden = true;
     $("company-results").replaceChildren();
     $("search-button").disabled = !configured;
     $("provider-status").textContent = configured ? "Session configured" : "Not configured";
@@ -67,6 +69,8 @@
     selected = null;
     $("research-select").hidden = true;
     $("connected-output").hidden = true;
+    $("filing-evidence-panel").hidden = true;
+    $("filing-result").hidden = true;
     const companies = data.companies || [];
     if (!companies.length) {
       status("search-message", "No matching supported candidates. Search another name or ticker.");
@@ -99,6 +103,9 @@
         $("confirm-listing").checked = false;
         $("confirm-currency").checked = false;
         $("research-select").hidden = false;
+        $("filing-evidence-panel").hidden = false;
+        $("filing-result").hidden = true;
+        status("filing-message", "Confirm the listing and USD currency, then choose a topic.");
         $("connected-output").hidden = true;
       });
       container.append(button);
@@ -208,6 +215,8 @@
     selected = null;
     $("research-select").hidden = true;
     $("connected-output").hidden = true;
+    $("filing-evidence-panel").hidden = true;
+    $("filing-result").hidden = true;
     button.disabled = true;
     status("search-message", "Retrieving issuer candidates from SEC (first search may take time)…");
     try {
@@ -257,5 +266,77 @@
       button.disabled = false;
     }
   });
+  function showFiling(result) {
+    const filing = result.document;
+    const source = $("filing-source");
+    source.replaceChildren();
+    source.append(node("p", "filing-metadata",
+      "SEC Form " + filing.form + " · Filed " + filing.filed_on +
+      " · Accession " + filing.accession +
+      " · Extracted-text digest " + filing.document_sha256.slice(0, 16) + "…"));
+    if (typeof filing.source_url === "string" &&
+        /^https:\/\/www\.sec\.gov\/Archives\/edgar\/data\/[0-9]+\/[0-9]+\/[A-Za-z0-9_.-]+$/.test(filing.source_url)) {
+      const link = node("a", "secondary-link", "Open primary filing on SEC.gov");
+      link.href = filing.source_url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      source.append(link);
+    }
+    const excerpts = $("filing-excerpts");
+    excerpts.replaceChildren();
+    if (!result.passages.length) excerpts.append(node("p", "empty-state",
+      "No sufficiently long keyword-matching passages were extracted. " +
+      "This does not mean the filing lacks this information."));
+    for (const p of result.passages) {
+      const article = node("article", "filing-excerpt");
+      article.append(
+        node("p", "filing-excerpt-text", p.excerpt),
+        node("p", "filing-excerpt-ref", "Extracted-text offsets " +
+          p.extracted_start + "–" + p.extracted_end),
+        node("code", "reference-chip", p.evidence_id));
+      excerpts.append(article);
+    }
+    const limitations = $("filing-limitations");
+    limitations.replaceChildren();
+    for (const warning of result.limitations) limitations.append(node("li", "", warning));
+    $("filing-result").hidden = false;
+  }
+
+  for (const button of document.querySelectorAll(".filing-topic")) {
+    button.addEventListener("click", async () => {
+      if (!configured || !selected) return;
+      if (!$("confirm-listing").checked || !$("confirm-currency").checked) {
+        status("filing-message", "Confirm the listing and USD currency first.");
+        return;
+      }
+      const candidate = selected;
+      const generation = selectionVersion;
+      button.disabled = true;
+      $("filing-result").hidden = true;
+      status("filing-message", "Retrieving the selected SEC filing and excerpts…");
+      try {
+        const result = await post("/api/v1/research/filing-evidence", {
+          symbol: candidate.symbol, venue: candidate.venue, cik: candidate.cik,
+          currency: candidate.currency_candidate,
+          confirm_current_listing: $("confirm-listing").checked,
+          confirm_currency: $("confirm-currency").checked,
+          topic: button.dataset.topic
+        });
+        if (generation !== selectionVersion || selected !== candidate || !configured) {
+          status("filing-message", "Selection changed; previous excerpts discarded.");
+          return;
+        }
+        showFiling(result);
+        status("filing-message", "Retrieved source excerpts; no AI analysis was performed.");
+      } catch (error) {
+        if (generation === selectionVersion && selected === candidate) {
+          status("filing-message", error.message || "Filing evidence unavailable.");
+        }
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+
   initialize();
 })();
