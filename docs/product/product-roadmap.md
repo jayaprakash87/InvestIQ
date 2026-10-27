@@ -1,315 +1,173 @@
-# InvestIQ — Product Strategy and Roadmap
+# InvestIQ — AI-First Open-Source Investment Research Platform | Roadmap to v1.0
 
-> **Status:** Finalized planning baseline · **Version:** 2.0 · **Date:** 2026-10-27  
-> **Implementation baseline:** InvestIQ v0.1.1 (the released open-source Python toolkit).  
-> **Decision:** Connected, provider-agnostic investment research with freshness-aware retrieval, optional shared/cloud cache, and immutable reproducible research snapshots.  
-> **Nature:** Public product direction and acceptance criteria; **not** a statement that these future features already exist, a guaranteed delivery schedule, or investment advice.
+> **Status:** Proposed planning baseline **v3.0 (product-focused revision)** · **Date:** 2026-10-27
+> **Implementation:** v0.2.0 **source release candidate**, not a completed consumer product; live-provider license smoke and public publication authorization are separate outstanding gates.
+> **Audience:** Individual self-directed investors first, followed by wider independent users and open-source developers. Initial adoption is local-first; functionality is industry-neutral and user-configurable.
+> **Companions:** [v0.3 Personal Research Desk PRD](ai-research-experience.md) · [User and OSS Validation](validation-plan.md) · [Engineering Blueprint](../engineering/engineering-blueprint.md) · [Architecture](../architecture/overview.md) · [ADR 0009](../decisions/0009-ai-first-product-pivot.md).
 
-## 1. Executive decision
+## 1. Executive decision — what we are building
 
-**InvestIQ will be a connected Investment Research OS, not a local-only company-data application.** A company's share price, quote/volume and news change within a session; consensus estimates, corporate actions and fundamental filings change on other schedules. We cannot treat a copy on an individual's computer as today's market truth. Nor can we overwrite old research inputs whenever market data changes.
+**InvestIQ is an AI-first, open-source, user-controlled investment research system** that makes repeatable investment decisions easier: explore a universe, deeply understand companies, verify market/fundamental evidence, compare economic models, evaluate price and scenarios, challenge assumptions, explicitly record conclusions and revisit them when new facts arrive.
 
-We therefore separate two jobs:
+It is **not** a stock-picking chatbot, a clone of ChatGPT, an Excel-to-dashboard conversion or an infrastructure showcase. A distinctive benefit must be demonstrated in less repetitive prompting, more reliable sourced analysis, useful methodology consistency and history-aware research.
 
-1. **Current research view:** Retrieve provider-entitled data on demand, expose its actual market timestamp, entitlement/delay, market session and freshness, and update calculations when those inputs change.
-2. **Historical decision view:** Preserve the exact evidence, quote reference or permitted captured value, explicit assumptions, calculation/method versions and creation time for a saved thesis. Reproduce it later without querying today's feed.
+**Development sequence:**
+1. **Initial usability:** an individual investor runs a local app, researches real supported companies and verifies that the results are useful and reliable. The first usable local UI is required in v0.3, not v0.5.
+2. **Deepen the complete investing workflow:** progressively deliver company/peer intelligence, defensible screening, valuation and entry-condition analysis, historical decisions and optional holdings/context. Each release must stay usable, rather than postponing value until v1.0.
+3. **Open-source adopters:** make setup, coverage, provider/model configuration, privacy, docs and failure recovery intuitive for external users (alpha by v0.9; external contributions can begin earlier).
+4. **v1.0:** stable, reproducible, usable end-to-end research workspace for supported securities, independent of an InvestIQ-hosted SaaS.
 
-**Target architecture:** provider adapters → normalized market/fundamental evidence → freshness-aware retrieval/cache → deterministic research engine → interfaces; a separate immutable research history store records deliberate decisions. Managed cloud infrastructure is an **optional deployment**, not a dependency for using or contributing to the public Python library.
+**Decision:** Keep the MIT-licensed deterministic Python core and existing v0.2 connected adapters/snapshots. Put AI in the **user-facing orchestration layer**, while retaining provenance/financial arithmetic/licensing in trusted components. Historical snapshots and current quotes remain distinct. Default deployment **local-first with on-demand remotely sourced financial data**, not a static local market database or mandatory hosted cloud service.
 
-**Next release: v0.2 — Connected Company Research.** A user can select a supported listed instrument, fetch appropriately recent quotes and sourced financial facts under the applicable provider entitlement, calculate a traceable company view, and explicitly save/replay a thesis snapshot. The first vertical slice may be a CLI. Do not build a heavy web app or streaming backend before this journey works.
+## 2. Investment research problem and product principles
 
-**Why this, not new AI skills or stock rankings?** v0.1.1 has tested arithmetic, evidence models, five portable research skills and a synthetic end-to-end example. It does **not** have a connected price/fundamental source, accurate freshness semantics, research update/reconciliation, or a real-company end-to-end journey. This is the limiting product gap.
+**The problem:** Investment research is fragmented across financial-data tools, documents, screeners, spreadsheets, AI assistants and personal notes. Investors must repeatedly collect and verify evidence, reconcile dates and financial definitions, decide whether companies are genuinely comparable, test uncertain assumptions, explain rankings and track which conclusions changed. A generic LLM can answer individual questions but may not provide a consistent, auditable, user-controlled research-to-decision workflow.
 
-## 2. Product purpose and users
+**InvestIQ's proposed solution:** Automate the research workflow through **AI-guided discovery, research, comparison, valuation, critical challenge and monitoring**, backed by qualified source data, deterministic calculations, configurable methodologies and explicit investor control. The intended improvement in accuracy, effort and sustained usefulness must be validated rather than assumed.
 
-**Mission.** Make company research current *when viewed* and reproducible *when revisited*: show what is sourced, what is assumed, what changes, what is unknown and how conclusions depend on inputs.
+**Product principles:**
+- **Sector- and thesis-agnostic:** Work with any supported company, industry, investment theme, portfolio or investor methodology. Examples and internal research histories never define product functionality or default rankings. Equity analysis is the **initial supported asset class**, not a permanent architectural restriction.
+- **AI executes the workflow, not just chat:** Natural-language questions and purposeful actions should trigger appropriate permitted retrieval, computation, synthesis, comparison and follow-up without repeated technical prompts or manual spreadsheet assembly.
+- **Evidence before opinion:** Identify issuers/listings correctly; disclose source, market/fiscal date, currency, rights and missing data. Model prose is not a source of financial facts, and LLM mathematics is not authoritative.
+- **Explainable, adaptable models:** Financial quality, business strength, valuation, risk, momentum/catalysts and uncertainty can be evaluated separately; sector-appropriate factors, investor-defined weights and horizons should be versioned and inspectable.
+- **Distinguish research from decisions:** An investment scenario is not a return forecast; explain base/bear/bull assumptions and conditions that could invalidate a thesis. Never automatically place trades or rewrite a saved conclusion.
+- **Current evidence, immutable decisions:** Refresh current inputs from authorized providers; preserve prior approved research only to the extent lawful and never treat a static local file as today's market data.
+- **Local-first open source:** Let an individual use the software before building shared infrastructure. Preserve privacy and portability. Third-party model/data credentials or subscriptions, where needed, are distinct from InvestIQ's open-source license.
+- **Progressively useful releases:** Deliver a coherent, small supported journey early and expand coverage, sophistication and external usability through verified milestones—not a large unfinished set of modules.
 
-**Primary user:** independent investment researcher investigating one or several equities over time. **Secondary:** an analyst, educator or team running repeatable research and peer reviews. **Enabling user:** developer embedding vendor-neutral research and valuation modules.
+## 3. Intended users and deployment
 
-**Product positioning:** an open-source, evidence-centered research workflow, differentiated by clear information freshness, analytical consistency, explainable assumptions and investment decision history. It is not a brokerage, investment adviser, high-frequency terminal, personal stock picker or guaranteed-alpha engine.
+| Stage | Primary user | Setup / access | Experience expectation |
+| --- | --- | --- | --- |
+| **v0.3–v0.6 personal alpha** | Initial self-directed investor | Local app; own authorized market-data/model credentials where required; synthetic offline mode | No CLI/CIK/manual JSON during normal research; clear provider/coverage setup, save/private local records |
+| **v0.7–v0.8 repeat-use alpha** | Initial investor plus limited reviewers | Same local/self-hostable product; private data optional | Timely update/re-underwriting and portfolio/context only if explicitly enabled |
+| **v0.9 external OSS beta** | Independent nontechnical investors and developers | Documented one-command/packaged install; guided setup; portable private data; reproducible samples | First real supported research task without knowing Python or assembling multiple prompts |
+| **v1.0 stable OSS** | Any user within supported markets/asset classes and accepted provider requirements | Local-first, open code and documented plug-in adapters; optional self-host; cloud not required | Complete repeatable, trustworthy research lifecycle and versioned migration/compatibility |
 
-**Experience principles**
-- **Freshness visible, never implied.** Show “real-time”, “delayed”, “end-of-day”, “historical” or “unavailable” **only when supported** by actual provider/plan metadata; otherwise mark timeliness unknown.
-- **Factual vs hypothetical.** Preserve source-reported facts and analyst/AI-derived interpretations separately. An input price and a valuation target are not both “the stock price”.
-- **Supported geography before broad claims.** First supported issuer and venue coverage depends on the chosen licensed data providers. SEC/EDGAR supplies US filing data, not live US/EU stock quotations.
-- **Online when needed, offline when justified.** Connectivity supports current research; offline replay supports accountability. The two must never silently substitute for one another.
-- **Public and private boundaries.** Repository contains synthetic or redistributable examples only; personal theses, provider credentials and licensed datasets stay in user-controlled storage.
-- **Reusable by anyone.** Business logic stays in the portable Python core; cloud hosting, GUI, data providers and AI are adapters, not mandatory product dependencies.
+**Portable user configuration:** No user's tickers, holdings, buy prices, preferences, theses or credentials become public fixtures, rankings or hardcoded defaults. Demonstration data are redistributable and clearly synthetic. Each installation supports its own research universe, assumptions, preferences and methods.
 
-## 3. What exists versus what must be built
+**Open source from now, consumer-ready later:** The repository is already public/MIT; v0.9 is **usability/beta readiness**, not the first time code is open.
 
-| Capability | Released v0.1.1 | Missing for connected product |
+## 4. Experience — user actions, not modules
+
+A supported investor should open InvestIQ and see:
+- **Ask or Research:** "Analyze this company for a multi-year horizon" — the system resolves a supported security, retrieves lawful current sources, builds financial/business/valuation evidence, shows a specific bear case and allows follow-ups.
+- **Compare:** "Compare these companies and explain which are genuine peers" — identify differences in business model, economics, financial definitions and investment trade-offs.
+- **Explore:** "Which companies in this industry or investment theme deserve further research?" — define the company universe, data coverage and explainable score/rank breakdown **as of** a dated data snapshot.
+- **Underwrite:** "What assumptions and entry price could support my chosen hypothetical return hurdle and investment horizon?" — scenarios, reverse valuation, sensitivity and named failure conditions.
+- **Revisit:** "What changed since I last assessed it?" — distinguish price, fundamentals, published guidance/estimates, corporate events, assumptions and scoring-method changes under lawful observation retention.
+- **Portfolio context (opt-in):** "Are my selected investments exposed to overlapping risks? What happens in a downside scenario?" — do not merge watchlists and owned positions.
+
+**No daily user needs to chain six SKILL.md prompts, assemble manual CIK/MIC records, run a CLI or recalculate spreadsheet formulas.** A simple natural-language task interface plus purpose-built tables/charts/controls delivers more than pure chat. The five existing skills become guided research procedures invoked by orchestrator tools; skills alone are not executing agents.
+
+**UI minimum:** question/search, company overview, structured source/evidence panel, timeframe selector, actual-versus-assumption clarity, scenarios where supported, specific risk/counter-case and deliberate history save. As capabilities ship, expose discover, compare, watchlists, rankings, thresholds and portfolio views. Never show clickable features that do nothing.
+
+## 5. Implementation baseline and data reality
+
+**Already implemented (v0.2 source):** portable Python valuation/evidence/thesis contracts; five model-neutral research *instruction* skills; synthetic offline CLI; SEC annual US-GAAP facts and Twelve Data BYOK minute-candle CLOSE; venue-qualified issuer contracts; conservative quote freshness and default-denied reuse rights; dated current analysis; explicit rights-aware private snapshots/replay and CLI acceptance tests.
+
+**Not implemented or not verified:** model execution, research coordinator, company search, graphical interface, multi-company trend/peer workflows, comprehensive FCF/ROIC/quarterly data, wide-universe research, scorecards, alerts, holdings, open-source consumer installers, secure hosted SaaS, verified provider real-time data rights, independent provider smoke and real-user evaluation.
+
+**Coverage discipline:** The existing v0.2 implementation supports a narrow SEC annual US-GAAP path, **not** every equity issuer, accounting standard, exchange or asset class. Broaden the supported universe through explicitly tested adapters, fiscal/FX/share-basis normalization, corporate-action semantics and provider rights. The general-purpose product vision must not be confused with universal data coverage at v1.0; unsupported is an honest result.
+
+**Market-data policy:** On-demand permitted feeds for current research. Consumer app may use BYOK when source contracts require it, but a **setup wizard** rather than manual environment variables is required for everyday use. Offline synthetic sample requires **no account or key** and is always visibly fictional. LLM adapters may require their own endpoint/key or supported local model; verify actual quality/cost before claiming turnkey free AI. A public hosted service requires separate licensing/security/business justification.
+
+## 6. Roadmap to v1.0 — progressive, independently usable releases
+
+Releases are **outcome milestones, not delivery dates or promises**. Every release inherits source rights, truthful data and security gates. A workflow that fails its earlier release gate blocks dependent scope.
+
+| Version | Theme | Usable capability by that release | Exit gate |
+| --- | --- | --- | --- |
+| **v0.1.1 — released** | Research primitives | Run fictional evidence/thesis/reverse valuation CLI | Historical release |
+| **v0.2.0 — source release candidate** | Connected analytical core | Optional manual BYOK single-company SEC/quote research and private lawful snapshot/replay | Live provider/account rights smoke + explicit public tag/release authorization outstanding |
+| **v0.3 — Personal Research Desk (NEXT)** | **AI + local UX first** | Install/run local task UI, set up permitted data/model provider once, search a small supported company set, ask for a **complete source-linked company research answer**, inspect bear case, adjust eligible simple scenarios and save an allowed thesis | Initial user completes actual supported research without CLI/CIK/JSON; coherent UI/model/source/consent failure states and AI semantic/security tests |
+| **v0.4 — Company & Peer Intelligence** | Business and fundamentals | Inspect company economics, financial trend/quality, margins/cash/leverage **where sourced**, material risks, and compare supported true peers or show economic mismatch | Supported peer/period/units/FX, no invented history; comparison passes representative daily research tasks |
+| **v0.5 — Universe, Screens & Explainable Scores** | Discovery and research prioritization | Maintain sector/theme value-chain lists; evaluate named companies using configurable quality/valuation/growth/moat/risk/confidence factors, compare short vs long horizons and see missing data/rank sensitivity | Coverage-aware rankings, documented weights/method versions, no price-dependent score on stale/unverified price |
+| **v0.6 — Underwriting & Entry Conditions** | Valuation-to-decision | Bear/base/bull, reverse valuation, implied growth, entry-threshold analysis for a **hypothetical** return hurdle, risk/assumption sensitivity and explicit thesis decision record | Correct valuation basis/horizon, no free-form LLM arithmetic, changed price never silently changes past decisions |
+| **v0.7 — Research Continuity & Monitoring** | Why did my thesis change? | Approved watchlists, lawful scheduled/on-demand refresh, saved conditions, material price/fundamental/news/estimate changes if covered; see price-driven vs thesis-driven vs methodology-driven deltas | Point-in-time checks, opt-in schedules, licensed retention, meaningful alerts, no automatic thesis revision, observed repeat usefulness |
+| **v0.8 — Portfolio Context & Research Workspaces** | Decision portfolio | Optional private holdings and watchlist separation, thematic concentration, risk/overlap and conditional allocation/scenario analysis, multi-currency where correctly supported; import/export personally sourced research | No defaults containing personal holdings, privacy isolation, accurate position currency/source, no brokerage orders |
+| **v0.9 — External Open-Source Beta** | Others can use it | Supported OS installation, guided first-run demo/BYOK setup, discoverable UI, example research, docs, supported scope and privacy controls, error recovery and contributor extension contracts | Independent external install and task tests; stable migrations, release artifacts, security/privacy/license checks; documented failure limits |
+| **v1.0 — Stable Open Research Workspace** | Dependable OSS product | A user can install, configure, explore/research/compare/underwrite/track supported equities, inspect evidence, export/replay permitted decisions, use own models/data adapters/configuration and reset/delete local profile | Defined product+engineering exit checklist in §9; evidence of repeat usage and independent external adoption |
+
+### Work sequencing and dependencies
+
+- **v0.3 is intentionally narrow:** one useful, real-company end-to-end personal flow, including **traceable issuer narrative evidence** as needed for business/risk claims; not broad market coverage or a comprehensive stock screener.
+- **v0.4 requires validated source breadth:** trend/peer only with compatible periods, fiscal filings and sources; narrow alternatives when providers cannot support it.
+- **v0.5 requires score methodology integrity:** no rankings merely because a formula can be calculated. Include confidence, missingness, scenario/sector/horizon distinctions.
+- **v0.6 requires price/valuation rights and completeness:** reverse underwriting is allowed only with compatible current/ref-price and financial assumptions.
+- **v0.7 requires durable dated source history to the extent lawful:** can monitor source changes without storing restricted quote bodies; do not falsely claim exact hindsight reconstruction.
+- **v0.8 is opt-in and private:** holdings require stronger secret/storage/user-correction controls.
+- **v0.9/v1.0 require real external usability:** publication on GitHub alone is insufficient.
+
+Scope changes can shift features between minor releases, but **must preserve the full v1.0 capability map and release dependencies**, and record why a feature moves. Do not shortcut gates by renaming.
+
+## 7. Detailed roadmap capabilities and method evolution
+
+### A. AI and interaction (starts v0.3, improves every release)
+- Single bounded, replaceable model coordinator with narrow **issuer filing/document passage retrieval** (for business model, concentration and risks), numerical evidence/quote retrieval, calculation, source inspection, challenge and explicit-save tools; agent run costs, failures, citations and model version visible where useful.
+- Context-aware follow-ups within approved tasks; never need to restate every factor/stock/timestamp. Do not persist conversations or investor preferences without opt-in.
+- Report-first UI plus purposeful comparison tables, scoring breakdowns, charts and sliders. AI **orchestrates**; the product isn't an unstructured prompt box.
+- Source-to-claim semantic checks, confidence calibrated to evidence coverage (not fabricated numerical probability), prompt-injection defenses and bounded retries.
+- Portfolio/notifications later only with deliberate opt-in and controlled retention.
+
+### B. Connected financial and fundamental data (expanded when required)
+- Issuer/listing mapping, supported geographic/fiscal regimes, price kind/session/time, currency and FX/adjustments; no "today" quote without a credible event time.
+- Annual → quarterly/TTM where available, restatements, financial definitions, capex/FCF, ROIC/debt/share count; vendor coverage matrix by sector and instrument.
+- Provider-permission-aware caching and data costs, offline sample, private lawful snapshots; do not run a server/data warehouse just to maintain static current prices.
+
+### C. Research methodology and scoring (v0.4–v0.6)
+- Extensible **industry-aware** research templates and valuation methods based on economic characteristics, business model, financial disclosure and data quality—without privileging named sectors or hardcoding a thematic universe.
+- Research scores: business quality, financial trend, sustainable economics, valuation/return potential, risk resilience, catalyst/horizon and evidence coverage **separately**, plus optional explicit-weight composite.
+- Every score stores source vintage, assumptions, weight/model version and peer group; calculate rank shifts due to price, fundamental and scoring-method changes distinctly.
+- No default factor weights or historical investor preferences are universally objective; support auditable, editable methodologies, explicit uncertainty and validation with lawful point-in-time data when needed.
+
+### D. User-controlled state and continuity (v0.3+)
+- Historical decisions saved explicitly; position/watchlist membership, saved scenarios, choices and consent stored locally by default under user-owned data paths.
+- Refresh current views without mutating decisions. Save lawful data/refs; if retention prohibited, replay only eligible inputs and visibly disclose the gap.
+- Future sync/cloud deployment and automatic monitoring optional, conditioned on hosting authorization, multi-user isolation and sustainable costs.
+
+### E. Open-source operating model (v0.3 → v1.0)
+- MIT core and app; no dependency on centrally hosted InvestIQ infrastructure. Provider/model adapters open/documented; data provider contracts and model costs **separate** from MIT grant.
+- Config portability, cross-platform developer/consumer install, accessible UX, security-by-default for user secrets, sample fixtures, contributor docs, CLI compatibility and migration/backup/export.
+- If a new external user has no paid feeds, the app still demonstrates an **honestly labeled synthetic** workflow and clearly explains how to configure permitted connected research.
+
+## 8. v0.3 step-by-step delivery slices (outcome PRs, not premature implementation approval)
+
+| Step | User-visible result | Required proof |
 | --- | --- | --- |
-| Python package, CLI, tests, MIT license | Implemented | Connected commands / packaging of optional adapters |
-| Equity valuation math and scenarios | Positive-EPS multiple/CAGR/reverse-valuation primitives | Use timestamped entitled prices and dated fundamentals; additional valuation methods later |
-| Attributed numeric evidence | Source, public/recorded times, observation vintages | Market quote/time-series contract, issuer identity and provider-specific normalization |
-| Five reusable research skills | Portable procedures and structured report validator | Research inputs assembled from real sources; semantic/source checks |
-| Thesis history | Hash-linked versions and JSONL import/export | A user-triggered save/replay workflow with storage adapters |
-| Real market data | **Not shipped** | Licensed/BYOK quote provider, entitlement/delay metadata, refresh policies |
-| Filings, estimates, news | **Not shipped** | Source adapters with quality, timestamps, licensing and availability guarantees |
-| Shared cache/cloud data | **Not shipped** | Optional deployment and entitlement-aware cache when needed |
-| Quant backtesting | **Not shipped** | Point-in-time universes, revisions, corporate actions, costs and independent validation |
+| **PR A — first-run research shell** | Simple local research entry, supported company lookup/selection and guided provider/model configuration **or transparent synthetic demo** | On Windows/Linux supported target, local startup, no CLI during normal use, credential and data-rights safeguards; interactive smoke |
+| **PR B — one complete AI research task** | Bounded coordinator combines existing dated SEC/quote tools with trusted valuation, cited business/financial summary, strongest bear case and useful gaps | Model/tool contracts, semantic/source checks, numerical delegation, partial failures, prompt-injection and cost controls |
+| **PR C — interactive answer and lawful decision** | Drill into sources, compare conditional scenarios, answer grounded follow-ups, explicitly create/replay/export private versioned permitted thesis | Scenario correctness, allowed history fields, no stale data or silent writes, local privacy/deletion behavior |
+| **PR D — personal release acceptance** | Repeatable research for an intentionally supported small stock set; offline demo and connected happy/negative paths | Initial investor uses the daily workflow without developer instructions; measure quality, latency/cost and compare against direct LLM research |
 
-**Key product distinction:** A live quote can change without creating a new `ThesisSnapshot`. A research snapshot is created only on explicit save (or an approved research workflow), not on every refresh, market tick or data-reconciliation job.
+The first PR may use mocks clearly labeled as such, but **v0.3 release requires a real, independently verified supported case** under actual provider terms. Do not add a generic browser stack or SaaS accounts before the first research journey works.
 
-## 4. Data classes, refresh and retention policy
+## 9. v1.0 acceptance — what "ready to be used" means
 
-**Refresh policy is a capability, not a guarantee.** Exact timing is a configurable rule that must respect the provider plan, exchange entitlement, trading session and legal use. An illustrative TTL cannot transform delayed data into real-time data.
+**Functional acceptance**
+1. Independently install and configure on documented supported OS; run synthetic sample with no credentials, and configure lawful connected provider/model access through a comprehensible UI.
+2. Run a supported company deep dive, explicit peer comparison, explainable screening/ranking, valuation/entry sensitivity and source-linked counter-thesis. No mandatory Python skills or multi-prompt recipes.
+3. Save, reopen, diff and export a user-authorized thesis; see meaningful legal/data-coverage limitations and research-update events. No silent historical revision.
+4. Opt into a watchlist and, if desired, private holdings/portfolio research. Never require broker connection or trading permissions.
+5. Edit methodology weights, horizon, assumptions, source choices and sector definitions without changing other users' defaults. Clear method/model/source versions.
 
-| Data class | Source / update pattern | Research-view behavior | History behavior |
-| --- | --- | --- | --- |
-| Last trade, bid/ask, price, volume | Quote REST or stream; session-sensitive | Fetch on request or subscribe only if entitled; show exchange timestamp, received timestamp, market/session, actual delay | Record the quote ID/value only when permitted and selected for an analysis; not every tick |
-| Daily OHLCV / longer price history | Provider EOD/time-series API | Fetch current adjusted/unadjusted series with explicit currency, adjustment and cutoff | Preserve the input vintage/reference needed to reproduce saved calculations within license terms |
-| Fundamentals | Regulatory filings / provider financial APIs | Refresh on new filing/amendment or scheduled checks; explicit fiscal period and announcement time | Preserve each report vintage and filing provenance; do not overwrite historic facts |
-| Earnings estimates / revisions | Entitled consensus provider | Reconcile by source revision/event and provider TTL | Snapshot assumptions/estimates **only** when license permits; never pretend reconstructed consensus is historic |
-| Corporate actions and instruments | Reference-data events | Invalidate affected prices, share counts, EPS bases and symbols; time-qualified mappings | Preserve effective dates and applied adjustment/mapping rules |
-| FX | FX provider with timestamp and pair conventions | Fetch when conversions are needed; show conversion source/date and limitations | Preserve used rate or lawful reference for repeatable cross-currency results |
-| News / company announcements | Provider feeds / filings | Event-driven polling or demand refresh with source timestamp, deduplication and disclosure of coverage | Keep selected references or summaries only under license; do not republish restricted bodies |
-| Research theses and scenarios | Explicit researcher action | Compare current inputs with saved position; don't auto-change thesis | Append-only revisions with method/input digests and approved decision rationale |
+**Engineering and trust acceptance**
+6. Verified issuer/venue/price/currency/time/fiscal data with zero known critical permission violations or fabricated official figures; supported-region and missing-data failures are understandable.
+7. Financial unit/economic/temporal, source-to-claim semantic, prompt-injection, model regression, privacy, storage migration/replay, installer/browser accessibility and provider contractual test suites pass as applicable.
+8. Versioned public APIs/data schemas, backward-compatible CLI, repeatable releases, clean source/synthetic fixtures, documented source/model/provider cost and licensing obligations, secure secrets, backup/export/delete and security disclosure process.
+9. At least one structured independent external usability/adoption trial plus measured repeat-use evidence; record actual sample size and observed results before declaring the milestone complete. **Numeric thresholds should be set after a baseline**, not invented.
+10. No untested promise of guaranteed investment return, all market coverage, automatic trading, licensed real-time public redistribution or institutional portfolio compliance.
 
-**Market-time model (required contract):**
-- Source/event time (`market_timestamp` or document publication time), response/ingestion time, normalized freshness assessment `as_of`, and viewer request time **are different timestamps**.
-- Represent market/exchange, security/share class, quote currency, session/timezone, price kind (last/close/bid/ask/etc.), adjusted status, units, provider ID, delay classification (real-time/delayed/EOD/historical/unknown), known delay duration **if supplied**, and entitlement/reuse scope.
-- Prevent a closed-market EOD quote or delayed feed from being labeled “live now”. Market holidays, after-hours, vendor outages and halted securities require explicit states or unknowns.
-- No assumed global 24/7 equities market and no fabricated refresh SLA.
+**Operational readiness:** The complete product still works as an open-source local/self-hosted package with on-demand data, not a paid hosted account. Unsupported providers/regimes remain explicitly out of scope; a consistent subset is acceptable for v1.0.
 
-## 5. Architecture: logical layers and deployment modes
+## 10. Measures, validation, governance and stop rules
 
-```text
-InvestIQ Interfaces (CLI first; optional later web UI / API / AI skills)
-                           |
-         Research Application / Orchestration
-                           |
-    +----------------------+----------------------+
-    |                                             |
-    v                                             v
-Current Information View                   Research Decision View
-- on-demand quotations                     - explicitly saved thesis/version
-- filing and estimate refresh              - exact input manifest + provenance
-- quality and freshness metadata           - methodology/calculation versions
-    |                                       - repeatable offline replay
-    v                                             |
-Provider-neutral Data Access                       v
-- Security/issuer resolver                 Durable, user-controlled history
-- Quote/fundamental/news adapters          - local or cloud repository adapter
-- normalization + entitlements             - immutable versions + audit
-    |
-    v
-Optional cache and refresh service
-- in-process cache for single user
-- shared managed cache only when justified
-- provider/source/entitlement isolation
-    |
-    v
-Licensed provider REST, feed, filing API or user-supplied data
-```
+**Personal north-star before external beta:** number of completed, **actually useful** supported research/underwriting sessions per week, with accepted evidence and no manual data assembly. Also track first useful answer time, corrections, missing source/financial data, score/valuation confidence, research re-use and authorized data/LLM cost.
 
-**Dependency rule:** provider adapters and persistence depend on documented domain interfaces; valuation math and research logic must not import vendor SDKs or require a running cloud service.
+**External north-star for v0.9–1.0:** portion of new independent users who install, configure, finish one source-linked task and voluntarily return for another decision/research update.
 
-### Supported deployment choices
+**Compare with alternatives:** same task across current InvestIQ, a general-purpose LLM and a mature research service; do not presume superior model output without measured source fidelity, effort, retention and preference. See [validation plan](validation-plan.md).
 
-| Mode | User / usage | Architecture | Decision |
-| --- | --- | --- | --- |
-| **Library or CLI + bring-your-own provider key** | Developers and independent researchers | Provider APIs on demand, optional bounded in-process cache, local/private thesis snapshots | **First implementation, no cloud prerequisite** |
-| **Self-hosted connected service** | Small teams, technical operators | Shared API process, optional database and cache, user/tenant-controlled secrets and entitlement isolation | Supported design target; not mandatory in v0.2 |
-| **Centrally hosted InvestIQ service** | Multi-user public product | Data-access gateway, managed provider contracts, entitlement-aware cache, identity/auth, secure durable research store and monitoring | **Conditional future capability**; needs licensing, demand, budget and security review |
-| **Full streaming/lakehouse** | Large-scale quant / historical data science | Licensed historical market feed, high-volume storage, bias controls, strategy experiment services | Not justified for v0.2 |
+**Stop/narrow/pivot if:** no sustained personal use; user repeatedly prefers manual LLM prompting; unreliable or unlicensable sources; significant wrong/risky outputs; cost disproportionate to value; external users cannot install/use; or no meaningful return-value after several iterations. An assistant-native integration remains a distribution option **alongside**, not a substitute for delivering a usable personal research workspace.
 
-Do **not** provision Redis, Kafka, Event Hubs, Databricks, microservices or a multi-tenant SaaS just to implement v0.2. Keep adapters swappable and documented, allowing these components where operational need later justifies them.
-
-### Cache is not the source of truth
-
-- Adapter-backed cache is an *optimization*. On cache hit, return original source/event timestamp, entitlement/delay class, provider reference, expiry and freshness status. Expired entries are not magically current.
-- Define cache policy **per data category/provider/entitlement**. Quote TTL may be seconds or longer depending on actual feed terms; fundamental refresh may follow filings; estimates and news follow separate terms.
-- Key cache entries by provider, instrument + venue, quote/series kind, session/time range, currency, adjustment flags and **entitlement/license scope**. Never serve a premium licensed item to an unauthorized caller via a shared cache.
-- Stampede protection, backoff, 429 handling, timeouts, circuit-breaking and bounded fallbacks are required before shared deployment.
-- Provider fallback requires semantic compatibility and re-labeling of source, timestamp, delay and coverage. Do **not** silently replace live price with delayed/EOD or mix an adjusted series with an unadjusted one.
-- If a source is offline, show stale-with-timestamp when explicitly allowed, or fail clearly. Never silently invent or forward-fill unverified prices.
-
-### Saved research snapshots
-
-A user-triggered `save` records:
-- instrument/issuer identity and exact calculation inputs (or legally permitted durable source references);
-- source IDs, publication/event and retrieval times, data status and quote delay classification;
-- assumptions and optional selected price, method/contract versions, scenario parameters and research summary;
-- immutable hash-linked thesis version and reviewer rationale.
-
-On `replay`, use the saved admissible input manifest. **Never call today's live feed while pretending to reproduce an old thesis.** When source rights prohibit retention of values, indicate non-reproducibility limitations; do not promise exact offline replay.
-
-Storage location is a separate adapter: local SQLite/private files may serve a single researcher, while a secure managed cloud store may serve permitted hosted deployments. Neither choice makes the underlying *market* data local-only.
-
-## 6. Data-provider strategy and licensing gates
-
-**Avoid a single mandated provider.** Publish small provider-neutral interfaces and one end-to-end adapter at a time; establish coverage, rights, latency and identity semantics before choosing the default.
-
-**Candidate source classes (to evaluate, not implemented or committed):**
-- **Company filings:** SEC EDGAR submissions / XBRL Companyfacts for eligible US issuers. Supplies reported corporate facts and filings, not streaming quotations. Respect fair access, user-agent guidance, and data context including amended statements and actual filing dates. <https://www.sec.gov/edgar/sec-api-documentation>
-- **Consolidated fundamentals / estimates:** Financial Modeling Prep or other appropriately licensed APIs. Coverage, depth, caching and redistribution require plan-specific verification before selection. <https://site.financialmodelingprep.com/>
-- **Equity market prices and historical bars:** Massive (formerly Polygon.io) or another entitled quote/history provider. REST vs WebSocket, real-time vs delayed/EOD, exchange permissions and use/redistribution rights depend on the contract and market. <https://massive.com/docs/>
-- **Optional provider aggregation:** OpenBB or similar integration may help access multiple adapters, but it must remain optional and should not become core domain logic. <https://docs.openbb.co/>
-
-**Provider decision matrix (must be completed before PR 2):**
-
-| Criterion | Must demonstrate |
-| --- | --- |
-| Instruments and markets | Supported region, venue/MIC, issuer and share class; what is missing |
-| Timeliness | Quote source timestamps, session coverage, plan-specific real-time/delayed/EOD entitlements |
-| Historical correctness | Adjustments, amendments, corporate actions, estimates vintages, availability |
-| Allowed use | Personal/BYOK vs hosted display, caching, redistribution, public examples and derived metrics |
-| Engineering | Documented API, errors, rate limits, retry guidance, pagination, outage handling |
-| Cost | Free/paid tiers, quota limits, estimated usage under representative research scenarios |
-| Access/security | Credential handling, license isolation, no leakage in CI/public fixtures |
-
-**Deployment policy:** an MIT-licensed client library can let users bring their own permitted API key. A public hosted service cannot assume the same commercial exchange data can be redistributed freely. If no legally usable live feed is available, v0.2 must **truthfully ship as delayed/EOD connected research** with explicit labeling, or remain at release-candidate status until its advertised minimum is met.
-
-No public project fixture may embed copyrighted paid datasets or personal brokerage information. Public sources are not necessarily unrestricted to republish. Provider selection is a gated decision, not a promised coverage or latency guarantee.
-
-## 7. Release roadmap (ordered, no fixed dates)
-
-| Release | Theme | Core user outcome | Release gate |
-| --- | --- | --- | --- |
-| **v0.1.1 — Released** | Portable research toolkit | Run deterministic, source-aware *synthetic* research offline | Existing release verified |
-| **v0.2 — Connected Company Research** | **NEXT** | Retrieve time-labeled real company fundamentals and appropriately current price, calculate and save a sourced research snapshot; replay when permitted | One real supported company, transparent price delay/entitlement, end-to-end reproducibility |
-| **v0.3 — Fundamental & Peer Intelligence** | Compare with context | Track fundamental trends and compare genuinely comparable peers using time-aligned current inputs | Comparable periods/currency, sources, errors and sector distinctions |
-| **v0.4 — Research Updates & Decision Intelligence** | Understand changes | Identify what changed in quotes, filings, estimates and explicit thesis assumptions; alert/review only on opt-in | Timed delta evidence, no automatic rewriting of historical theses |
-| **v0.5 — Accessible Research Experience** | User-facing workspace | Interact through optional local/hosted GUI, inspect sources and scenario sensitivities without coding | User-tested usability, privacy, costs and licensed hosted feed gate |
-| **v0.6+ — Quant Research Lab** | Empirical strategy testing | Explore risk-aware factor/portfolio hypotheses with historical data of demonstrable quality | Look-ahead/survivorship/corporate-action/cost and out-of-sample safeguards |
-| **v1.0 — Stable Open Research Platform** | Mature interoperability | Dependable schemas, adapter ecosystem, documentation, stable user journeys and community contributions | External users, migration/compatibility policy, long-term maintenance and security posture |
-
-These versions express direction, not guaranteed future releases. A fund, ETF, algorithmic mutual fund, autonomous trading platform or managed-account service is *not* a committed milestone.
-
-## 8. v0.2 — Connected Company Research PRD
-
-### User story
-
-> “I select a supported company, obtain the freshest **legally available and correctly labeled** quote and sourced financials, see exactly when the numbers were valid, test a valuation, and choose whether to save a dated, reproducible thesis. Tomorrow's refreshed price should not erase yesterday's reasoning.”
-
-### Minimum end-to-end flow
-
-1. **Resolve company and instrument**: support issuer/reporting identity separately from venue-qualified ticker/currency; no arbitrary ticker-only joins.
-2. **Fetch on demand**: use a configured entitled quote provider and filing data provider. Return source/market time, received time, session, currency, availability/delay status and license capabilities.
-3. **Normalize**: map a bounded financial statement metric catalog and valuation input contracts; validate period, units, share class, amendment and FX/adjustment semantics. Decline ambiguous conversions.
-4. **Compute**: show sourced business fundamentals and calculations; derive price-sensitive P/E and scenario outputs from the selected quote timestamp. Clearly mark outdated, unavailable or inapplicable methods.
-5. **Inspect and refresh**: report source links and freshness status; on refresh, fetch/calculate again, with safe fallback and visible differences. **No thesis revision from quote refresh alone.**
-6. **Save explicitly**: preserve a versioned research snapshot, assumption and selected input manifest under the user-controlled storage backend, subject to source permissions.
-7. **Replay**: reconstruct saved results without fresh calls wherever licensing and retention allow, and flag any non-replayable external dependencies.
-
-### Must-have contracts
-
-**A. Instrument and source identities:** issuer/reporting ID vs share class/instrument (venue MIC, currency, symbol effective dates); source provider and identifiers; versioned mapping resolution.
-
-**B. Price and time:** quote kind, currency, market event time, provider observation time (if distinct), fetched/received time, exchange/session and timezone, entitlement, delayed duration if verifiable, adjusted status, staleness threshold/assessment, provider data rights.
-
-**C. Fundamentals:** metric dictionary, filing/accession and report periods, public-availability qualification, revision/amendment lineage, reported vs derived vs consensus, comparable share/currency/accounting basis, missing and conflict diagnostics.
-
-**D. Analysis:** `CurrentResearchView` and `ResearchSnapshot` are separate concepts. Current view may refresh; snapshots are immutable with source/method version references.
-
-**E. Provider integration:** capabilities (quotes/financials/estimates/news), sync/async adapter interface, explicit failure modes, opt-in networking, BYOK secrets, rate limits, cache metadata, permitted reuse. No mandatory vendor SDK in the core.
-
-### v0.2 acceptance criteria — all mandatory
-
-1. **Genuine connected case:** analyze ≥1 supported real issuer and listed instrument using legally accessible filing source and one permitted price source. Label it according to *actual* provider real-time, delayed or EOD entitlement. Do not claim worldwide support.
-2. **Freshness demonstration:** show price timestamp, market/session and effective delay/unknown with user-facing stale/closed-market messages. A forced late cache response cannot be reported as live.
-3. **Change behavior:** after a new permitted quote, price-sensitive calculations change deterministically while earlier saved thesis snapshots remain unchanged. Refresh should not generate redundant thesis revisions.
-4. **Financial provenance:** show source/report period, fiscal units, filing/publication qualifiers and amendment handling for each material reported metric; invalid, missing and incompatible facts fail clearly.
-5. **Provider robustness:** exercise 401/403, 429, timeouts, provider outage, unsupported region, ambiguous symbols, missing historical vintages, currency and corporate-action mismatch, stale cache and entitlement-denied cases. Forbidden providers must not be bypassed via fallback.
-6. **Reproducibility:** saved snapshot can be replayed from its permitted retained input manifest on a fresh installation without calling today's provider. Any legally unavailable retained inputs must be conspicuously disclosed.
-7. **Licensing and security:** confirm plan/API rights for the chosen demo; redacted logs, no private keys or holdings in public Git, cache user/entitlement isolation if shared, documented quota/cost behavior.
-8. **Developer/public usability:** fresh checkout/wheel, one supported connected company flow, CLI instructions, deterministic fixtures, CI and independent tester walkthrough. Do not invent usage statistics, provider speed or outcomes.
-9. **Code quality:** numerical/semantic domain tests, adapter-contract tests, snapshot tests, installed-wheel smoke, minimal CI runs and no unresolved critical code/security findings.
-
-**No implied promise:** v0.2 does not require real-time streaming, automated price updates every second, multi-region exchange support or a hosted cloud deployment; truthful delayed/EOD connected data is acceptable if clearly designated and useful.
-
-### Implementation order — six outcome-based PRs
-
-| PR | Outcome | Deliverable / acceptance | Dependency |
-| --- | --- | --- | --- |
-| **1. Provider-neutral market-data architecture** | Correct domain model before vendor integration | ADR, quote/fundamental/time/freshness/entitlement models, issuer mapping, capability/failure contracts, synthetic validation tests | v0.1.1 |
-| **2. Provider adapters and source evaluation** | Real licensed/entitled data enters InvestIQ | SEC filing adapter plus one price-data provider selected via documented comparison; BYOK and deterministic test doubles, limits/errors/fallback rules | PR 1 |
-| **3. Connected data service and cache** | One reliable research view | On-demand retrieval, normalization, source-specific freshness rules, in-process bounded cache, optional shared-cache interface; entitlement isolation and invalidation tests | PRs 1–2 |
-| **4. Connected research analysis** | Current company view yields traceable analysis | Source-linked fundamentals, price-sensitive valuations, support for refresh and delay/staleness messaging, negative-EPS and currency guardrails | PRs 2–3 |
-| **5. Durable research snapshots and outputs** | User controls what is saved | Portable storage interface, single-user private local implementation first with cloud-ready backend contract; explicit save/replay, Markdown/JSON reports, lawful retention limits | PRs 1–4 |
-| **6. v0.2 integration and acceptance** | Release-quality usable connected workflow | Real-company walkthrough, provider terms verification, resilient negative-case suite, snapshot replay, user trial, complete documentation and release signoff | PRs 1–5 |
-
-Keep **outcome-based** PR scope: combine related fixes/tests/docs in the same PR; never create one PR per helper or trigger redundant CI per micro-commit. Preserve CI and Codex review gates; substantial product choices get ADRs.
-
-### Deliberate v0.2 non-goals
-
-Hosted public SaaS, user sign-up and billing, global live market coverage, exchange redistribution licenses, large shared price database, multi-tenant authorization, cloud streaming infra, subscriptions, autonomous portfolio rebalancing, options/derivatives, order execution, AI-generated financial facts, automatic investment ratings or quantitative outperformance claims.
-
-## 9. v0.3 — Fundamental trends and comparative intelligence
-
-**User outcome:** compare compatible businesses and understand price/valuation context **as of a selected time**.
-
-- Period-aligned revenue/earnings/FCF/cash-conversion and balance-sheet analysis; explicit adjusted vs unadjusted conventions and issuer metric applicability.
-- Cross-company and cross-currency comparisons only with attributable FX timestamps, periods, inflation/reporting conventions where material.
-- Peer group and value-chain relationships (competitor/supplier/substitute) instead of thematic pseudo-peers; industry packs for software, semiconductors, industrials, utilities etc.
-- Add EV, FCF yield/DCF/reverse valuation methods when source definitions and debt/cash/share calculations can be validated. Inapplicable multiples remain N/A.
-- Track short-horizon market/catalyst signals separately from multi-year business trajectory and current-price underwriting.
-- Source-aware watchlists may be introduced as research collections, **not** investor holdings or trade recommendations.
-
-**Gate:** two to five supported peers analyzed with consistent price-time context; correct rejection of misleading comparisons and unknown data.
-
-## 10. v0.4 — Research updates and decision intelligence
-
-**User outcome:** “Since my saved thesis, did the price change, did fundamentals/estimates change, or did my assumptions change?”
-
-- Selective, permissioned refresh/polling (fundamentals/news/consensus), event reconciliation, as-of deltas and materiality thresholds.
-- Explain quote-driven vs earnings-driven vs consensus-driven valuation changes; never manufacture a new investment hypothesis solely due to market ticks.
-- Preserve earlier source vintages, methods and assumptions; explicit human-approved thesis revisions and change reasons.
-- Alerting or watchlist updates are **opt-in** and scoped to source licensing, cost and supported schedules. No mandatory background agent.
-
-**Gate:** reproduces prior research and explains real observed changes without hindsight contamination or silent provider shifts.
-
-## 11. v0.5 — Optional research UX and hosted deployment
-
-- Simple chart/table/document interface, visible source/freshness badges and scenario what-if controls. Test whether a lightweight local UI suffices before a full SPA.
-- Cloud-hosted multi-user operation is a **separate deployment decision**, gated on user demand, privacy/security design, broker-free account management and exchange/third-party data redistribution rights.
-- If entitled licensed sharing and viable costs are absent, offer self-hosted/BYOK instead of a public “free live quote” promise.
-- AI-generated drafting remains optional, provider-independent, subject to evaluation for missing citations and factual fidelity; deterministic calculations remain authoritative.
-
-**Gate:** usability validated with independent users; entitlement, cloud cost and user-data protection addressed before public hosting.
-
-## 12. v0.6+ quantitative research and hypothetical investment products
-
-Conditional future work only after historic universe, delistings, corporate actions, FX, survivorship, revision timestamps, benchmark alignment, transaction costs and out-of-sample validation are available with appropriate data rights.
-
-- Transparent factor research with predeclared rules and prospective paper portfolios, not post-hoc multibagger claims.
-- Report turnover, exposures, drawdowns, economic regimes and failure scenarios before any claim of alpha.
-- A strategy/index license, algorithmic ETF or mutual fund requires a separate business/regulatory plan and authorized partners. It is **not part of current InvestIQ development approval**.
-
-## 13. Product metrics, governance and risk
-
-**North-star:** share of new users who can generate a truthful, source-linked **current company research view** and deliberately save/reproduce one historical snapshot.
-
-**Product quality measures** (measured in tests or by opt-in feedback; never default telemetry):
-- Source/time attribution coverage: target **100% of official surfaced market prices and reported numeric claims**; real-time/delayed/EOD/unknown label visible.
-- Data freshness: provider-class policy adherence; no fresh label for expired or unsupported cache entries.
-- Current view vs saved thesis: deterministic calculation changes after input updates, **zero accidental history mutations**.
-- User experience: documented time-to-first-research flow, provider setup friction, fail-closed errors and recovery.
-- Economics: API requests per research workflow, cache hit rate by entitlement group, quota and cloud service costs **only where measured**.
-- Responsible research: no undocumented estimate interpolation, trading guarantees, unlicensed public data distribution or fabricated provider behavior.
-
-**Risk register**
-
-| Risk | Mitigation / owner decision |
-| --- | --- |
-| Real-time data costs and exchange rights | BYOK/self-host first, verify provider entitlements, mark delay, host only when commercially licensed |
-| Stale/incorrect price and after-hours sessions | Strict timestamps/session metadata, source-aware TTL, fail closed or display visibly stale data |
-| False comparability and corporate actions | Explicit units/currency/share-class/revision mapping and negative-case tests |
-| Vendor concentration | Small adapters, capability discovery, optional alternate provider with semantic consistency checks |
-| Look-ahead and corrupted research history | Public vs recorded timestamps, immutable input manifests, no implicit refresh during replay |
-| Privacy and secret leakage | No keys in repo, local private storage option, encrypted secure host store only after review |
-| Overengineering / infrastructure spend | Start direct API calls and in-process cache; add shared cache/cloud only on measured need |
-| AI hallucination and confident rankings | Evidence-linked drafts, semantic evaluation, deterministic arithmetic and human approval |
-
-**Governance:** this document is the **final agreed v2.0 architecture/product planning baseline**. Future roadmap changes require explicit review/ADR and subsequent PR; “final” does not mean future user findings cannot change priorities. No product implementation is implied by merging these documents.
-
-## 14. Immediate next action
-
-Start **v0.2 PR 1: provider-neutral contracts and architecture ADR**. Define and test quote timestamp/entitlement/freshness models, issuer/security mappings, provider capability/failure types, a separate current-view versus saved-research boundary and a selected-provider comparison matrix.
-
-**Do not** begin with SQLite-only persistence, a public web server, a streaming lakehouse or a new stock-scoring engine. First prove the live-or-delayed connected view and explicit history semantics, then add data providers and optional deployment components as needed.
-
----
-**References for source-evaluation candidates:** [SEC EDGAR API documentation](https://www.sec.gov/edgar/sec-api-documentation) · [Massive market-data APIs](https://massive.com/docs/) · [Financial Modeling Prep](https://site.financialmodelingprep.com/) · [OpenBB](https://docs.openbb.co/). Their availability, products, contracts and quotas must be verified at implementation time. **No paid data entitlement or global live market coverage is assumed.**
+**Review policy:** roadmap changes require PR and a product-decision record. Product defines problems/release gates; [engineering](../engineering/engineering-blueprint.md) defines implementation. Complete v0.2 PR/ADR/release facts remain historical. This planning proposal does not authorize public tag, hosted infrastructure, private-data upload or merge.
