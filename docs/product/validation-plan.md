@@ -7,7 +7,7 @@
 
 InvestIQ is **already open-source**, but its source release candidate is still developer-oriented. Validate usefulness with the original research user **first**, then validate whether independent investors can install/use it without developer assistance.
 
-- **Personal dogfood (v0.3–v0.6):** owner uses actual supported companies and scores the product against their current LLM+spreadsheets workflow; records errors, repeated prompting, sourced detail, coverage gaps, time saved and whether conclusions changed after correct data.
+- **Initial use validation (v0.3–v0.6):** an investor uses real supported companies and evaluates the workflow against an LLM and existing research tools; records errors, repeated prompting, sourced detail, coverage gaps, time saved and whether conclusions changed after correct data.
 - **Personal repeat use (v0.7–v0.8):** user revisits tracked hypotheses across real filings/price changes, sees relevant material deltas and optionally uses private portfolio context.
 - **External OSS beta (v0.9):** small independent group configures, uses, evaluates, exports and attempts to extend the same supported code with their own watchlists and data.
 - **v1.0 gate:** stable installation, end-to-end research tasks, maintained schemas/security/permission constraints and observed repeat engagement; not arbitrary GitHub star counts or feature checklist alone.
@@ -16,7 +16,7 @@ InvestIQ is **already open-source**, but its source release candidate is still d
 
 | Task | Existing-workflow pain | Expected product value | First milestone |
 | --- | --- | --- | --- |
-| Deep analyze supported AI infrastructure business | Repeated source collection and prompts, stale quotes, weak historical continuity | One bounded, cited AI/finance research flow with risks and explicit data gaps | v0.3 |
+| Analyze a supported listed company | Repeated source collection and prompts, stale quotes, weak historical continuity | One bounded, cited AI/finance research flow with risks and explicit data gaps | v0.3 |
 | Compare economically different AI subsegments | Misleading single PE/score and subjective comparable lists | Explain cross-layer exposure, comparable KPIs and inappropriate comparison cases | v0.4 |
 | Rank a theme/industry universe | Manually updated large spreadsheet, opaque weights and rank instability | Versioned factor methods, dated coverage, uncertainty and sensitivity | v0.5 |
 | Test valuation/entry price | Return scenarios manually recalculated using approximate forward EPS and assumed terminal multiples | Transparent exact, dated reverse underwriting with explicit conditional limits | v0.6 |
@@ -30,7 +30,7 @@ For each product milestone record **research session date, qualified instrument,
 
 Do not silently turn this personal log into a persistent cloud service or require sending private holdings to an LLM. Publish sanitized issue summaries with synthetic or permitted fixtures only.
 
-**Proposed personal success criteria (qualitative until baseline):** the owner independently chooses InvestIQ rather than repeatedly returning to ChatGPT plus manual spreadsheet assembly for at least the bounded supported job; major numeric/source errors are absent and unsupported-data warnings are credible. Record failures openly. No performance/accuracy threshold invented before tests.
+**Proposed initial-use success criteria (qualitative until baseline):** an initial investor voluntarily prefers InvestIQ over general-purpose AI prompting and manual research assembly for a bounded supported task; major numeric/source errors are absent and unsupported-data warnings are credible. Record failures openly. No performance/accuracy threshold invented before tests.
 
 ## 4. Matched-task comparison with alternatives
 
