@@ -1,12 +1,12 @@
-# InvestIQ Architecture — Connected Research, Reproducible Decisions
+# InvestIQ Architecture — AI-First Research on a Trusted Financial Core
 
-> **Current implementation:** v0.1.1 portable Python core and synthetic offline CLI.
+> **Current implementation:** v0.2.0 source release candidate: portable Python core, opt-in BYOK connected CLI, constrained annual facts, deliberate rights-aware snapshots and offline replay. **No shipped LLM agent or consumer UI.**
 >
-> **Approved target direction (not yet built):** provider-agnostic connected investment data, freshness-aware access and optional caching; explicit, immutable research snapshots stored locally **or** in a properly governed cloud service. See [Product Roadmap v2.0](../product/product-roadmap.md) and [ADR 0003](../decisions/0003-connected-data-and-research-history.md).
+> **Proposed v0.3 direction (not built):** an accessible AI-first, source-grounded investment research journey with bounded model tools, reliable deterministic math, critical thesis challenge and explicit private-history control. Existing provider rights/freshness/snapshot contracts remain mandatory. See [Roadmap v3.0](../product/product-roadmap.md), [v0.3 PRD](../product/ai-research-experience.md), [ADR 0009](../decisions/0009-ai-first-product-pivot.md) and historical [ADR 0003](../decisions/0003-connected-data-and-research-history.md).
 
 Engineering practices for these boundaries are defined by the [Engineering Blueprint](../engineering/engineering-blueprint.md). It is a policy for future work, not evidence that conditional tooling or services already exist.
 
-## 1. Current implemented modules (v0.1.1)
+## 1. Implementation history and actual v0.2 baseline
 
 ```text
 src/investiq_core/
@@ -22,19 +22,19 @@ skills/
 tests/           Public synthetic and negative-case automated tests
 ```
 
-There is **no live/delayed price provider, cloud cache, cloud database, web UI or live-data ingestion capability in v0.1.1**. Do not interpret this target description as deployed functionality.
+**Historical note:** The preceding v0.1.1 tree is preserved for release history. The cumulative v0.2 source described below **does** add opt-in provider adapters, connected analysis and rights-aware private snapshots. None of that establishes live-provider entitlement, a public hosted feed or an AI consumer research application. Each PR subsection describes the state **at that PR**, not the complete final v0.2 state.
 
-### v0.2 PR 1 domain contracts (implemented; adapters still planned)
+### v0.2 PR 1 domain contracts (implemented; historical stage)
 
 `market.py` defines issuer-to-listing lineage, sourced quotes, quote timeliness, reuse rights and caller-policy freshness. `fundamentals.py` contains filing references and a narrow financial metric catalog. `ports.py` declares optional-provider capabilities, requests and categorized failures using async Protocol interfaces. None of these modules makes network requests or grants market-data entitlements. See [ADR 0004](../decisions/0004-provider-neutral-data-contracts.md) and [connected data contracts](../methodology/connected-data-contracts.md).
 
 ### v0.2 PR 2 adapters (implemented, opt-in)
 
-`adapters/sec_edgar.py` lists recent SEC submissions by explicit CIK; `adapters/twelve_data.py` fetches a BYOK, venue-verified minute-candle CLOSE price with **UNKNOWN** plan timeliness and default-denied reuse. `adapters/_http.py` provides bounded, no-redirect HTTPS JSON transport and synthetic-test injection. No provider calls occur at import. **No cache, account management, financial-statement mapper, saved research workflow, or public hosted service has been added.** See [ADR 0005](../decisions/0005-provider-selection.md) and [provider setup/limitations](../methodology/provider-adapters.md).
+`adapters/sec_edgar.py` lists recent SEC submissions by explicit CIK; `adapters/twelve_data.py` fetches a BYOK, venue-verified minute-candle CLOSE price with **UNKNOWN** plan timeliness and default-denied reuse. `adapters/_http.py` provides bounded, no-redirect HTTPS JSON transport and synthetic-test injection. No provider calls occur at import. **At PR 2,** cache, Companyfacts normalization and snapshots were not yet integrated; the subsequent PRs added those constrained capabilities. A public hosted service and account management are still absent. See [ADR 0005](../decisions/0005-provider-selection.md) and [provider setup/limitations](../methodology/provider-adapters.md).
 
 ### v0.2 PR 3 connected source orchestration (implemented)
 
-`application/connected_data.py` provides on-demand quote and filing use cases, source-age validation, bounded retry policy and rights-aware in-process quote caching. The cache is **disabled for provider responses without explicit caching rights**, including the currently integrated Twelve Data adapter. `QuoteCachePort` is a future shared cache contract, not a hosted implementation. No XBRL financial-data normalization, company valuation workflow, historical thesis store or frontend has been added. See [ADR 0006](../decisions/0006-connected-data-service.md) and [usage](../methodology/connected-data-service.md).
+`application/connected_data.py` provides on-demand quote and filing use cases, source-age validation, bounded retry policy and rights-aware in-process quote caching. The cache is **disabled for provider responses without explicit caching rights**, including the currently integrated Twelve Data adapter. `QuoteCachePort` is a future shared cache contract, not a hosted implementation. **At PR 3,** Companyfacts mapping, valuation and snapshot storage were not yet added; PRs 4–6 subsequently implemented the limited connected analysis and snapshot workflows described below. No frontend was added. See [ADR 0006](../decisions/0006-connected-data-service.md) and [usage](../methodology/connected-data-service.md).
 
 ### v0.2 PR 4 connected issuer analysis (implemented; constrained)
 
@@ -48,31 +48,29 @@ There is **no live/delayed price provider, cloud cache, cloud database, web UI o
 
 `connected_cli.py` and the legacy-compatible `cli.py` provide an explicit, user-supplied listing/CIK research command and a network-free saved-decision replay command. Importing CLI code and running the synthetic demo never starts network calls. `tests/test_release_acceptance.py` exercises actual SEC/quote adapters with injected synthetic HTTP and the full CLI save/replay sequence. Real provider entitlements are **not** validated by fake HTTP. See [connected CLI guide](../methodology/connected-cli.md) and [release acceptance](../engineering/release-acceptance-v0.2.md).
 
-## 2. Target logical components
+## 2. Target AI-first logical architecture (v0.3 — not deployed)
 
-```text
- CLI | optional Web / API | portable AI research skills
-                        |
-                Research application
-                   /          \
-                  v            v
-        Current research     Saved decision/replay
-              view                 |
-                  |                 v
-         Data access facade     Snapshot repository
-          + normalization     (local or cloud adapter)
-                  |                 |
-          Source freshness       Immutable versions
-          and entitlement        source/input manifests
-                  |
-    Provider quote/fundamental/news adapters
-                  |
-    Optional bounded in-process / shared cache
-                  |
-           Entitled market providers
-```
+**Top-down investor journey:** Natural-language investment question or supported company search → qualified issuer/security selection → bounded AI research orchestration → entitled dated evidence and deterministic calculations → integrated answer with source drill-down, strongest counterargument and data gaps → explicit user-controlled decision save.
 
-**Source of current data:** provider API/stream and its entitlement, never a private copy presumed current. **Source of historical decision:** saved, versioned research evidence and assumptions, never a silently refreshed quote.
+**Execution and trust boundaries:**
+
+1. **UI or assistant-native integration (planned):** simple question entry, responsive answer and scenario controls, source timing, uncertainty, consent and research-save actions. No mandatory CIK/API key/CLI for a supported nontechnical consumer flow.
+2. **ResearchTask / bounded coordinator (planned):** choose narrow allowlisted tools, operate within step/time/token/API budgets, return typed success/partial/error outputs, and never treat external text as commands.
+3. **Existing financial core (v0.2):** issuer identity, permitted data adapters, source freshness/entitlements, qualified fundamentals, deterministic valuation and research-report/thesis contracts. Domain logic never calls the LLM.
+4. **Claims and thesis challenge (planned):** checked source IDs, time/currency semantics, semantic evidence faithfulness and specific falsifiable bear-case reasoning; a cited ID alone is not enough.
+5. **Research continuity:** existing **explicit, immutable, rights-aware** historical snapshots remain separate from transient current quotations. v0.4 may introduce opt-in investor context and material-change monitoring only after v0.3 validation.
+
+**Runtime distribution not decided:** Test a thin standalone task UI against an assistant/skill/MCP integration using the same core tools. Cloud identity, shared licensed cache, relational storage and encryption controls are required if hosted user data make them necessary; no assumed free global real-time feed. Avoid queues, microservices, complex agents and vector infrastructure without demonstrated use.
+
+### Planned boundary contracts
+
+| Boundary | Purpose | Must not do |
+| --- | --- | --- |
+| ResearchTask and UI | Typed question, supported instrument resolution, as-of scope, user approvals and evidence/status rendering | Require developers' setup or hide ambiguous securities |
+| AI orchestration tools | Allowlisted identity, sourced retrieval, deterministic analysis, scenario follow-ups, challenge and deliberate save | Make up quotes, perform authoritative free-form calculations, execute trades or bypass consent |
+| Semantic evidence check | Material source-to-claim support, numerical/time/issuer fidelity, missing and conflicting sources | Claim semantic certainty from citation ID validation |
+| Financial domain core | Stable, versioned evidence/calculations and licensed-source controls | Depend on model SDKs, browsers or provider network logic |
+| Optional investor context (v0.4) | Private approved watchlists/preferences, saved thesis-delta evidence and deletion/export | Continuously collect private holdings or rewrite prior theses |
 
 ## 3. Module boundaries
 
@@ -85,7 +83,7 @@ There is **no live/delayed price provider, cloud cache, cloud database, web UI o
 | `research/valuation` | deterministic calculations on qualified inputs | Fetching live quotes during math |
 | `research/snapshot` (planned) | deliberate save/replay, immutable research decisions and version manifests | Capturing every tick |
 | `storage/*` (planned) | adapter for user-controlled durable snapshots | Becoming an exchange-data redistribution backend |
-| `interface/*` | CLI, export and optional later web/AI integration | Duplicating financial domain logic |
+| `interface/*` | Existing CLI/export; **planned v0.3 AI/task UI or assistant integration** | Duplicating financial calculations or hiding provider/model uncertainty |
 
 ### Distinct record types
 
@@ -125,4 +123,4 @@ There is **no live/delayed price provider, cloud cache, cloud database, web UI o
 - Confirm API quota costs, identity corrections, corporate actions, user session/timezone changes, outages and missing observations with deterministic negative-case tests.
 - Preserve architecture-level contract tests and v0.1 synthetic offline regression suite. A docs-only plan does not change the released API behavior.
 
-**Architectural development starts at the source/price contract, not a local database, streaming bus, website or market-scoring model.**
+**The v0.2 source/price contract exists. v0.3 architecture now starts at a validated, safe, accessible investor task and bounded research-tool boundary — not another platform-first backend expansion.**
