@@ -14,9 +14,6 @@
   let aiGeneration = 0;
   let scenarioGeneration = 0;
   let questionHistory = [];
-  let privateHistoryEnabled = false;
-  let lastValidatedHypothesis = null;
-  let openedPrivateDecision = null;
   let selectionVersion = 0;
   let evidenceVersion = 0;
   let searchVersion = 0;
@@ -36,6 +33,7 @@
     evidenceVersion += 1;
     searchVersion += 1;
     selected = null;
+    document.dispatchEvent(new Event("investiq:issuer-cleared"));
     $("research-select").hidden = true;
     $("connected-output").hidden = true;
     $("filing-evidence-panel").hidden = true;
@@ -129,6 +127,10 @@
         selectionVersion += 1;
         evidenceVersion += 1;
         selected = company;
+        document.dispatchEvent(new CustomEvent("investiq:issuer-selected", {
+          detail: { symbol: company.symbol, venue: company.venue,
+            cik: company.cik, currency: company.currency_candidate, company: company.company }
+        }));
         for (const choice of container.querySelectorAll("button")) {
           choice.classList.remove("candidate-selected");
         }
@@ -207,11 +209,9 @@
       csrf = session.csrf;
       setConfigured(session.configured, session.quote_configured);
       setModelConfigured(session.model_configured, session.model_name);
-      privateHistoryEnabled = session.private_history_enabled === true;
-      $("history-status").textContent = privateHistoryEnabled ? "Local store enabled" : "History disabled";
-      $("decision-save-panel").hidden = !privateHistoryEnabled;
-      $("decision-list-panel").hidden = !privateHistoryEnabled;
-      if (privateHistoryEnabled) await refreshPrivateHistory();
+      document.dispatchEvent(new CustomEvent("investiq:session-ready", {
+        detail: { csrf, privateHistoryEnabled: session.private_history_enabled === true }
+      }));
       status("setup-message", session.configured ?
         "Provider credentials are configured in server memory." :
         "Configure your own provider credentials to begin connected research.");
@@ -599,6 +599,7 @@
   $("scenario-form").addEventListener("input", () => {
     scenarioGeneration += 1;
     $("scenario-results").hidden = true;
+    document.dispatchEvent(new Event("investiq:scenario-invalidated"));
     status("scenario-message", "Assumptions changed. Recalculate to view new outcomes.");
   });
 
@@ -711,6 +712,9 @@
         return;
       }
       renderHypothetical(result);
+      document.dispatchEvent(new CustomEvent("investiq:scenario-calculated", {
+        detail: { inputs: result.inputs }
+      }));
       status("scenario-message", "Hypothetical outcomes recalculated; no data was saved.");
     } catch (error) {
       if (generation === scenarioGeneration && selection === selectionVersion) {
