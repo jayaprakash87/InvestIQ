@@ -27,7 +27,6 @@ from investiq_core.ports import (
     QuoteRequest,
 )
 
-
 NOW = datetime(2026, 10, 27, 16, tzinfo=UTC)
 EVENT = datetime(2026, 10, 26, 15, tzinfo=UTC)
 KEY = "SYNTHETIC-DO-NOT-USE"
