@@ -325,7 +325,7 @@ def test_entire_local_research_journey_with_purposeful_save_and_no_provider_leak
 
 
 def test_fabricated_model_citation_fails_at_http_boundary_without_saving(research_desk):
-    port, directory, filing, fundamentals, model, private, access_code = research_desk
+    port, directory, filing, fundamentals, model, private, _access_code = research_desk
     cookie, csrf, _ = authenticated(port)
     assert send(port, "/api/v1/session/configure", {
         "sec_contact": "InvestIQ Test researcher@example.org",
