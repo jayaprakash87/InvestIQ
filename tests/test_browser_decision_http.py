@@ -197,6 +197,60 @@ def test_history_requires_cookie_csrf_origin_and_declared_folder(app):
     assert catalog.calls == 0
 
 
+def test_second_local_http_session_cannot_read_or_export_private_decisions(app):
+    port, _, catalog, code = app
+    owner_cookie, owner_csrf, owner_status = session(port)
+    other_cookie, other_csrf, other_status = session(port)
+    assert owner_cookie != other_cookie
+    assert owner_status["private_history_unlocked"] is False
+    assert other_status["private_history_unlocked"] is False
+    assert code not in json.dumps(owner_status)
+    assert code not in json.dumps(other_status)
+    assert request(port, "/api/v1/decisions/unlock", {
+        "code": code,
+    }, owner_cookie, owner_csrf)[0] == 200
+    assert request(port, "/api/v1/session/configure", {
+        "sec_contact": "Research support@example.org", "twelve_data_api_key": "",
+    }, owner_cookie, owner_csrf)[0] == 200
+    assert request(port, "/api/v1/companies/search", {
+        "query": "EXM",
+    }, owner_cookie, owner_csrf)[0] == 200
+    assert request(port, "/api/v1/decisions/save", save_payload(),
+                   owner_cookie, owner_csrf)[0] == 200
+    for path, data in (
+        ("/api/v1/decisions/list", {}),
+        ("/api/v1/decisions/open", {
+            "thesis_id": "fictional_industries", "revision": 1
+        }),
+        ("/api/v1/decisions/export", {
+            "thesis_id": "fictional_industries", "revision": 1, "format": "json"
+        }),
+        ("/api/v1/decisions/save", save_payload()),
+    ):
+        response = request(port, path, data, other_cookie, other_csrf)
+        assert response[0] == 403
+        assert "unit economics" not in json.dumps(response)
+    assert request(port, "/api/v1/decisions/unlock", {
+        "code": "wrong-private-code"
+    }, other_cookie, other_csrf)[0] == 403
+    assert request(port, "/api/v1/decisions/list", {},
+                   other_cookie, other_csrf)[0] == 403
+    assert request(port, "/api/v1/decisions/list", {},
+                   owner_cookie, owner_csrf)[2]["snapshots"][0]["revision"] == 1
+    assert catalog.calls == 1
+
+
+def test_private_history_code_rotates_on_app_restart(tmp_path):
+    first = LocalConnectedResearch(decision_dir=tmp_path / "private")
+    second = LocalConnectedResearch(decision_dir=tmp_path / "private")
+    assert first.history_access_code
+    assert second.history_access_code
+    assert first.history_access_code != second.history_access_code
+    assert first.history_access_code not in str(first.session_status(
+        first.session(None, create=True)[1]
+    ))
+
+
 def test_history_disabled_does_not_create_any_unrequested_files(tmp_path):
     service = LocalConnectedResearch()
     assert service.history_available() is False
