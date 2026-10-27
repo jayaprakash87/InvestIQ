@@ -1,36 +1,36 @@
-# InvestIQ Product Scope
+# InvestIQ — Product Scope and User Journey
 
-> **Status:** Aligned to proposed [Product Strategy & Roadmap v3.0](product-roadmap.md) · **Date:** 2026-10-27
-> **Current code:** v0.2.0 source release candidate; independent real-provider smoke and public release authorization remain outstanding.
-> **Next product hypothesis:** v0.3 **AI Research Experience**, not another developer-first analytics release.
+> **Proposed alignment:** [Product Strategy & Roadmap v3.0 through v1.0](product-roadmap.md) · **Date:** 2026-10-27
+> **Research basis:** [Existing investment research requirements](research-foundations.md)
+> **Current code:** v0.2.0 source release candidate; connected API rights/provider smoke and public tag approval remain separate gates.
 
-## Mission and intended user
+## Mission
 
-Help a serious self-directed equity investor move from **question → sourced research → strongest challenge → deliberate thesis → subsequent reassessment** with substantially less manual prompting and clerical reconciliation. User-facing tools must be accessible without CLI, CIK/MIC, BYOK configuration or JSON knowledge for a supported consumer workflow. Developers retain the portable open-source Python library.
+Create an **AI-first, open-source, local-first equity investment research workspace** that the original researcher actually uses, then make it usable by anyone with an authorized provider/model configuration within supported coverage. Its primary job is to **discover and evaluate companies, compare meaningful peers, underwrite valuation and entry conditions, document a falsifiable investment thesis, and revisit new evidence** with far less manual prompting and spreadsheet reconciliation.
 
-The competitive advantage is a hypothesis to **test** against a general LLM and existing investment research services, not a feature-based claim.
+**AI coordinates research; sourced tools retrieve market/filing facts; deterministic functions calculate; the investor decides.** This is neither a generic chatbot nor an automated stock adviser/brokerage.
 
-## What currently exists (v0.2 source)
+## User and release strategy
 
-- Portable Python domain calculations, attributed financial observations, type/rights/time contracts, reproducible synthetic offline CLI, five portable **instruction-only** AI skills and hash-linked history.
-- Opt-in connected research: SEC annual US-GAAP facts and Twelve Data BYOK minute-candle CLOSE quote for explicitly verified issuer and listing; unknown plan timeliness remains unknown.
-- Rights-gated private snapshots; prices without confirmed retention permission and their derivatives are not stored/replayed. No user accounts, web UI, model-powered research agent, automatic search, monitoring, portfolio or returns predictor.
-- Live-provider rights/smoke are manual gates; synthetic CI is **not** provider/economic proof.
+1. **v0.3 personal first:** usable local task UI, guided provider/model setup or no-key synthetic demo, integrated sourced research, specific bear case and explicit private thesis save for a limited supported US-accounting universe.
+2. **v0.4–v0.6 analytical depth:** company economics, financial trends/peers, research universes and explainable scores, transparent return-hurdle/entry sensitivity.
+3. **v0.7–v0.8 personal continuity:** opt-in watchlists, material changes, versioned research, optional private portfolio concentration/risks and multi-currency when supported.
+4. **v0.9–v1.0 external ready:** independently installable and usable open-source product, documented supported markets/providers, safely replaceable personal context, scenario/workspace export, stable contracts and actual external tests.
 
-## Next intended outcome: v0.3
+The repository is already public and MIT-licensed. **External-use readiness is a usability/quality achievement, not a business-model conversion or postponement of open source.**
 
-A nontechnical user selects a **supported** equity or asks a natural-language question; InvestIQ's **planned** model-neutral, bounded orchestrator invokes sourced tools and deterministic calculations to generate an integrated evidence-supported research answer with a specific counter-thesis, explicit information gaps, traceable source drill-down and responsive interactive experience. Follow-ups and scenarios remain grounded; saved theses are explicitly approved and source-rights-aware.
+## Actual v0.2 source release candidate
 
-**Must prove:** low-friction task completion, source/financial reliability, usefulness versus general LLM/incumbent tools, AI privacy and cost/security guardrails. See [v0.3 PRD](ai-research-experience.md) and [validation](validation-plan.md).
+Implemented: portable Python research/valuation/evidence primitives; five *instruction-only* AI skill files; synthetic offline CLI; SEC US-GAAP annual Companyfacts plus Twelve Data BYOK minute-candle quote; issuer listing/rights/freshness contracts; limited sourced analysis; user-triggered, rights-aware private immutable snapshots/replay.
 
-## Later (conditionally validated) capabilities
+Not implemented: AI/LLM runtime, local/browser task UI, stock lookup wizard, company/peer full financial trends, research universes/rankings, DCF/entry threshold engine, alerts, portfolios, model claim-to-source semantic evaluation or multiuser hosted service. Provider-plan timeliness and ability to retain quotes remain UNKNOWN without independent rights confirmation.
 
-- **v0.4:** opt-in investor preferences, watchlists, durable research memory, material change explanation, safe opt-in monitoring.
-- **v0.5:** company discovery, trend/peer analytics, research rankings where inputs, evaluation and limitations support them.
-- **v0.6+:** voluntary portfolio-context scenarios and evidence-backed quantitative experimentation only after required permissions, security and methodology.
+## Non-negotiable boundaries
 
-## Out of scope / principles
+- Provider API is the present-price/facts source, with explicit timestamps, delay/session, fiscal periods, currency, share class, changes and gaps. Local research history is **not** a static current data feed.
+- Save research and any user positions only with explicit informed permission and lawful input retention; omit restricted quote-derived results from offline replay.
+- Open-source core/app must work locally without a centralized InvestIQ account; authentic provider/model access **may require BYOK, payment or a validated local alternative**, always disclosed. No-key demo uses only synthetic data.
+- Personal holdings, account credentials, prior workbook prices or subjective stock-buy recommendations are never embedded in public fixtures or defaults.
+- No guarantee of global data coverage, investment gains, stock-selection accuracy, personalized trade instructions, trade execution, brokerage account management or licensed hosted redistribution.
 
-No automatic trade execution, unsupported investment recommendations, guaranteed outperformance, unlicensed feed redistribution, default capture of private holdings, fabricated forecasts or silent changes to saved decisions. Current market facts come from legally permitted provider calls, not local stale copies. Historical thesis history is immutable, permissioned and separate. Actual hosting/distribution remains conditional and may be **assistant-native instead of standalone**.
-
-Historical v0.1/v0.2 source behavior and release notes are unchanged by this scope document.
+See the [full roadmap](product-roadmap.md) for releases and v1.0 exit checklist, the [v0.3 PRD](ai-research-experience.md), and [validation plan](validation-plan.md).
