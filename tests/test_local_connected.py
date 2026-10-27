@@ -433,6 +433,8 @@ def test_filing_browser_avoids_html_injection_and_stale_company_evidence():
     assert "filing-evidence" in js
     assert "textContent" in js
     assert "generation !== selectionVersion" in js
+    assert "topicRequest !== evidenceVersion" in js
+    assert '!$("confirm-listing").checked' in js
     assert "selected !== candidate" in js
 
 
