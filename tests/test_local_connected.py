@@ -99,6 +99,21 @@ class FakeFilingEvidence:
         }
 
 
+class FakeAiResearch:
+    def __init__(self):
+        self.calls = []
+
+    async def run(self, **kwargs):
+        self.calls.append(kwargs)
+        return {
+            "mode": "ai_assisted_sec_limited_not_verified",
+            "model_executed": True,
+            "analysis": {"overview": "Fixture SEC analysis", "findings": [],
+                         "bear_case": {}, "open_questions": []},
+            "source_records": {}, "disclosures": ["AI is not verified."],
+        }
+
+
 @dataclass
 class Harness:
     port: int
@@ -106,6 +121,7 @@ class Harness:
     directory: FakeDirectoryTransport
     research: FakeResearchService
     evidence: FakeFilingEvidence
+    ai: FakeAiResearch
     server: object
 
 
@@ -114,16 +130,18 @@ def harness():
     directory = FakeDirectoryTransport()
     research = FakeResearchService()
     evidence = FakeFilingEvidence()
+    ai = FakeAiResearch()
     connected = LocalConnectedResearch(
         directory_transport=directory,
         research_factory=lambda contact, key: research,
         evidence_factory=lambda contact: evidence,
+        ai_coordinator=ai,
     )
     server = create_app_server(0, connected=connected)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
-        yield Harness(server.server_port, connected, directory, research, evidence, server)
+        yield Harness(server.server_port, connected, directory, research, evidence, ai, server)
     finally:
         server.shutdown()
         thread.join(timeout=4)
@@ -261,7 +279,8 @@ def test_connected_search_and_research_requires_confirmation_and_is_unsaved(harn
     code, _, configured = configure(harness, cookie, csrf)
     assert code == 200
     assert configured == {
-        "configured": True, "credentials_persisted": False, "network_called": False
+        "configured": True, "quote_configured": True,
+        "credentials_persisted": False, "network_called": False
     }
     code, _, payload = request(
         harness, "POST", "/api/v1/companies/search", {"query": "EXM"},
@@ -436,6 +455,126 @@ def test_filing_browser_avoids_html_injection_and_stale_company_evidence():
     assert "topicRequest !== evidenceVersion" in js
     assert '!$("confirm-listing").checked' in js
     assert "selected !== candidate" in js
+
+
+def test_ai_requires_model_key_explicit_consent_and_confirmed_sec_issuer(harness):
+    cookie, csrf, _, _ = initialize(harness)
+    selection = {
+        "symbol": "EXM", "venue": "XNAS", "cik": "0000012345",
+        "currency": "USD", "confirm_current_listing": True,
+        "confirm_currency": True,
+        "question": "Which business risks are described?",
+        "consent_external_sec_data": True,
+    }
+    assert request(
+        harness, "POST", "/api/v1/research/ai", selection,
+        cookie=cookie, csrf=csrf,
+    )[0] == 403
+    assert configure(harness, cookie, csrf)[0] == 200
+    assert request(
+        harness, "POST", "/api/v1/research/ai", selection,
+        cookie=cookie, csrf=csrf,
+    )[0] == 403
+    model_key = "private-test-model-key"
+    status_code, _, setup = request(
+        harness, "POST", "/api/v1/model/configure",
+        {"model_api_key": model_key, "model": "gpt-4.1-mini"},
+        cookie=cookie, csrf=csrf,
+    )
+    assert status_code == 200
+    assert setup["model_configured"] is True
+    assert model_key not in json.dumps(setup)
+    assert request(
+        harness, "POST", "/api/v1/research/ai", selection,
+        cookie=cookie, csrf=csrf,
+    )[0] == 400
+    assert request(
+        harness, "POST", "/api/v1/companies/search",
+        {"query": "EXM"}, cookie=cookie, csrf=csrf,
+    )[0] == 200
+    for bad in (
+        {**selection, "consent_external_sec_data": False},
+        {**selection, "confirm_currency": False},
+        {**selection, "cik": "0000012346"},
+        {**selection, "currency": "EUR"},
+        {**selection, "question": "x" * 500},
+    ):
+        assert request(
+            harness, "POST", "/api/v1/research/ai", bad,
+            cookie=cookie, csrf=csrf,
+        )[0] == 400
+    assert harness.ai.calls == []
+    code, _, outcome = request(
+        harness, "POST", "/api/v1/research/ai", selection,
+        cookie=cookie, csrf=csrf,
+    )
+    assert code == 200
+    assert outcome["model_executed"] is True
+    assert harness.ai.calls[0]["cik"] == "0000012345"
+    assert harness.ai.calls[0]["model_key"] == model_key
+    assert model_key not in json.dumps(outcome)
+    code, _, cleared = request(
+        harness, "POST", "/api/v1/model/clear", {},
+        cookie=cookie, csrf=csrf,
+    )
+    assert code == 200
+    assert cleared["model_configured"] is False
+    assert request(
+        harness, "POST", "/api/v1/research/ai", selection,
+        cookie=cookie, csrf=csrf,
+    )[0] == 403
+
+
+def test_sec_only_session_needs_no_twelve_data_key_for_ai(harness):
+    cookie, csrf, _, _ = initialize(harness)
+    code, _, configured = request(
+        harness, "POST", "/api/v1/session/configure",
+        {"sec_contact": "InvestIQ Test research@example.com",
+         "twelve_data_api_key": ""},
+        cookie=cookie, csrf=csrf,
+    )
+    assert code == 200
+    assert configured["configured"] is True
+    assert configured["quote_configured"] is False
+    assert request(
+        harness, "POST", "/api/v1/companies/search",
+        {"query": "EXM"}, cookie=cookie, csrf=csrf,
+    )[0] == 200
+    assert request(
+        harness, "POST", "/api/v1/research/connected",
+        {"symbol": "EXM", "venue": "XNAS", "cik": "0000012345",
+         "currency": "USD", "confirm_current_listing": True,
+         "confirm_currency": True, "max_quote_age_minutes": 120},
+        cookie=cookie, csrf=csrf,
+    )[0] == 403
+    assert request(
+        harness, "POST", "/api/v1/model/configure",
+        {"model_api_key": "private-test-model-key", "model": "gpt-4.1-mini"},
+        cookie=cookie, csrf=csrf,
+    )[0] == 200
+    assert request(
+        harness, "POST", "/api/v1/research/ai",
+        {"symbol": "EXM", "venue": "XNAS", "cik": "0000012345",
+         "currency": "USD", "confirm_current_listing": True,
+         "confirm_currency": True, "consent_external_sec_data": True,
+         "question": "What are the significant risks?"},
+        cookie=cookie, csrf=csrf,
+    )[0] == 200
+    assert harness.research.calls == []
+
+
+def test_ai_browser_does_not_render_untrusted_html_or_stale_results():
+    from importlib.resources import files
+
+    js = files("investiq_core").joinpath("web", "connect.js").read_text(
+        encoding="utf-8"
+    )
+    assert "innerHTML" not in js
+    assert "textContent" in js
+    assert "generation !== aiGeneration" in js
+    assert "consent_external_sec_data" in js
+    assert '$("ai-consent").checked = false' in js
+    assert "validatedSecLink" in js
 
 
 def test_app_does_not_require_connection_for_existing_synthetic_demo(harness):

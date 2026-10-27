@@ -163,6 +163,24 @@ def test_injected_full_inspection_is_dated_attributable_and_not_ai():
     assert HTML not in str(result)  # No full filing body returned
 
 
+def test_ai_topic_aggregates_bounded_unique_passages_in_one_filing_request():
+    meta, html = JsonFixture(), HtmlFixture()
+    provider = SecFilingEvidenceProvider(
+        user_agent="InvestIQ Research research@example.org",
+        json_transport=meta, html_transport=html, min_interval_seconds=0.2,
+    )
+    result = run(provider, "all")
+    assert result["topic"] == "all"
+    assert len(result["passages"]) <= 6
+    ids = [passage["evidence_id"] for passage in result["passages"]]
+    assert len(ids) == len(set(ids))
+    assert {passage["topic"] for passage in result["passages"]} <= {
+        "business", "risks", "management"
+    }
+    assert len(meta.calls) == 1
+    assert len(html.calls) == 1
+
+
 def test_no_supported_recent_10k_surfaces_gap_not_fabrication():
     metadata = {
         **METADATA,

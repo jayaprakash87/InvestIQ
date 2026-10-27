@@ -282,7 +282,7 @@ class SecFilingEvidenceProvider:
         self._delay = min_interval_seconds
 
     async def inspect(self, issuer: IssuerId, *, topic: str) -> dict[str, Any]:
-        if topic not in _TOPIC_WORDS:
+        if topic not in _TOPIC_WORDS and topic != "all":
             raise ValueError("Unknown document research topic")
         if issuer.namespace != "SEC_CIK" or re.fullmatch(r"[0-9]{10}", issuer.value) is None:
             raise ValueError("Expected normalized SEC issuer CIK")
@@ -311,7 +311,19 @@ class SecFilingEvidenceProvider:
             raise translate_error("SEC EDGAR", exc) from None
         try:
             text = extract_filing_text(html)
-            passages = select_passages(text, topic=topic, accession=doc.accession)
+            if topic == "all":
+                # One bounded filing download serves all three research angles.
+                # Deduplicate passages, preserving the first selected topic.
+                selected = {}
+                for candidate_topic in ("business", "risks", "management"):
+                    for item in select_passages(
+                        text, topic=candidate_topic, accession=doc.accession,
+                        max_passages=2,
+                    ):
+                        selected.setdefault(item.evidence_id, item)
+                passages = tuple(selected.values())[:6]
+            else:
+                passages = select_passages(text, topic=topic, accession=doc.accession)
         except (ValueError, TypeError):
             raise ProviderFailure(
                 "SEC EDGAR", ProviderFailureCode.INVALID_RESPONSE,

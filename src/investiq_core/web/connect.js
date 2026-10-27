@@ -9,6 +9,9 @@
   let csrf = null;
   let selected = null;
   let configured = false;
+  let quoteConfigured = false;
+  let modelConfigured = false;
+  let aiGeneration = 0;
   let selectionVersion = 0;
   let evidenceVersion = 0;
   let searchVersion = 0;
@@ -20,8 +23,9 @@
   };
 
   function status(id, value) { $(id).textContent = value; }
-  function setConfigured(value) {
+  function setConfigured(value, quotes = false) {
     configured = Boolean(value);
+    quoteConfigured = Boolean(quotes);
     // Rotate selection version when credentials/entitlements are changed.
     selectionVersion += 1;
     evidenceVersion += 1;
@@ -33,10 +37,22 @@
     $("filing-result").hidden = true;
     $("company-results").replaceChildren();
     $("search-button").disabled = !configured;
+    $("research-button").disabled = !quoteConfigured;
+    $("ai-run-button").disabled = !configured || !modelConfigured;
     $("provider-status").textContent = configured ? "Session configured" : "Not configured";
     $("nav-connection-state").textContent = configured ? "Configured" : "Not configured";
-    if (!configured) {
-    }
+    if (!configured) setModelConfigured(false);
+    aiGeneration += 1;
+    $("ai-result").hidden = true;
+  }
+
+  function setModelConfigured(value, model) {
+    modelConfigured = Boolean(value);
+    $("nav-model-state").textContent = modelConfigured ? "Configured" : "Not configured";
+    $("ai-run-button").disabled = !modelConfigured || !configured;
+    if (model) $("model-select").value = model;
+    aiGeneration += 1;
+    $("ai-result").hidden = true;
   }
 
   async function post(path, payload) {
@@ -106,10 +122,13 @@
         $("confirm-listing").checked = false;
         $("confirm-currency").checked = false;
         $("research-select").hidden = false;
+        $("research-button").disabled = !quoteConfigured;
         $("filing-evidence-panel").hidden = false;
         $("filing-result").hidden = true;
         status("filing-message", "Confirm the listing and USD currency, then choose a topic.");
         $("connected-output").hidden = true;
+        aiGeneration += 1;
+        $("ai-result").hidden = true;
       });
       container.append(button);
     }
@@ -162,7 +181,8 @@
       if (!response.ok) throw new Error("Could not initialize local session.");
       const session = await response.json();
       csrf = session.csrf;
-      setConfigured(session.configured);
+      setConfigured(session.configured, session.quote_configured);
+      setModelConfigured(session.model_configured, session.model_name);
       status("setup-message", session.configured ?
         "Provider credentials are configured in server memory." :
         "Configure your own provider credentials to begin connected research.");
@@ -184,7 +204,7 @@
       const result = await post("/api/v1/session/configure", values);
       $("quote-key").value = "";
       $("sec-contact").value = "";
-      setConfigured(result.configured);
+      setConfigured(result.configured, result.quote_configured);
       status("setup-message", "Configured for this server session only. No credentials were persisted.");
     } catch (error) {
       status("setup-message", error.message || "Unable to configure session.");
@@ -197,7 +217,7 @@
   $("clear-session").addEventListener("click", async () => {
     try {
       await post("/api/v1/session/clear", {});
-      setConfigured(false);
+      setConfigured(false, false);
       $("quote-key").value = "";
       $("sec-contact").value = "";
       status("setup-message", "Disconnected; session credentials and directory cleared.");
@@ -216,6 +236,8 @@
     // A search initiated during a prior research call invalidates that result.
     selectionVersion += 1;
     evidenceVersion += 1;
+    aiGeneration += 1;
+    $("ai-result").hidden = true;
     selected = null;
     $("research-select").hidden = true;
     $("connected-output").hidden = true;
@@ -239,7 +261,10 @@
 
   $("connected-research-form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!selected || !configured) return;
+    if (!selected || !configured || !quoteConfigured) {
+      status("research-message", "An authorized Twelve Data key is required for quotes.");
+      return;
+    }
     const button = $("research-button");
     const submittedCandidate = selected;
     const submittedVersion = selectionVersion;
@@ -345,6 +370,155 @@
       }
     });
   }
+
+  function validatedSecLink(url) {
+    if (typeof url !== "string") return null;
+    if (!/^https:\/\/(www|data)\.sec\.gov\/(Archives\/edgar\/data\/|api\/xbrl\/companyfacts\/)/.test(url)) {
+      return null;
+    }
+    return url;
+  }
+
+  function citedClaim(claim, records, className) {
+    const result = node("article", className);
+    result.append(node("p", "ai-claim-text", claim.claim));
+    const citations = node("div", "ai-citations");
+    for (const id of claim.evidence_ids) {
+      const ref = records[id];
+      if (!ref) continue;
+      const box = node("div", "ai-source");
+      box.append(node("code", "reference-chip", id));
+      if (ref.type === "filing_passage") {
+        box.append(node("p", "ai-source-detail", ref.excerpt));
+      } else {
+        box.append(node("p", "ai-source-detail",
+          ref.metric + ": " + ref.value + " " + ref.currency +
+          " · fiscal end " + ref.fiscal_end));
+      }
+      const url = validatedSecLink(ref.source_url);
+      if (url) {
+        const link = node("a", "secondary-link", "Inspect SEC source");
+        link.href = url;
+        link.rel = "noopener noreferrer";
+        link.target = "_blank";
+        box.append(link);
+      }
+      citations.append(box);
+    }
+    if (!claim.evidence_ids.length) {
+      citations.append(node("span", "unattributed",
+        "Counter-thesis hypothesis; no directly supporting supplied source."));
+    }
+    result.append(citations);
+    return result;
+  }
+
+  function showAiResearch(payload) {
+    if (payload.mode !== "ai_assisted_sec_limited_not_verified" ||
+        payload.model_executed !== true || !payload.analysis ||
+        !payload.source_records) {
+      throw new Error("Unsupported AI research response");
+    }
+    $("ai-overview").textContent = payload.analysis.overview;
+    const findings = $("ai-findings");
+    findings.replaceChildren();
+    for (const finding of payload.analysis.findings) {
+      findings.append(citedClaim(finding, payload.source_records, "ai-claim"));
+    }
+    $("ai-bear").replaceChildren(
+      citedClaim(payload.analysis.bear_case, payload.source_records, "ai-claim")
+    );
+    $("ai-questions").replaceChildren();
+    for (const q of payload.analysis.open_questions) {
+      $("ai-questions").append(node("li", "", q));
+    }
+    $("ai-disclosures").replaceChildren();
+    for (const limitation of payload.disclosures) {
+      $("ai-disclosures").append(node("li", "", limitation));
+    }
+    $("ai-result").hidden = false;
+  }
+
+  $("model-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = $("model-setup-button");
+    button.disabled = true;
+    status("model-message", "Validating model key locally; no provider call…");
+    const payload = {
+      model_api_key: $("model-key").value,
+      model: $("model-select").value
+    };
+    try {
+      const result = await post("/api/v1/model/configure", payload);
+      setModelConfigured(result.model_configured, result.model_name);
+      $("model-key").value = "";
+      status("model-message", "Model key configured in local session memory. It has not been tested.");
+    } catch (error) {
+      status("model-message", error.message || "Model configuration rejected.");
+    } finally {
+      payload.model_api_key = "";
+      button.disabled = false;
+    }
+  });
+
+  $("model-clear-button").addEventListener("click", async () => {
+    try {
+      await post("/api/v1/model/clear", {});
+      setModelConfigured(false);
+      $("model-key").value = "";
+      status("model-message", "Model credential cleared from the local session.");
+    } catch (error) {
+      status("model-message", error.message || "Could not clear model session.");
+    }
+  });
+
+  $("ai-research-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!selected || !configured || !modelConfigured) {
+      status("ai-message", "Configure SEC discovery and a model, then select a company.");
+      return;
+    }
+    if (!$("confirm-listing").checked || !$("confirm-currency").checked ||
+        !$("ai-consent").checked) {
+      status("ai-message", "Confirm the issuer, currency and external model consent.");
+      return;
+    }
+    const candidate = selected;
+    const selection = selectionVersion;
+    const generation = ++aiGeneration;
+    const submit = $("ai-run-button");
+    submit.disabled = true;
+    $("ai-result").hidden = true;
+    status("ai-message", "Reading SEC evidence; one permitted model call follows…");
+    try {
+      const response = await post("/api/v1/research/ai", {
+        symbol: candidate.symbol, venue: candidate.venue, cik: candidate.cik,
+        currency: candidate.currency_candidate,
+        confirm_current_listing: $("confirm-listing").checked,
+        confirm_currency: $("confirm-currency").checked,
+        consent_external_sec_data: $("ai-consent").checked,
+        question: $("ai-question").value
+      });
+      if (generation !== aiGeneration || selection !== selectionVersion ||
+          selected !== candidate || !modelConfigured ||
+          !$("confirm-listing").checked || !$("confirm-currency").checked ||
+          !$("ai-consent").checked) {
+        status("ai-message", "Company, consent or model changed; discarded previous analysis.");
+        return;
+      }
+      showAiResearch(response);
+      status("ai-message",
+        "Model response complete. Every citation identifies an input source, not verified truth.");
+    } catch (error) {
+      if (generation === aiGeneration && selection === selectionVersion) {
+        status("ai-message", error.message || "AI research failed.");
+      }
+    } finally {
+      // Consent is per request, not an ongoing or blanket authorization.
+      $("ai-consent").checked = false;
+      submit.disabled = !modelConfigured || !configured;
+    }
+  });
 
   initialize();
 })();
