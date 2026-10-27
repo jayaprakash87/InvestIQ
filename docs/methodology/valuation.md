@@ -16,7 +16,7 @@ These are transparent **calculation primitives**, not stock forecasts, price tar
 Probabilities are subjective scenario weights, **not** statistically calibrated likelihoods. No factor or ranking receives automatic predictive credibility.
 
 ## Boundaries
-- Prices and EPS must use the same instrument/share class, split adjustment and currency. No implied currency conversion.
+- Prices and EPS must use the same instrument/share class, split adjustment and currency. No implied currency conversion.\n- In the offline research-bundle workflow, a hypothetical entry price is assumed to use the instrument's trading currency. The optional `hypothetical_entry_price_currency` field may state it explicitly; cross-currency EPS requires a separate, attributed FX conversion workflow and is **rejected** until one exists. The output includes `valuation_currency`. Legacy 0.1 bundles without the optional field retain this trading-currency convention.
 - The EPS/P-E method is not applicable to non-positive earnings or industries where earnings multiples are misleading; choose an alternative economic model.
 - These examples do not include cash dividends, buybacks, new equity issuance, debt financing changes, tax, leverage, slippage or management-execution risk.
 - Compound growth is only meaningful for economically comparable periods; do not assume a trough or peak year represents normalized future earnings.

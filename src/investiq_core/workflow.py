@@ -152,6 +152,7 @@ def build_synthetic_bundle() -> dict[str, Any]:
             "eps_evidence_id": eps.observation_id,
             "base_growth_assumption_id": growth.assumption_id,
             "hypothetical_entry_price": 75.0,
+            "hypothetical_entry_price_currency": instrument.trading_currency,
             "years": 3,
             "scenarios": [
                 {"name": "bear", "annual_eps_growth": 0.0, "terminal_pe": 10.0,
@@ -215,6 +216,18 @@ def validate_bundle(
         raise ValueError("valuation EPS reference must have diluted_eps per-share units")
     if eps.instrument != history[-1].instrument:
         raise ValueError("valuation EPS instrument must match thesis")
+    # The hypothetical entry price is denominated in the instrument's trading
+    # currency. An issuer's reported EPS may be in a different currency.
+    # Never calculate a P/E without a documented, attributed FX conversion.
+    valuation_currency = eps.instrument.trading_currency
+    declared_price_currency = valuation.get(
+        "hypothetical_entry_price_currency", valuation_currency
+    )
+    if declared_price_currency != valuation_currency or eps.currency != valuation_currency:
+        raise ValueError(
+            "valuation requires EPS and entry price in the instrument trading currency; "
+            "explicit FX conversion is required for cross-currency inputs"
+        )
     if eps.publicly_available_at > report.as_of or (
         basis == "recorded" and eps.recorded_at > report.as_of
     ):
@@ -271,6 +284,7 @@ def validate_bundle(
         "finding_count": len(report.findings),
         "thesis_revision_count": len(history),
         "scenario_analysis": asdict(analysis),
+        "valuation_currency": valuation_currency,
         "disclaimer": (
             "Hypothetical price-only outcomes; no live price, dividends, "
             "transaction costs, investment advice or validated probabilities."

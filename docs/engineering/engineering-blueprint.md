@@ -5,6 +5,8 @@
 > **Architecture:** [Connected research](../architecture/overview.md), [ADR 0003](../decisions/0003-connected-data-and-research-history.md), [Product roadmap](../product/product-roadmap.md).  
 > **Intent:** financial correctness, transparency, maintainability, security, thoughtful UX, and AI readiness **without unnecessary infrastructure**.
 
+The [v0.1.1 engineering alignment audit](baseline-audit-v0.1.1.md) records the codebase's verified starting point, identified financial-correctness hardening and pre-v0.2 entry criteria.
+
 ## 1. Engineering decision and enforcement
 
 InvestIQ follows a **small modular Python monolith with ports and adapters at actual external boundaries**. We invest in good engineering practices **now**, while introducing new infrastructure only after an actual connected-research workflow needs it.
