@@ -12,7 +12,7 @@ from enum import Enum
 from typing import Protocol
 
 from .evidence import InstrumentId
-from .fundamentals import FilingReference
+from .fundamentals import AnnualMetricFact, FilingReference
 from .market import IssuerId, MarketQuote, QuoteKind, QuoteTimeliness
 
 
@@ -143,3 +143,28 @@ class FilingProvider(Protocol):
     def capabilities(self) -> ProviderCapabilities: ...
 
     async def list_filings(self, request: FilingRequest) -> tuple[FilingReference, ...]: ...
+
+
+@dataclass(frozen=True, slots=True)
+class AnnualMetricsRequest:
+    """Current SEC annual filing-vintage cutoff; not a historical snapshot."""
+
+    issuer: IssuerId
+    as_of: datetime
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.issuer, IssuerId):
+            raise TypeError("issuer must be IssuerId")
+        if not isinstance(self.as_of, datetime) or (
+            self.as_of.tzinfo is None or self.as_of.utcoffset() is None
+        ):
+            raise ValueError("as_of must be a timezone-aware datetime")
+
+
+class FundamentalsProvider(Protocol):
+    @property
+    def capabilities(self) -> ProviderCapabilities: ...
+
+    async def get_annual_metrics(
+        self, request: AnnualMetricsRequest
+    ) -> tuple[AnnualMetricFact, ...]: ...

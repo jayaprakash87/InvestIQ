@@ -7,6 +7,7 @@ belong to actual provider adapters and are NOT implied by this seed catalog.
 from __future__ import annotations
 
 import re
+from decimal import Decimal
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from enum import Enum
@@ -108,3 +109,57 @@ class FilingReference:
             and self.publicly_available_at.astimezone(UTC) > self.retrieved_at.astimezone(UTC)
         ):
             raise ValueError("public filing availability cannot follow retrieval")
+
+
+@dataclass(frozen=True, slots=True)
+class AnnualMetricFact:
+    """One SEC-reported annual metric; not a certified intraday point-in-time fact.
+
+    Filing date is date-only. The public release instant is *unknown*, and a
+    later amendment or repeated value can describe an earlier fiscal period.
+    """
+
+    issuer: IssuerId
+    metric: str
+    value: Decimal
+    unit: ValueUnit
+    currency: str | None
+    period_start: date
+    period_end: date
+    accession: str
+    filed_on: date
+    source_reference: str
+    taxonomy: str
+    tag: str
+    retrieved_at: datetime
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.issuer, IssuerId):
+            raise TypeError("issuer must be IssuerId")
+        if self.metric not in {item.code for item in SEED_METRICS}:
+            raise ValueError("metric must be a supported financial concept")
+        if not isinstance(self.value, Decimal) or not self.value.is_finite():
+            raise ValueError("reported metric must be a finite Decimal")
+        if not isinstance(self.unit, ValueUnit):
+            raise TypeError("unit must be ValueUnit")
+        if self.unit in (ValueUnit.MONEY, ValueUnit.MONEY_PER_SHARE):
+            if not isinstance(self.currency, str) or not re.fullmatch(r"[A-Z]{3}", self.currency):
+                raise ValueError("monetary metrics require an ISO currency")
+        elif self.currency is not None:
+            raise ValueError("nonmonetary metrics must not include a currency")
+        for name in ("period_start", "period_end", "filed_on"):
+            v = getattr(self, name)
+            if not isinstance(v, date) or isinstance(v, datetime):
+                raise TypeError(f"{name} must be a date")
+        if self.period_start > self.period_end or self.filed_on < self.period_end:
+            raise ValueError("annual period and filing dates are inconsistent")
+        if not 330 <= (self.period_end - self.period_start).days + 1 <= 395:
+            raise ValueError("annual period must approximate a fiscal year")
+        for name in ("accession", "source_reference", "taxonomy", "tag"):
+            v = getattr(self, name)
+            if not isinstance(v, str) or not v.strip():
+                raise ValueError(f"{name} must be nonempty")
+        if not isinstance(self.retrieved_at, datetime) or (
+            self.retrieved_at.tzinfo is None or self.retrieved_at.utcoffset() is None
+        ):
+            raise ValueError("retrieved_at must be timezone-aware")

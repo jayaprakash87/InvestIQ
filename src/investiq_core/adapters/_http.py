@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from decimal import Decimal
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -117,6 +118,7 @@ class UrllibJsonTransport:
         try:
             return json.loads(
                 raw.decode("utf-8"),
+                parse_float=Decimal,
                 parse_constant=lambda _value: (_ for _ in ()).throw(ValueError()),
             )
         except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
