@@ -33,6 +33,10 @@ def _parser() -> argparse.ArgumentParser:
     app.add_argument(
         "--no-browser", action="store_true", help="Do not launch a web browser automatically"
     )
+    app.add_argument(
+        "--research-dir", type=Path,
+        help="Explicit private folder for user-approved saved decisions; disabled by default",
+    )
 
     demo = commands.add_parser("demo", help="Create and validate a fictional research bundle")
     demo.add_argument("--output", type=Path, help="Write the synthetic bundle as JSON")
@@ -98,7 +102,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             # Delay the import to keep the historical CLI and offline tests unchanged.
             from .webapp import serve_app
 
-            serve_app(port=args.port, open_browser=not args.no_browser)
+            serve_app(
+                port=args.port, open_browser=not args.no_browser,
+                research_dir=args.research_dir,
+            )
         elif args.command == "demo":
             bundle = build_synthetic_bundle()
             validate_bundle(bundle, basis="recorded")
