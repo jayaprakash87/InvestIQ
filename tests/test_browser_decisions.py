@@ -83,6 +83,9 @@ def test_save_reopen_export_and_offline_replay_after_new_app_instance(tmp_path):
     assert parsed.annual_facts == ()
     markdown = restored.export("example_thesis", 1, "markdown")["content"]
     assert "My authored business thesis" in markdown
+    assert "Research stage: researching" in markdown
+    assert "Demand could weaken" in markdown
+    assert "Revenue contracts materially" in markdown
     assert "not retained" in markdown
     assert "private" in markdown.lower()
     assert "api_key" not in exported["content"]
@@ -127,6 +130,13 @@ def test_optional_hypotheses_keep_only_year_growth_multiple_weights(tmp_path):
     assert "initial_price" not in export
     assert "weighted_terminal_price" not in export
     assert "Model" not in export
+    rendered = journal.export("example_thesis", 1, "markdown")["content"]
+    assert "Hypothetical holding period: 5 years" in rendered
+    assert "bear: annual EPS growth -5.00%" in rendered
+    assert "base: annual EPS growth 5.00%" in rendered
+    assert "terminal P/E 15" in rendered
+    assert "subjective weight 50.00%" in rendered
+    assert "My authored business thesis" in rendered
 
 
 @pytest.mark.parametrize("change", [
