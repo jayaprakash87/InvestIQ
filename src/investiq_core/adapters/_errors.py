@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+from ..ports import ProviderFailure, ProviderFailureCode
 from ._http import (
     TransportInvalidResponseError,
     TransportStatusError,
     TransportTimeoutError,
     TransportUnavailableError,
 )
-from ..ports import ProviderFailure, ProviderFailureCode
 
 
 def translate_error(provider: str, error: Exception) -> ProviderFailure:

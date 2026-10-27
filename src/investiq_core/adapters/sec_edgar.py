@@ -115,7 +115,7 @@ class SecEdgarFilingProvider:
             raise ValueError("clock must provide timezone-aware datetime")
         try:
             return _parse_recent(payload, issuer, cik, retrieved, request.limit, url)
-        except (ValueError, TypeError, KeyError, IndexError) as exc:
+        except (ValueError, TypeError, KeyError, IndexError):
             raise ProviderFailure(
                 "SEC EDGAR", ProviderFailureCode.INVALID_RESPONSE,
                 "SEC EDGAR submissions schema is invalid",
@@ -126,17 +126,17 @@ def _parse_recent(
     payload: Any, issuer, cik: int, received: datetime, limit: int, url: str
 ) -> tuple[FilingReference, ...]:
     if not isinstance(payload, dict):
-        raise ValueError("expected object")
+        raise TypeError("expected object")
     actual = payload.get("cik")
     # SEC responds with a numeric CIK. Do not associate another entity's data.
     if isinstance(actual, bool) or not isinstance(actual, int) or actual != cik:
         raise ValueError("CIK mismatch")
     filings = payload["filings"]
     if not isinstance(filings, dict):
-        raise ValueError("filings must be an object")
+        raise TypeError("filings must be an object")
     recent = filings["recent"]
     if not isinstance(recent, dict):
-        raise ValueError("recent must be an object")
+        raise TypeError("recent must be an object")
     accessions = recent["accessionNumber"]
     forms = recent["form"]
     dates = recent["filingDate"]
@@ -155,7 +155,7 @@ def _parse_recent(
         if not isinstance(form, str) or not form.strip():
             raise ValueError("invalid form")
         if not isinstance(filed, str):
-            raise ValueError("invalid filing date")
+            raise TypeError("invalid filing date")
         filed_on = date.fromisoformat(filed)
         result.append(
             FilingReference(
