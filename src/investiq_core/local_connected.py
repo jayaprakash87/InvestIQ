@@ -32,6 +32,7 @@ from .connected_cli import _render_current
 from .evidence import InstrumentId
 from .filing_evidence import SecFilingEvidenceProvider
 from .issuer_directory import IssuerCandidate, SecDirectoryProvider, search_candidates
+from .interactive_scenarios import evaluate_hypothetical
 from .market import IssuerId, IssuerListing
 
 SESSION_LIFETIME_SECONDS = 60 * 60
@@ -251,6 +252,38 @@ class LocalConnectedResearch:
                 cik=cik, contact=session.contact, model_key=session.model_key,
                 model_name=session.model_name, question=question.strip(),
             ))
+
+    def preview_scenarios(
+        self, session: BrowserSession, data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """User-authored calculation, independently of model and market providers."""
+        symbol, venue, cik = (data.get(name) for name in ("symbol", "venue", "cik"))
+        if (
+            not isinstance(symbol, str) or not isinstance(venue, str)
+            or not isinstance(cik, str) or data.get("currency") != "USD"
+            or data.get("confirm_current_listing") is not True
+            or data.get("confirm_currency") is not True
+        ):
+            raise ValueError("Confirm the supported listing and USD currency")
+        with session.lock:
+            if not session.configured:
+                raise PermissionError("Configure SEC discovery and select an issuer first")
+            if (
+                session.directory_refreshed_at is None
+                or self._clock() - session.directory_refreshed_at > DIRECTORY_LIFETIME_SECONDS
+            ):
+                raise ValueError("Company selection expired; search and confirm again")
+            if sum(
+                (item.symbol, item.venue, item.cik) == (symbol, venue, cik)
+                for item in session.directory
+            ) != 1:
+                raise ValueError("Issuer selection is not a current directory candidate")
+            result = evaluate_hypothetical(data.get("hypothetical"))
+            result["selection"] = {
+                "symbol": symbol, "venue": venue, "cik": cik,
+                "selection_type": "directory_candidate_user_confirmed_not_verified_basis",
+            }
+            return result
 
     def inspect_evidence(
         self, session: BrowserSession, data: dict[str, Any]
