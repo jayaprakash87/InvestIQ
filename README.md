@@ -69,7 +69,8 @@ All numbers are **fictional assumptions**, not estimates of a listed company's f
 - [Thesis history](docs/methodology/thesis-history.md)
 - [Portable AI skills](skills/README.md)
 - [Project architecture](docs/architecture/overview.md)
-- [Product Roadmap](docs/product/product-roadmap.md) — priorities, v0.2 requirements and future release gates
+- [Approved Product Roadmap v2.0](docs/product/product-roadmap.md) — connected research, truthful quote freshness, provider strategy and releases
+- [Architecture Decision: Connected Data](docs/decisions/0003-connected-data-and-research-history.md)
 - [Roadmap Summary](docs/roadmap.md)
 - [Changelog](CHANGELOG.md)
 
@@ -78,6 +79,12 @@ All numbers are **fictional assumptions**, not estimates of a listed company's f
 Source-supported analysis over fabricated certainty. Distinct observed facts, consensus estimates, calculations and researcher assumptions. Date-aligned evidence. Explicit uncertainty and missing information. Portable, vendor-neutral interfaces. Synthetic-only public fixtures. No mandatory LLM or brokerage.
 
 **Important:** A validated bundle is only structurally consistent. It has not been fact-checked against external documents, tested for model accuracy, or approved for personal investing.
+
+## Approved direction after v0.1
+
+The [connected-research roadmap](docs/product/product-roadmap.md) targets **provider-agnostic, appropriately current market information** with visible source, session and delay, optional freshness-aware caching, and **immutable saved research decisions**. A local workspace may hold a user's private historic theses, but it must **not** masquerade as a live pricing feed.
+
+These are **planned v0.2+ capabilities**, not included in the v0.1.1 release. Live data, real-time exchange licensing, hosted accounts, a shared cloud cache and a full web application are not shipped today.
 
 ## Contributing and safety
 
