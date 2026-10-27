@@ -1,19 +1,20 @@
 # InvestIQ Roadmap
 
-**Canonical and finalized planning baseline:** [InvestIQ Product Strategy and Roadmap v2.0](product/product-roadmap.md) (2026-10-27).
+> **Planning status:** Proposed [AI-first Product Strategy & Roadmap v3.0](product/product-roadmap.md) (2026-10-27). Earlier v2.0 release priorities are superseded for **future** planning, not past implementation. See [ADR 0009](decisions/0009-ai-first-product-pivot.md).
 
-**Architecture decision:** connected, provider-agnostic market/fundamental data; provider- and entitlement-aware freshness/cache; **optional** cloud deployment; **user-controlled immutable research snapshots**. Local storage is an allowed choice for *historical research*, never the sole source of current prices.
+**Product hypothesis:** An accessible, source-linked AI investment **decision workflow** — research, evaluate, challenge, deliberately save and later reassess — provides value beyond generic LLM prompts and incumbent research tools. **This has not yet been validated with users.**
 
-| Release | Direction |
+| Release | Intended outcome and status |
 | --- | --- |
-| **v0.1.1 (released)** | Offline research library, five skills, provenance, valuation and synthetic example |
-| **v0.2.0 (release candidate)** | BYOK quote / SEC annual facts, conservative connected analysis, explicit local rights-aware snapshots, CLI and synthetic acceptance; live provider smoke still requires credentials |
-| **v0.3** | Comparisons, trends and industry-aware valuation |
-| **v0.4** | Data-change intelligence, human-approved thesis updates and opt-in monitoring |
-| **v0.5** | Optional local/hosted interface, gated by users, data licenses and cost |
-| **v0.6+** | Point-in-time quant research only after bias/cost/data-quality gates |
-| **v1.0** | Stable extensible open research platform |
+| **v0.1.1 — released** | Portable, synthetic offline open-source research toolkit |
+| **v0.2.0 — source release candidate** | BYOK SEC annual facts + Twelve Data CLI research, rights-aware snapshots/replay; live-provider smoke and tag approval not complete |
+| **v0.3 — NEXT / proposed** | Task/conversation-first AI Research Experience, real sourced tool orchestration and an accessible research UI; [PRD](product/ai-research-experience.md) |
+| **v0.4 — conditional** | Opt-in investor context, watchlists, saved thesis continuity and material-change monitoring |
+| **v0.5 — conditional** | Evidence-based discovery, peer/trend analysis and explainable research screens |
+| **v0.6 — conditional** | Opt-in portfolio-context and scenario intelligence |
+| **v0.7+ — conditional** | Point-in-time quant lab only after data, bias, cost and rights gates |
+| **v1.0 — conditional** | Adopted, sustainable, reliable open research platform |
 
-Completed v0.2 implementation workstreams: (1) market-data contracts/ADR; (2) entitled provider adapters; (3) on-demand access/freshness/cache; (4) connected analysis; (5) durable snapshots and source-linked output; (6) integrated acceptance/release.
+**Immediate priority:** [validate product experience and standalone vs assistant distribution](product/validation-plan.md), not additional platform-first implementation. v0.2 six PR workstreams are historical work, not the next tasks. The five AI skills are currently instructions, **not** an autonomous deployed AI system.
 
-No web SaaS, live feed entitlement, trading or investment-fund capabilities are promised by this roadmap. **See the [full document](product/product-roadmap.md)** for requirements, non-goals, rollout gates, cost/security controls and provider evaluation.
+**Non-negotiable:** truthful data timestamps/entitlements, deterministic arithmetic, versioned lawful research history, explicit consent, independently evaluated AI output, no fabricated performance claims and no trading automation.
