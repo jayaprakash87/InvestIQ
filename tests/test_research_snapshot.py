@@ -6,7 +6,7 @@ import json
 import os
 from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal, Inexact, localcontext
 
 import pytest
 
@@ -325,3 +325,40 @@ def test_markdown_escapes_formatting_in_user_authored_notes():
     text = render_snapshot_markdown(snap)
     assert "\\*\\*bad\\*\\*" in text
     assert "\\[link\\]" in text
+
+
+def test_third_and_later_revisions_validate_full_existing_chain(tmp_path):
+    store = LocalSnapshotStore(tmp_path / "private")
+    one = make_snapshot()
+    store.save(one)
+    req, res = inputs(right=Permission.ALLOWED)
+    second = capture_research_snapshot(
+        res, req, thesis(revision=2, parent_digest=one.thesis.digest,
+                         recorded_at=SAVED + timedelta(minutes=5)),
+        saved_at=SAVED + timedelta(minutes=5),
+    )
+    store.save(second)
+    third = capture_research_snapshot(
+        res, req, thesis(revision=3, parent_digest=second.thesis.digest,
+                         recorded_at=SAVED + timedelta(minutes=10)),
+        saved_at=SAVED + timedelta(minutes=10),
+    )
+    store.save(third)
+    assert store.load("analysis_1", 3).digest == third.digest
+    assert store.load("analysis_1", 1).digest == one.digest
+    assert store.load("analysis_1", 2).digest == second.digest
+    wrong = replace(third, thesis=replace(third.thesis, parent_digest="a" * 64))
+    with pytest.raises(ValueError, match="ancestry"):
+        store.save(wrong)
+
+
+def test_replay_decimal_arithmetic_is_independent_of_caller_precision_and_traps():
+    snapshot = make_snapshot(right=Permission.ALLOWED)
+    baseline = replay_snapshot(snapshot).annual_pe_proxy
+    with localcontext() as ctx:
+        ctx.prec = 4
+        ctx.traps[Inexact] = True
+        exact = replay_snapshot(snapshot).annual_pe_proxy
+        restored = import_snapshot_json(export_snapshot_json(snapshot))
+        assert replay_snapshot(restored).annual_pe_proxy == baseline
+    assert exact == baseline

@@ -222,13 +222,20 @@ class LocalSnapshotStore:
         thesis = snapshot.thesis
         destination = self._path(thesis.thesis_id, thesis.revision)
         replay_snapshot(snapshot)
-        if thesis.revision > 1:
-            previous = self.load(thesis.thesis_id, thesis.revision - 1)
-            if previous.issuer != snapshot.issuer or previous.saved_at > snapshot.saved_at:
+        history = []
+        for revision in range(1, thesis.revision):
+            previous = self.load(thesis.thesis_id, revision)
+            if (
+                previous.issuer != snapshot.issuer
+                or previous.thesis.instrument != thesis.instrument
+                or previous.saved_at > snapshot.saved_at
+            ):
                 raise ValueError("research revision issuer or chronology mismatch")
-            validate_thesis_history([previous.thesis, thesis])
-        else:
-            validate_thesis_history([thesis])
+            history.append(previous.thesis)
+        # The existing ledger validator starts at revision 1 and verifies
+        # every ancestor's SHA-256 link. Checking only the direct predecessor
+        # would incorrectly reject all third-and-later revisions.
+        validate_thesis_history([*history, thesis])
         data = export_snapshot_json(snapshot).encode("utf-8")
         if len(data) > _MAX_BYTES:
             raise ValueError("snapshot exceeds size limit")

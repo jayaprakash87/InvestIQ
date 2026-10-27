@@ -12,7 +12,7 @@ import json
 import re
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
-from decimal import Decimal
+from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from typing import Any
 
 from .application.connected_research import CompanyResearchRequest, CompanyResearchResult
@@ -384,7 +384,10 @@ def replay_snapshot(snapshot: ResearchSnapshot) -> ReplayedResearch:
     elif price.freshness_at_capture is not QuoteFreshness.WITHIN_POLICY:
         warnings.append("Quote was not fresh under the saved policy at capture.")
     else:
-        pe = price.price / eps.value
+        # Use a fixed replay precision independent of ambient caller settings,
+        # including callers that enable Decimal Inexact traps.
+        with localcontext(Context(prec=34, rounding=ROUND_HALF_EVEN)):
+            pe = price.price / eps.value
         if snapshot.scenarios:
             analysis = evaluate_scenarios(
                 start_eps=float(eps.value), initial_price=float(price.price),
