@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -55,3 +56,20 @@ def test_filing_date_is_not_invented_intraday_publication_time() -> None:
         replace(item, retrieved_at=datetime(2026, 2, 27))
     with pytest.raises(ValueError, match="timezone-aware"):
         replace(item, retrieved_at=None)
+
+
+def test_filing_availability_uses_utc_order_through_dst_transition() -> None:
+    ny = ZoneInfo("America/New_York")
+    filing = FilingReference(
+        issuer=IssuerId("SEC_CIK", "0000123456"),
+        accession="synthetic:dst",
+        form="8-K",
+        filed_on=date(2026, 11, 1),
+        source_reference="synthetic:dst-filing",
+        retrieved_at=datetime(2026, 11, 1, 1, 50, tzinfo=ny, fold=0),
+    )
+    with pytest.raises(ValueError, match="cannot follow retrieval"):
+        replace(
+            filing,
+            publicly_available_at=datetime(2026, 11, 1, 1, 10, tzinfo=ny, fold=1),
+        )

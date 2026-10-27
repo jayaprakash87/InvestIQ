@@ -20,7 +20,7 @@ An identifier is a user/provider assertion, not verified registry truth. Adapter
 
 `MarketQuote` is an immutable positive finite Decimal amount tied to its listing currency, quote type (last/bid/ask/open/close), price adjustment basis, provider/source ID and provider symbol.
 
-An event/market timestamp and actual receipt timestamp are distinct timezone-aware values. The quote carries source-declared market session, entitlements, asserted timeliness (`real_time`, `delayed`, `end_of_day`, `historical`, `unknown`) and delay in seconds *only when meaningful and supplied*. Source classification is not independently proven by the struct.
+An event/market timestamp and actual receipt timestamp are distinct timezone-aware values. **Chronological comparisons and elapsed ages are normalized to UTC before subtraction/comparison**, including daylight-saving folds where two aware datetimes use the same `ZoneInfo` instance. The quote carries source-declared market session, entitlements, asserted timeliness (`real_time`, `delayed`, `end_of_day`, `historical`, `unknown`) and delay in seconds *only when meaningful and supplied*. Source classification is not independently proven by the struct.
 
 `assess_quote_freshness(quote, now, max_age)` evaluates a caller-selected policy against event time. It returns `unknown` without a policy, and never upgrades EOD/delayed/unknown source classification to real-time. Even a within-policy quote could be from a closed market. No universal TTL or stock-exchange-hours assumptions.
 

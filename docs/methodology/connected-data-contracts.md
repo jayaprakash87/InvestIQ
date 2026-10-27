@@ -31,7 +31,7 @@ Use `IssuerId(namespace, value)` for the legal/reporting entity and existing `In
 
 Example: a 30-second-old **end-of-day** record may be `within_policy` for a 60-second check while the provider's timeliness remains `end_of_day` and the session remains `closed`. **Do not display it as live.** A one-day-old quote retrieved a second ago remains stale under a short policy.
 
-Market calendars, quote permissions, actual market-session checks, vendor delay verification and symbol-to-security authentication are external adapters/services in later PRs.
+Market-event/receipt order and elapsed freshness age are compared after UTC normalization; this avoids daylight-saving `fold` errors in a shared named timezone. Filing publication/retrieval instants use the same UTC comparison rule.\n\nMarket calendars, quote permissions, actual market-session checks, vendor delay verification and symbol-to-security authentication are external adapters/services in later PRs.
 
 ## Financial statements and filings
 

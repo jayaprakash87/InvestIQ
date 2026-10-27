@@ -3,6 +3,7 @@
 from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -173,3 +174,30 @@ def test_issuer_mapping_is_venue_qualified_and_effective_dated() -> None:
         IssuerId("cik", "0000123456")
     with pytest.raises(ValueError, match="whitespace"):
         IssuerId("SEC_CIK", " 0000123456")
+
+
+def test_quote_age_and_event_order_use_elapsed_utc_time_across_dst_fold() -> None:
+    ny = ZoneInfo("America/New_York")
+    early = datetime(2026, 11, 1, 1, 10, tzinfo=ny, fold=0)
+    later = datetime(2026, 11, 1, 1, 20, tzinfo=ny, fold=1)
+    # Same wall-clock timezone, but 70 real minutes elapsed at the DST fallback.
+    item = quote(
+        event_at=early, received_at=later,
+        timeliness=QuoteTimeliness.UNKNOWN, delay_seconds=None,
+    )
+    assert assess_quote_freshness(
+        item, now=later, max_age=timedelta(minutes=30)
+    ) == QuoteFreshness.STALE
+    # This value is an event 30 real minutes *after* receipt even though
+    # the wall-clock display appears to put it first.
+    with pytest.raises(ValueError, match="event time"):
+        quote(
+            event_at=datetime(2026, 11, 1, 1, 20, tzinfo=ny, fold=1),
+            received_at=datetime(2026, 11, 1, 1, 50, tzinfo=ny, fold=0),
+        )
+    with pytest.raises(ValueError, match="clock"):
+        assess_quote_freshness(
+            item,
+            now=datetime(2026, 11, 1, 1, 50, tzinfo=ny, fold=0),
+            max_age=timedelta(hours=1),
+        )

@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from enum import Enum
 
@@ -205,7 +205,7 @@ class MarketQuote:
             raise ValueError("quote currency must match instrument trading currency; FX is explicit")
         _aware(self.event_at, "event_at")
         _aware(self.received_at, "received_at")
-        if self.event_at > self.received_at:
+        if self.event_at.astimezone(UTC) > self.received_at.astimezone(UTC):
             raise ValueError("market event time must not follow receipt time")
         if not isinstance(self.session, MarketSession):
             raise TypeError("session must be MarketSession")
@@ -246,7 +246,7 @@ def assess_quote_freshness(
     if not isinstance(quote, MarketQuote):
         raise TypeError("quote must be MarketQuote")
     _aware(now, "now")
-    if now < quote.received_at:
+    if now.astimezone(UTC) < quote.received_at.astimezone(UTC):
         raise ValueError("freshness clock precedes quote receipt")
     if max_age is None:
         return QuoteFreshness.UNKNOWN
@@ -254,6 +254,6 @@ def assess_quote_freshness(
         raise ValueError("max_age must be a positive timedelta or None")
     return (
         QuoteFreshness.STALE
-        if now - quote.event_at > max_age
+        if now.astimezone(UTC) - quote.event_at.astimezone(UTC) > max_age
         else QuoteFreshness.WITHIN_POLICY
     )

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from enum import Enum
 
 from .evidence import ValueUnit
@@ -105,6 +105,6 @@ class FilingReference:
             raise ValueError("publicly_available_at must be timezone-aware")
         if (
             self.publicly_available_at is not None
-            and self.publicly_available_at > self.retrieved_at
+            and self.publicly_available_at.astimezone(UTC) > self.retrieved_at.astimezone(UTC)
         ):
             raise ValueError("public filing availability cannot follow retrieval")
