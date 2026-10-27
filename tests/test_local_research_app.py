@@ -81,6 +81,11 @@ def test_local_http_assets_are_packaged_and_available(app_port):
     assert "model" in html.lower()
     assert "textContent" in js
     assert "innerHTML" not in js
+    connector_js = files("investiq_core").joinpath("web", "connect.js").read_text(
+        encoding="utf-8"
+    )
+    assert "textContent" in connector_js
+    assert "innerHTML" not in connector_js
 
 
 def test_offline_api_is_structurally_valid_and_explicit(app_port):
