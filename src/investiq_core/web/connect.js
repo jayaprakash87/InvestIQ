@@ -269,6 +269,9 @@
     $("ai-result").hidden = true;
     resetInteractions();
     selected = null;
+    document.dispatchEvent(new Event("investiq:issuer-cleared"));
+    $("confirm-listing").checked = false;
+    $("confirm-currency").checked = false;
     $("research-select").hidden = true;
     $("connected-output").hidden = true;
     $("filing-evidence-panel").hidden = true;
