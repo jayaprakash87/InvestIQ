@@ -74,6 +74,8 @@ Research analysis includes:
 
 ### PR 6 opt-in private decision boundary
 
+The v0.3 release gate additionally requires a per-launch terminal-only private-history code: a separate local HTTP session with its own cookie/CSRF cannot open or export an existing researcher's history until explicitly unlocked. Localhost is not OS-user identity, and this does not protect against compromised user processes.
+
 The local Research Desk uses the **existing** v0.2 `ThesisSnapshot`, `ResearchSnapshot`, `LocalSnapshotStore` and offline replay rather than a second research database. The investor opts in using a private startup directory and **explicitly authors and approves** each immutable revision. Stored data comprise thesis text/stage/revision rationale, risks/falsification triggers, issuer identity and optionally hypothetical growth, terminal P/E, weights and horizon. Restricted or uncertain-rights quotes, manually entered EPS/entry price, price-derived outputs, complete filings, API keys and AI interpretations are **not** retained. Offline replay therefore provides identity/history integrity but not numeric price valuations; no misleading replay claim is permitted. Local digests are tamper-evident only under an honest file owner, not externally trusted signatures, and the user must secure the folder. Release acceptance still needs independently authorized source coverage and demonstrated investor usefulness.
 
 ### PR 5 interactive evidence and scenario boundary

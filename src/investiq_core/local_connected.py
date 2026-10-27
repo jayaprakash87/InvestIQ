@@ -50,6 +50,7 @@ class BrowserSession:
     quote_key: str | None = None
     model_key: str | None = None
     model_name: str | None = None
+    history_unlocked: bool = False
     directory: tuple[IssuerCandidate, ...] = ()
     directory_refreshed_at: float | None = None
     lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
@@ -86,6 +87,7 @@ class LocalConnectedResearch:
         self._directory_transport = directory_transport
         self._ai = ai_coordinator or default_ai_coordinator()
         self._decisions = BrowserDecisionHistory(decision_dir)
+        self._history_code = secrets.token_urlsafe(24) if self._decisions.enabled else None
         self._research_factory = research_factory or _build_research_service
         self._evidence_factory = evidence_factory or (
             lambda contact: SecFilingEvidenceProvider(user_agent=contact)
@@ -120,6 +122,7 @@ class LocalConnectedResearch:
             "credentials_persisted": False,
             "csrf": session.csrf,
             "directory_loaded": session.directory_refreshed_at is not None,
+            "private_history_unlocked": session.history_unlocked,
         }
 
     @staticmethod
@@ -156,6 +159,7 @@ class LocalConnectedResearch:
             session.quote_key = None
             session.model_key = None
             session.model_name = None
+            session.history_unlocked = False
             session.directory = ()
             session.directory_refreshed_at = None
         return {
@@ -260,16 +264,53 @@ class LocalConnectedResearch:
     def history_available(self) -> bool:
         return self._decisions.enabled
 
-    def list_decisions(self) -> dict[str, Any]:
-        return self._decisions.list()
+    @property
+    def history_access_code(self) -> str | None:
+        """Ephemeral launch-terminal capability, never exposed via HTTP."""
+        return self._history_code
 
-    def open_decision(self, data: dict[str, Any]) -> dict[str, Any]:
-        return self._decisions.load(data.get("thesis_id"), data.get("revision"))
+    def unlock_history(self, session: BrowserSession, data: dict[str, Any]) -> dict[str, bool]:
+        if not self._decisions.enabled or self._history_code is None:
+            raise PermissionError("Private history is disabled")
+        if not isinstance(data, dict) or set(data) != {"code"}:
+            raise PermissionError("Invalid private history authorization")
+        supplied = data["code"]
+        if (
+            not isinstance(supplied, str) or len(supplied) > 128
+            or not secrets.compare_digest(supplied, self._history_code)
+        ):
+            raise PermissionError("Invalid private history authorization")
+        with session.lock:
+            session.history_unlocked = True
+        return {"private_history_unlocked": True}
 
-    def export_decision(self, data: dict[str, Any]) -> dict[str, str]:
-        return self._decisions.export(
-            data.get("thesis_id"), data.get("revision"), data.get("format"),
-        )
+    @staticmethod
+    def _require_history_unlock(session: BrowserSession) -> None:
+        if not session.history_unlocked:
+            raise PermissionError("Unlock private history using the launch-terminal code")
+
+    def list_decisions(self, session: BrowserSession) -> dict[str, Any]:
+        if not self._decisions.enabled:
+            raise PermissionError("Private history is disabled")
+        with session.lock:
+            self._require_history_unlock(session)
+            return self._decisions.list()
+
+    def open_decision(
+        self, session: BrowserSession, data: dict[str, Any]
+    ) -> dict[str, Any]:
+        with session.lock:
+            self._require_history_unlock(session)
+            return self._decisions.load(data.get("thesis_id"), data.get("revision"))
+
+    def export_decision(
+        self, session: BrowserSession, data: dict[str, Any]
+    ) -> dict[str, str]:
+        with session.lock:
+            self._require_history_unlock(session)
+            return self._decisions.export(
+                data.get("thesis_id"), data.get("revision"), data.get("format"),
+            )
 
     def save_decision(
         self, session: BrowserSession, data: dict[str, Any]
@@ -288,6 +329,7 @@ class LocalConnectedResearch:
         ):
             raise ValueError("Explicit save requires a confirmed issuer and decision")
         with session.lock:
+            self._require_history_unlock(session)
             if not session.configured:
                 raise PermissionError("Configure SEC discovery first")
             if (

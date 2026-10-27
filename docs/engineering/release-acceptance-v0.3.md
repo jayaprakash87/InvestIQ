@@ -19,7 +19,7 @@ A fully green offline suite qualifies a **local personal-alpha / engineering mil
 | Requirement | Verification | What a passing test establishes | What it cannot establish |
 | --- | --- | --- | --- |
 | Offline entry without credentials | `investiq demo`, `validate`, local `/api/v1/demo` | Fictional bundled fixture and validator work without network or persistence | Real-company coverage |
-| Protected local app | Existing local app HTTP/security tests and `test_v03_release_acceptance.py` | IPv4 loopback, Host/Origin/CSRF/session guards on accepted fixtures; unauthorized requests fail | Shared-user OS isolation, browser security certification |
+| Protected local app and private history | Existing local HTTP/security tests and `test_v03_release_acceptance.py`; second-session history access regressions | IPv4 loopback, Host/Origin/CSRF/session checks; random terminal-only history unlock required per browser session; separate local HTTP clients fail closed | OS malware/process-memory adversaries, full shared-user OS isolation or browser security certification |
 | Company selection | Injected SEC directory + controller E2E | User must select/confirm matching CIK, symbol, MIC and USD; invalid CIK rejected | SEC candidate is an exchange-verified historical security |
 | Source inspection | Injected 10-K passage provider | Source accession/URL and bounded excerpts displayed through the app boundary | Correct HTML parsing on all live filings or verified narrative entailment |
 | AI orchestration | Real AI coordinator with fake bounded model, source validator, negative tests | Consent mandatory; unsupported IDs and malformed model outputs fail; model inputs do not contain a quote/key/history | Correct investment conclusions, actual OpenAI terms or real API compatibility |
@@ -42,7 +42,7 @@ The executable `tests/test_v03_release_acceptance.py` starts a **real loopback H
 4. AI analysis requires a separately configured model and **explicit consent**. The response links only existing fixture source IDs. A follow-up sends neither prior answer nor chat history.
 5. Manually entered hypothetical values are validated and computed by the existing Python method, with no model or quote request.
 6. Research remains unsaved until the investor **explicitly** authors and approves a private decision. The saved manifest excludes API keys, AI text, full SEC documents, price, user-entered EPS/entry price and price-derived values.
-7. The saved thesis reopens and exports **offline** after clearing provider credentials. Wrong origins, cookies, CSRF, issuer IDs and unsafe file paths fail closed.
+7. History is additionally gated by a **per-launch random code printed in the local terminal**. A different localhost browser session cannot list/open/export/save decisions with its own valid cookie+CSRF alone. After disconnect, the code is required again. The saved thesis reopens/exports offline once unlocked. Wrong origins, cookies, CSRF, issuer IDs and unsafe paths fail closed.
 
 Run locally:
 
@@ -56,6 +56,10 @@ investiq app --help
 ```
 
 CI also checks `node --check`, wheel installation, help commands and packaged HTML/JS/CSS assets. Keep the normal draft-to-ready CI efficiency policy; do not create a new workflow per commit.
+
+## Security and privacy limitation verified at PR 7
+
+The previous v0.3 history UI accepted any separately initialized loopback browser session with a valid CSRF token. Loopback/Origin/CSRF mitigate cross-site attacks, **not unauthorized local HTTP clients**. PR 7 requires a random server-lifetime pairing code printed to the launch terminal; it is not returned by APIs, stored in URLs/files or shared across browser sessions. History listing, opening, exporting and saving remain locked until pairing; disconnect, session expiry and restart revoke it. This is an **engineering mitigation**, not encryption or protection from malicious software running under the same OS account. Do not expose the app publicly or port-forward it. Automated tests can check the isolated-client denial path, not prove absence of all local compromise vectors.
 
 ## Recorded incomplete product controls
 

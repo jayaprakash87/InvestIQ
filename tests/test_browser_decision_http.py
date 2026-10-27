@@ -36,7 +36,7 @@ def app(tmp_path):
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
-        yield server.server_port, directory, catalog
+        yield server.server_port, directory, catalog, service.history_access_code
     finally:
         server.shutdown()
         thread.join(timeout=4)
@@ -98,10 +98,13 @@ def save_payload():
 
 
 def test_browser_history_save_load_export_and_auth_without_quote_or_ai(app):
-    port, directory, catalog = app
+    port, directory, catalog, code = app
     cookie, csrf, status = session(port)
     assert status["private_history_enabled"] is True
     assert not directory.exists()
+    assert request(port, "/api/v1/decisions/list", {}, cookie, csrf)[0] == 403
+    assert request(port, "/api/v1/decisions/unlock", {"code": "bad"}, cookie, csrf)[0] == 403
+    assert request(port, "/api/v1/decisions/unlock", {"code": code}, cookie, csrf)[0] == 200
     assert request(port, "/api/v1/decisions/list", {}, cookie, csrf)[0] == 200
     assert request(port, "/api/v1/decisions/save", save_payload(), cookie, csrf)[0] == 403
     assert request(port, "/api/v1/session/configure", {
@@ -147,11 +150,12 @@ def test_browser_history_save_load_export_and_auth_without_quote_or_ai(app):
 
 
 def test_multibyte_thesis_within_documented_limits_can_be_saved(app):
-    port, directory, _ = app
+    port, directory, _, code = app
     cookie, csrf, _ = session(port)
     assert request(port, "/api/v1/session/configure", {
         "sec_contact": "Research support@example.org", "twelve_data_api_key": "",
     }, cookie, csrf)[0] == 200
+    assert request(port, "/api/v1/decisions/unlock", {"code": code}, cookie, csrf)[0] == 200
     assert request(
         port, "/api/v1/companies/search", {"query": "EXM"}, cookie, csrf,
     )[0] == 200
@@ -174,12 +178,16 @@ def test_multibyte_thesis_within_documented_limits_can_be_saved(app):
 
 
 def test_history_requires_cookie_csrf_origin_and_declared_folder(app):
-    port, _, catalog = app
+    port, _, catalog, code = app
     cookie, csrf, _ = session(port)
     assert send(port, "/api/v1/decisions/list", data={}, csrf=csrf)[0] == 403
     assert send(port, "/api/v1/decisions/list", data={}, cookie=cookie)[0] == 403
     assert send(port, "/api/v1/decisions/list", data={}, cookie=cookie,
                 csrf=csrf, origin=False)[0] == 403
+    assert request(port, "/api/v1/decisions/open", {
+        "thesis_id": "nonexistent", "revision": 1
+    }, cookie, csrf)[0] == 403
+    assert request(port, "/api/v1/decisions/unlock", {"code": code}, cookie, csrf)[0] == 200
     assert request(port, "/api/v1/decisions/open", {
         "thesis_id": "nonexistent", "revision": 1
     }, cookie, csrf)[0] == 404
@@ -189,9 +197,63 @@ def test_history_requires_cookie_csrf_origin_and_declared_folder(app):
     assert catalog.calls == 0
 
 
+def test_second_local_http_session_cannot_read_or_export_private_decisions(app):
+    port, _, catalog, code = app
+    owner_cookie, owner_csrf, owner_status = session(port)
+    other_cookie, other_csrf, other_status = session(port)
+    assert owner_cookie != other_cookie
+    assert owner_status["private_history_unlocked"] is False
+    assert other_status["private_history_unlocked"] is False
+    assert code not in json.dumps(owner_status)
+    assert code not in json.dumps(other_status)
+    assert request(port, "/api/v1/decisions/unlock", {
+        "code": code,
+    }, owner_cookie, owner_csrf)[0] == 200
+    assert request(port, "/api/v1/session/configure", {
+        "sec_contact": "Research support@example.org", "twelve_data_api_key": "",
+    }, owner_cookie, owner_csrf)[0] == 200
+    assert request(port, "/api/v1/companies/search", {
+        "query": "EXM",
+    }, owner_cookie, owner_csrf)[0] == 200
+    assert request(port, "/api/v1/decisions/save", save_payload(),
+                   owner_cookie, owner_csrf)[0] == 200
+    for path, data in (
+        ("/api/v1/decisions/list", {}),
+        ("/api/v1/decisions/open", {
+            "thesis_id": "fictional_industries", "revision": 1
+        }),
+        ("/api/v1/decisions/export", {
+            "thesis_id": "fictional_industries", "revision": 1, "format": "json"
+        }),
+        ("/api/v1/decisions/save", save_payload()),
+    ):
+        response = request(port, path, data, other_cookie, other_csrf)
+        assert response[0] == 403
+        assert "unit economics" not in json.dumps(response)
+    assert request(port, "/api/v1/decisions/unlock", {
+        "code": "wrong-private-code"
+    }, other_cookie, other_csrf)[0] == 403
+    assert request(port, "/api/v1/decisions/list", {},
+                   other_cookie, other_csrf)[0] == 403
+    assert request(port, "/api/v1/decisions/list", {},
+                   owner_cookie, owner_csrf)[2]["snapshots"][0]["revision"] == 1
+    assert catalog.calls == 1
+
+
+def test_private_history_code_rotates_on_app_restart(tmp_path):
+    first = LocalConnectedResearch(decision_dir=tmp_path / "private")
+    second = LocalConnectedResearch(decision_dir=tmp_path / "private")
+    assert first.history_access_code
+    assert second.history_access_code
+    assert first.history_access_code != second.history_access_code
+    assert first.history_access_code not in str(first.session_status(
+        first.session(None, create=True)[1]
+    ))
+
+
 def test_history_disabled_does_not_create_any_unrequested_files(tmp_path):
     service = LocalConnectedResearch()
     assert service.history_available() is False
     with pytest.raises(PermissionError):
-        service.list_decisions()
+        service.list_decisions(None)
     assert not list(tmp_path.iterdir())

@@ -14,6 +14,7 @@
   };
   let csrf = null;
   let enabled = false;
+  let unlocked = false;
   let issuer = null;
   let hypothetical = null;
   let opened = null;
@@ -22,7 +23,7 @@
   function message(text) { $("history-message").textContent = text; }
   function saveMessage(text) { $("decision-message").textContent = text; }
   function enableSaving() {
-    $("decision-save").disabled = !enabled || !issuer;
+    $("decision-save").disabled = !enabled || !unlocked || !issuer;
     $("decision-selected-issuer").textContent = issuer
       ? "Selected " + issuer.company + " · " + issuer.symbol + " / " + issuer.venue +
         ". Confirm the current listing and currency before saving."
@@ -43,15 +44,37 @@
   document.addEventListener("investiq:session-ready", event => {
     csrf = event.detail.csrf;
     enabled = event.detail.privateHistoryEnabled === true;
-    $("history-status").textContent = enabled ? "Local private store enabled" : "Saving disabled";
-    $("decision-save-panel").hidden = !enabled;
-    $("decision-list-panel").hidden = !enabled;
+    unlocked = event.detail.privateHistoryUnlocked === true;
+    $("history-status").textContent = !enabled ? "Saving disabled"
+      : unlocked ? "History unlocked" : "History locked";
+    $("history-unlock-form").hidden = !enabled || unlocked;
+    $("decision-save-panel").hidden = !unlocked;
+    $("decision-list-panel").hidden = !unlocked;
     enableSaving();
-    if (enabled) {
+    if (enabled && unlocked) {
       refreshHistory();
+    } else if (enabled) {
+      message("Private history requires the one-time code printed in your launch terminal.");
     } else {
       message("History is disabled. Restart with --research-dir to opt in.");
     }
+  });
+  document.addEventListener("investiq:session-disconnected", () => {
+    // The server revokes access on disconnect; also hide any opened local text.
+    unlocked = false;
+    opened = null;
+    generation += 1;
+    $("history-list").replaceChildren();
+    $("history-open-details").replaceChildren();
+    $("history-warnings").replaceChildren();
+    $("history-open").hidden = true;
+    $("decision-save-panel").hidden = true;
+    $("decision-list-panel").hidden = true;
+    $("history-unlock-form").hidden = !enabled;
+    $("history-unlock-code").value = "";
+    $("history-status").textContent = enabled ? "History locked" : "Saving disabled";
+    message("Private history locked after disconnect. Enter the launch code again.");
+    enableSaving();
   });
   document.addEventListener("investiq:issuer-selected", event => {
     issuer = event.detail;
@@ -135,7 +158,7 @@
   }
 
   async function refreshHistory() {
-    if (!enabled) return;
+    if (!enabled || !unlocked) return;
     const version = ++generation;
     message("Reading existing private decision revisions…");
     try {
@@ -162,11 +185,37 @@
       if (version === generation) message(error.message);
     }
   }
+  $("history-unlock-form").addEventListener("submit", async event => {
+    event.preventDefault();
+    if (!enabled || unlocked) return;
+    const field = $("history-unlock-code");
+    const code = field.value;
+    field.value = "";
+    $("history-unlock-message").textContent = "Checking the one-time access code…";
+    try {
+      const result = await post("/api/v1/decisions/unlock", { code });
+      if (result.private_history_unlocked !== true) {
+        throw new Error("Private history authorization was rejected.");
+      }
+      unlocked = true;
+      $("history-status").textContent = "History unlocked";
+      $("history-unlock-form").hidden = true;
+      $("decision-save-panel").hidden = false;
+      $("decision-list-panel").hidden = false;
+      enableSaving();
+      await refreshHistory();
+      $("history-unlock-message").textContent = "Private history unlocked for this session.";
+    } catch (error) {
+      $("history-unlock-message").textContent =
+        error.message || "Private history unlock failed.";
+    }
+  });
+
   $("history-refresh").addEventListener("click", refreshHistory);
 
   $("decision-form").addEventListener("submit", async event => {
     event.preventDefault();
-    if (!enabled || !issuer || !$("confirm-listing").checked ||
+    if (!enabled || !unlocked || !issuer || !$("confirm-listing").checked ||
         !$("confirm-currency").checked || !$("decision-consent").checked) {
       saveMessage("Select and confirm the issuer, then explicitly authorize local saving.");
       return;
@@ -223,7 +272,7 @@
   });
 
   async function exportPrivate(format) {
-    if (!opened || !enabled) return;
+    if (!opened || !enabled || !unlocked) return;
     try {
       const result = await post("/api/v1/decisions/export", {
         thesis_id: opened.thesis_id, revision: opened.revision, format
