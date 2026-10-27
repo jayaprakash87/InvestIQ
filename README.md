@@ -66,6 +66,7 @@ All numbers are **fictional assumptions**, not estimates of a listed company's f
 - [Evidence contract](docs/methodology/evidence-contract.md)
 - [Connected market-data contracts (v0.2 PR 1)](docs/methodology/connected-data-contracts.md) — provider-neutral types
 - [Optional provider adapters (v0.2 PR 2)](docs/methodology/provider-adapters.md) — SEC filings and Twelve Data BYOK quote access; not a connected research UI
+- [Connected data service (v0.2 PR 3)](docs/methodology/connected-data-service.md) — on-demand data validation, freshness, licensed caching and bounded retries
 - [Research report contract](docs/methodology/research-report-contract.md)
 - [Valuation conventions](docs/methodology/valuation.md)
 - [Thesis history](docs/methodology/thesis-history.md)
