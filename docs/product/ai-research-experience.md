@@ -1,13 +1,13 @@
 # InvestIQ v0.3 — Personal AI Research Desk PRD
 
-> **Status:** Proposed personal-alpha release, **not implemented** · **Date:** 2026-10-27
+> **Status:** v0.3 PRs 1–6 implemented as an **experimental local personal-alpha code path**; PR 7 release acceptance in progress. **Live SEC, model/quote access, source-to-claim factual reliability and investor usability are not yet independently verified.** · **Date:** 2026-10-27
 > **Canonical product path:** [Roadmap through v1.0](product-roadmap.md) · **Testing:** [Validation Plan](validation-plan.md).
 
 ## 1. Why v0.3 and what it is *not*
 
 The first product release after the analytical core must let an individual investor **complete a meaningful, source-backed company research task through a simple local interface**, without repeatedly constructing prompts, editing data files or learning the underlying Python toolkit.
 
-**v0.3 is an initial usable vertical slice**, not the whole research platform or a mass-market SaaS. Deliver one complete supported company research loop with clear source coverage, uncertainty and lawful save/replay. Later milestones add deeper financial/peer research, configurable scoring, scenario underwriting, updates, optional portfolio research and external open-source usability.
+**v0.3 is an initial usable vertical slice**, not the whole research platform or a mass-market SaaS. Its coded workflow and offline acceptance tests are not evidence that the same research journey works for every live SEC issuer, entitlement or investor. Deliver one complete supported company research loop with clear source coverage, uncertainty and lawful save/replay. Later milestones add deeper financial/peer research, configurable scoring, scenario underwriting, updates, optional portfolio research and external open-source usability.
 
 **Product hypothesis:** AI-coordinated financial research with verified evidence, repeatable computation, specific risk challenges and an accessible interface can reduce effort and errors relative to using a general-purpose LLM alone.
 
@@ -104,6 +104,10 @@ Follow GitHub Actions draft-to-ready policy, cohort PRs around outcomes and merg
 ## 8. From v0.3 to v1.0
 
 v0.3 provides the local UI, AI research loop and first explicit private decision, **not the full future roadmap**. The required following increments are [v0.4 economic/peer analysis → v0.5 sector universes & explainable scoring → v0.6 valuation entry conditions → v0.7 thesis updates/monitoring → v0.8 optional portfolio context → v0.9 external OSS usability → v1.0 stable workflows](product-roadmap.md#6-roadmap-to-v10--progressive-independently-usable-releases).
+
+## Release acceptance status and remaining dependencies
+
+The implementation now includes local discovery and source inspection, opt-in AI with validated source-ID presence, user-supplied scenario computation, and immutable author-approved private decisions. The narrow automated integrated acceptance workflow lives in `tests/test_v03_release_acceptance.py` and the final gate is [v0.3 release acceptance](../engineering/release-acceptance-v0.3.md). Source-ID validation is **not** semantic entailment, source rights or investment accuracy. Browser snapshot replay excludes quotes and manually entered EPS/price; this is deliberate, not full numeric historical replay. Live provider/terms smoke and real-investor quality/usability tests remain prerequisite to externally claiming end-to-end personal acceptance.
 
 ## 9. Decision
 
