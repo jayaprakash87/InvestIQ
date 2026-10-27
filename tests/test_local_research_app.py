@@ -87,7 +87,8 @@ def test_offline_api_is_structurally_valid_and_explicit(app_port):
     assert status == 200
     assert headers["Content-Type"].startswith("application/json")
     payload = json.loads(raw)
-    assert payload == build_demo_response()
+    # JSON round-trip converts typed dataclass tuples into JSON arrays.
+    assert payload == json.loads(json.dumps(build_demo_response()))
     assert payload["bundle"]["report"]["findings"][0]["evidence_ids"]
     assert "Fictional" in payload["description"]
 
