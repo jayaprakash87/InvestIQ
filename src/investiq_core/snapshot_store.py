@@ -135,7 +135,7 @@ def render_snapshot_markdown(snapshot: ResearchSnapshot) -> str:
         "",
         "| Metric | Value | Unit | Period end | Filing date | Accession |",
         "| --- | ---: | --- | --- | --- | --- |",
-    ]
+    ])
     for f in sorted(snapshot.annual_facts, key=lambda x: x.metric):
         parts.append(
             f"| {_md(f.metric)} | {f.value} | {_md(f.unit.value)} "
