@@ -72,6 +72,12 @@ Research analysis includes:
 
 **Not a release gate:** global fund-data completeness, broker integration, historical backtesting, full multi-factor stock ranking, portfolio management, unattended scheduled monitoring, installation by unknown external users, or unmeasured claims of superior returns.
 
+### PR 5 interactive evidence and scenario boundary
+
+The first follow-up UI provides **independent, single-turn** questions with fresh external-processing consent. It can prefill a suggested follow-up from the preceding response but **does not forward earlier questions, claims, sources or generated answers** as conversation context; the user sees that distinction and can review the new question. The question list is temporary browser memory only, not a recorded thesis or a private user profile.
+
+The first editable valuation surface uses **only manually entered hypothetical positive EPS and price in assumed USD/share**, three subjective bear/base/bull growth/multiple/weight cases, and InvestIQ's existing deterministic Python valuation core. The UI does not pretend to reconcile SEC company-wide EPS and an unknown-adjustment quote. Invalid weights, unsupported bounds and missing values must fail closed; weighted terminal outcomes and price-only annualized results must be source-method traceable. No external providers, model calls or persistence are part of this calculation. Verified valuation eligibility and approved saved research remain work for PR 6/7 and later milestones.
+
 ### PR 4 model-assisted interpretation boundary
 
 The first model execution is an explicit, consent-gated **single-call** interpretation over public SEC 10-K excerpts and a narrow annual US-GAAP fact subset; it uses a provider-neutral model port and one fixed OpenAI Responses adapter. No free-running agents, tools, arbitrary URL fetches, external licensed quotes, persisted prompt/answer history or investment recommendations. A strict structured-response schema and deterministic citation allowlist reject unknown sources. The interface must conspicuously distinguish **source presence** from **factual entailment**—the model's unsupported interpretation remains fallible even with an allowed citation. Full source-grounding evaluation, business knowledge extraction and model/provider portability are subject to later quality gates.

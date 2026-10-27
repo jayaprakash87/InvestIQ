@@ -149,6 +149,11 @@
             <label class="confirm-line"><input type="checkbox" id="ai-consent" required> I authorize this single request to send public SEC excerpts, annual SEC facts and my question to the selected external AI provider. I understand its data handling policies and potential charges. Do not include private information in the question.</label>
             <button class="primary-button" type="submit" id="ai-run-button" disabled>Analyze supported SEC evidence</button>
           </form>
+          <p class="field-help">Follow-ups are separate model requests with fresh SEC retrieval and separate consent. Earlier questions and answers are <strong>never sent as context</strong>. Do not paste private portfolio data into a question.</p>
+          <details id="ai-question-history" class="question-history" hidden>
+            <summary>Questions asked in this browser tab (not sent to the model)</summary>
+            <ol id="ai-question-list"></ol>
+          </details>
           <p class="connection-message" id="ai-message" role="status" aria-live="polite">Configure SEC discovery and a model, then select and confirm a company.</p>
           <div class="ai-result" id="ai-result" hidden>
             <div class="connected-output-head"><h3>Model interpretation · not verified</h3><span class="current-not-saved">AI GENERATED · NOT SAVED</span></div>
@@ -160,7 +165,46 @@
             <h4>Questions to investigate</h4>
             <ul id="ai-questions" class="connected-warnings"></ul>
             <h4>Important limitations</h4>
+            <div class="followup-panel">
+              <h4>Investigate further</h4>
+              <p class="field-help">Choose a suggested question to fill the question box above. This starts a <strong>new independent investigation</strong>, not a conversation with memory of the previous answer. Review its SEC citations and grant consent again.</p>
+              <div id="ai-followup-suggestions" class="followup-suggestions" aria-label="Suggested follow-up questions"></div>
+            </div>
             <ul id="ai-disclosures" class="connected-warnings"></ul>
+          </div>
+        </section>
+        <section class="filing-panel scenario-panel" id="scenario-workbench" hidden aria-labelledby="workbench-title">
+          <div class="form-step">STEP 06 · EXPLORE USER ASSUMPTIONS</div>
+          <h3 id="workbench-title">Hypothetical scenario workbench</h3>
+          <p class="field-help">Edit the inputs and recalculate with InvestIQ's deterministic Python valuation core. No model, financial provider, external request or disk storage is involved. <strong>Manual positive USD EPS and entry price only</strong>; the app cannot verify share class, currency and split compatibility. Not a prediction.</p>
+          <form id="scenario-form" autocomplete="off">
+            <div class="scenario-top-inputs">
+              <div><label for="scenario-eps">Hypothetical annual EPS (USD/share)</label><input type="number" id="scenario-eps" min="0.01" max="100000" step="any" placeholder="Enter positive EPS" required></div>
+              <div><label for="scenario-price">Hypothetical entry price (USD/share)</label><input type="number" id="scenario-price" min="0.01" max="1000000" step="any" placeholder="Enter price" required></div>
+              <div><label for="scenario-years">Holding period (years)</label><input type="number" id="scenario-years" min="1" max="15" step="1" value="5" required></div>
+            </div>
+            <div class="scenario-table-scroll">
+              <table class="scenario-input-table">
+                <caption>Assumptions are illustrative editable defaults, not evidence-based forecasts.</caption>
+                <thead><tr><th scope="col">Scenario</th><th scope="col">Annual EPS growth (%)</th><th scope="col">Terminal P/E</th><th scope="col">Subjective weight (%)</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">Bear</th><td><input type="number" id="scenario-bear-growth" min="-95" max="200" step="any" value="-5" aria-label="Bear annual EPS growth percent" required></td><td><input type="number" id="scenario-bear-pe" min="0.1" max="100" step="any" value="10" aria-label="Bear terminal P/E" required></td><td><input type="number" id="scenario-bear-weight" min="0" max="100" step="any" value="25" aria-label="Bear subjective weight percent" required></td></tr>
+                  <tr><th scope="row">Base</th><td><input type="number" id="scenario-base-growth" min="-95" max="200" step="any" value="5" aria-label="Base annual EPS growth percent" required></td><td><input type="number" id="scenario-base-pe" min="0.1" max="100" step="any" value="15" aria-label="Base terminal P/E" required></td><td><input type="number" id="scenario-base-weight" min="0" max="100" step="any" value="50" aria-label="Base subjective weight percent" required></td></tr>
+                  <tr><th scope="row">Bull</th><td><input type="number" id="scenario-bull-growth" min="-95" max="200" step="any" value="15" aria-label="Bull annual EPS growth percent" required></td><td><input type="number" id="scenario-bull-pe" min="0.1" max="100" step="any" value="20" aria-label="Bull terminal P/E" required></td><td><input type="number" id="scenario-bull-weight" min="0" max="100" step="any" value="25" aria-label="Bull subjective weight percent" required></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="scenario-cta">
+              <button type="submit" class="primary-button" id="scenario-run">Recalculate hypothetical outcomes</button>
+              <span class="field-help">Weights must total 100%. Results are price-only and exclude dividends, dilution, fees and taxes.</span>
+            </div>
+          </form>
+          <p class="connection-message" id="scenario-message" role="status" aria-live="polite">Provide EPS and price manually, then recalculate.</p>
+          <div class="scenario-results" id="scenario-results" hidden>
+            <div class="scenario-summary" id="scenario-result-summary"></div>
+            <div id="scenario-result-cases" class="scenario-result-cases"></div>
+            <p class="scenario-input-hash" id="scenario-input-hash"></p>
+            <ul class="connected-warnings" id="scenario-disclosures"></ul>
           </div>
         </section>
         <div class="connection-message" id="research-message" role="status" aria-live="polite"></div>

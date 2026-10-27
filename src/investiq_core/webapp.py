@@ -172,6 +172,7 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             "/api/v1/model/configure",
             "/api/v1/model/clear",
             "/api/v1/research/ai",
+            "/api/v1/research/scenarios",
             "/api/v1/companies/search",
             "/api/v1/research/connected",
             "/api/v1/research/filing-evidence",
@@ -203,6 +204,8 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
                 result = self.server.connected.clear_model(state)
             elif path.path == "/api/v1/research/ai":
                 result = self.server.connected.ai_analyze(state, body)
+            elif path.path == "/api/v1/research/scenarios":
+                result = self.server.connected.preview_scenarios(state, body)
             elif path.path == "/api/v1/companies/search":
                 result = self.server.connected.search(state, body)
             elif path.path == "/api/v1/research/filing-evidence":
