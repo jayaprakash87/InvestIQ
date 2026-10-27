@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import socket
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Protocol
@@ -74,9 +73,9 @@ class UrllibJsonTransport:
                     retry_after = min(int(raw_retry), 86_400)
             # Never surface the URL, headers, provider body or exception text.
             raise TransportStatusError(exc.code, retry_after) from None
-        except (TimeoutError, socket.timeout) as exc:
+        except TimeoutError:
             raise TransportTimeoutError() from None
-        except (URLError, OSError) as exc:
+        except (URLError, OSError):
             raise TransportUnavailableError() from None
         if len(raw) > self._max_bytes:
             raise TransportInvalidResponseError("provider JSON exceeds response limit")

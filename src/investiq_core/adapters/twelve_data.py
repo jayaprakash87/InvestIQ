@@ -88,7 +88,13 @@ class TwelveDataQuoteProvider:
             )
         ticker = request.instrument.ticker
         url = TWELVE_DATA_ORIGIN + "?" + urlencode(
-            {"symbol": ticker, "apikey": self._key, "timezone": "UTC"}
+            {
+                "symbol": ticker,
+                "mic_code": request.instrument.venue,
+                "interval": "1min",
+                "apikey": self._key,
+                "timezone": "UTC",
+            }
         )
         try:
             payload = await self._transport.get_json(url, headers={})
@@ -126,7 +132,7 @@ class TwelveDataQuoteProvider:
             )
         try:
             return _parse_quote(payload, request, received, self._scope)
-        except (ValueError, TypeError, KeyError, OverflowError, InvalidOperation) as exc:
+        except (ValueError, TypeError, KeyError, OverflowError, InvalidOperation):
             raise ProviderFailure(
                 "Twelve Data", ProviderFailureCode.INVALID_RESPONSE,
                 "Twelve Data quote failed identity/time/value validation",
@@ -137,7 +143,7 @@ def _parse_quote(
     payload: Any, request: QuoteRequest, received: datetime, scope: str
 ) -> MarketQuote:
     if not isinstance(payload, dict):
-        raise ValueError("quote response must be an object")
+        raise TypeError("quote response must be an object")
     subject = request.instrument
     symbol = payload["symbol"]
     mic = payload["mic_code"]
@@ -160,7 +166,7 @@ def _parse_quote(
     price = Decimal(raw_price)
     is_open = payload.get("is_market_open")
     if not isinstance(is_open, bool):
-        raise ValueError("is_market_open must be an explicit boolean")
+        raise TypeError("is_market_open must be an explicit boolean")
     # True does not prove regular vs pre/after market session. False describes
     # the provider's market status; never infer freshness from it.
     session = MarketSession.UNKNOWN if is_open else MarketSession.CLOSED
