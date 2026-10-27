@@ -72,6 +72,10 @@ Research analysis includes:
 
 **Not a release gate:** global fund-data completeness, broker integration, historical backtesting, full multi-factor stock ranking, portfolio management, unattended scheduled monitoring, installation by unknown external users, or unmeasured claims of superior returns.
 
+### PR 6 opt-in private decision boundary
+
+The local Research Desk uses the **existing** v0.2 `ThesisSnapshot`, `ResearchSnapshot`, `LocalSnapshotStore` and offline replay rather than a second research database. The investor opts in using a private startup directory and **explicitly authors and approves** each immutable revision. Stored data comprise thesis text/stage/revision rationale, risks/falsification triggers, issuer identity and optionally hypothetical growth, terminal P/E, weights and horizon. Restricted or uncertain-rights quotes, manually entered EPS/entry price, price-derived outputs, complete filings, API keys and AI interpretations are **not** retained. Offline replay therefore provides identity/history integrity but not numeric price valuations; no misleading replay claim is permitted. Local digests are tamper-evident only under an honest file owner, not externally trusted signatures, and the user must secure the folder. Release acceptance still needs independently authorized source coverage and demonstrated investor usefulness.
+
 ### PR 5 interactive evidence and scenario boundary
 
 The first follow-up UI provides **independent, single-turn** questions with fresh external-processing consent. It can prefill a suggested follow-up from the preceding response but **does not forward earlier questions, claims, sources or generated answers** as conversation context; the user sees that distinction and can review the new question. The question list is temporary browser memory only, not a recorded thesis or a private user profile.
