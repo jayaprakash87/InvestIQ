@@ -67,9 +67,7 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
         if host not in allowed:
             return False
         origin = self.headers.get("Origin")
-        if origin is not None and origin not in {f"http://{item}" for item in allowed}:
-            return False
-        return True
+        return origin is None or origin in {f"http://{item}" for item in allowed}
 
     def _send(self, status: int, body: bytes, content_type: str) -> None:
         self.send_response(status)
@@ -105,13 +103,13 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
         else:
             self._json(404, {"error": "Not found"})
 
-    def do_GET(self) -> None:  # noqa: N802
+    def do_GET(self) -> None:
         self._read()
 
-    def do_HEAD(self) -> None:  # noqa: N802
+    def do_HEAD(self) -> None:
         self._read()
 
-    def do_POST(self) -> None:  # noqa: N802
+    def do_POST(self) -> None:
         self._json(405, {"error": "Read-only preview; writes are not available"})
 
     def log_message(self, format: str, *args: object) -> None:
