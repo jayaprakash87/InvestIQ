@@ -1,7 +1,7 @@
-"""Loopback-only, no-dependency research preview backed by existing synthetic core.
+"""Loopback-only local Research Desk: offline demo and explicitly opted-in providers.
 
-PR 1 intentionally exposes NO live provider, secrets, AI calls, storage or writes.
-It must not be mistaken for the v0.3 connected research application.
+No startup network, persistent keys, hosted access, background polling or AI.
+Connected endpoints require origin, session cookie and anti-CSRF controls.
 """
 
 from __future__ import annotations
@@ -68,7 +68,7 @@ def _allowed_authorities(port: int) -> set[str]:
 
 
 class ResearchAppHandler(BaseHTTPRequestHandler):
-    """Serve a fixed allowlist of static assets and one read-only JSON API."""
+    """Serve static app plus bounded, explicitly authorized local research APIs."""
 
     server_version = "InvestIQ-Local"
     sys_version = ""
@@ -120,6 +120,15 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
         return item.value if item is not None else None
 
     def _read_session(self) -> None:
+        # A cross-site <img>/resource GET has no custom header and must never
+        # allocate session capacity. A cross-origin JS request with this header
+        # requires CORS preflight, which the local server never permits.
+        if (
+            self.headers.get("X-InvestIQ-Init") != "1"
+            or self.headers.get("Sec-Fetch-Site") not in (None, "same-origin")
+        ):
+            self._json(403, {"error": "Local session initialization requires app context"})
+            return
         session = self.server.connected.session(self._session_cookie(), create=True)
         if session is None:
             self._json(429, {"error": "Too many active local sessions; restart after expiry"})
