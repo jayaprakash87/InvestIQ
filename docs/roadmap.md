@@ -1,28 +1,20 @@
 # InvestIQ Roadmap
 
-## Released in v0.1 — Offline research foundations
-- Evidence, instrument and scenario contracts.
-- Tested financial and valuation primitives.
-- Five portable, model-neutral research skills.
-- Structural provenance checks and attributed research reports.
-- Hash-linked thesis history and JSONL import/export.
-- Locally generated synthetic research bundle plus CLI validation.
-- Build, tests, documentation and release packaging.
+**Canonical product roadmap:** [Product Strategy and Roadmap](product/product-roadmap.md) — current priorities, v0.2 PR sequence, release gates, risks, and conditional v0.3–v1.0 direction.
 
-## Candidate v0.2 — Meaningful researcher workflows
-- Independent semantic/source validation evaluations for skill outputs.
-- Reusable company dossiers and share-class / symbol-history mapping.
-- Public-data adapters with explicit rights, as-of integrity and error handling.
-- Persisted local research storage with schema migrations and backups.
-- Improved CLI reporting and research comparison views.
+## Current
+**Released:** v0.1.1 — offline Python research toolkit, evidence provenance, valuation arithmetic, five portable skills, hash-linked thesis history, synthetic end-to-end CLI demonstration.
 
-## Future only after domain/data acceptance
-- Point-in-time historical fundamentals and survivorship-bias-aware backtests.
-- Transparent strategy specification, prospective paper performance and risk attribution.
-- Optional GUI, integrations and community research plugins.
-- Commercial or regulated products only if evidence, demand and compliance justify them.
+## Next — v0.2 Real-Company Research
+**Product objective:** import correctly attributed real-company facts, create a reproducible local research dossier, and replay it offline. Local CSV/JSON ingestion and metric contracts first; opt-in SEC EDGAR adapter, local workspace, deterministic source-linked reports and acceptance evaluation next.
 
-## Acceptance gates
-Numerical accuracy, historical provenance, licensing and source semantics precede rankings. No backtest should be published without vintage-safe data, realistic costs and appropriate benchmarks. No realized-performance claims from simulations. No broker/trading integrations in v0.1.
+The [full roadmap](product/product-roadmap.md) contains outcome-based PRs and acceptance gates.
 
-These are research opportunities, not promises or current product capabilities.
+## Later, subject to validated user value
+- **v0.3:** fundamental trends and peer comparison
+- **v0.4:** research updates, thesis change explanations
+- **v0.5:** optional local-first UX and evaluated AI integrations
+- **v0.6+:** point-in-time quant research, only once historical data constraints are satisfied
+- **v1.0:** mature, stable open research product
+
+Algorithmic trading, mutual funds and ETFs are **not** committed roadmap features. No return prediction or broker integration is implied.
