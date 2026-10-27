@@ -1,10 +1,10 @@
 # InvestIQ — Roadmap Summary
 
-> **Status:** Proposed [Research-aligned Product Roadmap v3.0 through v1.0](product/product-roadmap.md) (2026-10-27); not automatically approved or merged. [ADR 0009](decisions/0009-ai-first-product-pivot.md) records the change.
+> **Status:** Proposed [Product Roadmap v3.0 through v1.0](product/product-roadmap.md) (2026-10-27); not automatically approved or merged. [ADR 0009](decisions/0009-ai-first-product-pivot.md) records the change.
 
-**Purpose:** Build an **AI-first, open-source, local-first investment research system** that becomes useful to its creator **before** it becomes easy for other investors to install and use. Preserve the tested financial Python core and strict source/freshness/rights rules. Never assume an InvestIQ cloud account or worldwide real-time data coverage is necessary.
+**Purpose:** Build a **general-purpose, AI-first, open-source, local-first investment research system**, proven initially with individual equity research and then expanded to independent users. Its scope does not privilege any stock, industry, thematic universe or personal research history. Preserve the tested financial Python core and strict source/freshness/rights rules. Never assume an InvestIQ cloud account or worldwide real-time data coverage is necessary.
 
-**Research foundation:** [AI-infrastructure/physical-AI value-chain mapping, sector-aware ranking, valuation/IRR entry conditions, comparisons, thesis continuity and portfolio research](product/research-foundations.md).
+**Product capability foundation:** source-connected research, business/financial analysis, comparisons, explainable screening/scoring, scenario underwriting, research continuity, opt-in portfolio context and source/data/model governance.
 
 | Release | Status / user outcome |
 | --- | --- |
