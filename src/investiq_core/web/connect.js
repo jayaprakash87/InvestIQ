@@ -12,6 +12,8 @@
   let quoteConfigured = false;
   let modelConfigured = false;
   let aiGeneration = 0;
+  let scenarioGeneration = 0;
+  let questionHistory = [];
   let selectionVersion = 0;
   let evidenceVersion = 0;
   let searchVersion = 0;
@@ -44,6 +46,7 @@
     if (!configured) setModelConfigured(false);
     aiGeneration += 1;
     $("ai-result").hidden = true;
+    resetInteractions();
   }
 
   function setModelConfigured(value, model) {
@@ -53,6 +56,21 @@
     if (model) $("model-select").value = model;
     aiGeneration += 1;
     $("ai-result").hidden = true;
+    resetQuestionHistory();
+  }
+
+  function resetQuestionHistory() {
+    questionHistory = [];
+    $("ai-question-list").replaceChildren();
+    $("ai-question-history").hidden = true;
+    $("ai-followup-suggestions").replaceChildren();
+  }
+
+  function resetInteractions() {
+    scenarioGeneration += 1;
+    $("scenario-workbench").hidden = true;
+    $("scenario-results").hidden = true;
+    resetQuestionHistory();
   }
 
   async function post(path, payload) {
@@ -129,6 +147,9 @@
         $("connected-output").hidden = true;
         aiGeneration += 1;
         $("ai-result").hidden = true;
+        resetInteractions();
+        $("scenario-workbench").hidden = false;
+        status("scenario-message", "Enter manually verified hypothetical EPS and price; no live data is used.");
       });
       container.append(button);
     }
@@ -238,6 +259,7 @@
     evidenceVersion += 1;
     aiGeneration += 1;
     $("ai-result").hidden = true;
+    resetInteractions();
     selected = null;
     $("research-select").hidden = true;
     $("connected-output").hidden = true;
@@ -436,6 +458,20 @@
     for (const limitation of payload.disclosures) {
       $("ai-disclosures").append(node("li", "", limitation));
     }
+    const hints = $("ai-followup-suggestions");
+    hints.replaceChildren();
+    for (const q of payload.analysis.open_questions) {
+      const button = node("button", "secondary-button followup-question", q);
+      button.type = "button";
+      button.addEventListener("click", () => {
+        $("ai-question").value = q.slice(0, 360);
+        $("ai-consent").checked = false;
+        aiGeneration += 1;
+        $("ai-question").focus();
+        status("ai-message", "Question filled. Review it and authorize another independent request.");
+      });
+      hints.append(button);
+    }
     $("ai-result").hidden = false;
   }
 
@@ -486,6 +522,7 @@
     const candidate = selected;
     const selection = selectionVersion;
     const generation = ++aiGeneration;
+    const submittedQuestion = $("ai-question").value;
     const submit = $("ai-run-button");
     submit.disabled = true;
     $("ai-result").hidden = true;
@@ -497,7 +534,7 @@
         confirm_current_listing: $("confirm-listing").checked,
         confirm_currency: $("confirm-currency").checked,
         consent_external_sec_data: $("ai-consent").checked,
-        question: $("ai-question").value
+        question: submittedQuestion
       });
       if (generation !== aiGeneration || selection !== selectionVersion ||
           selected !== candidate || !modelConfigured ||
@@ -507,6 +544,12 @@
         return;
       }
       showAiResearch(response);
+      questionHistory.push(submittedQuestion);
+      questionHistory = questionHistory.slice(-5);
+      $("ai-question-list").replaceChildren(
+        ...questionHistory.map(q => node("li", "", q))
+      );
+      $("ai-question-history").hidden = false;
       status("ai-message",
         "Model response complete. Every citation identifies an input source, not verified truth.");
     } catch (error) {
@@ -517,6 +560,133 @@
       // Consent is per request, not an ongoing or blanket authorization.
       $("ai-consent").checked = false;
       submit.disabled = !modelConfigured || !configured;
+    }
+  });
+
+  // The scenario workbench has no LLM or licensed provider dependency.
+  // An edit invalidates the previously displayed scenario and pending response.
+  $("scenario-form").addEventListener("input", () => {
+    scenarioGeneration += 1;
+    $("scenario-results").hidden = true;
+    status("scenario-message", "Assumptions changed. Recalculate to view new outcomes.");
+  });
+
+  function assumption(name, field) {
+    const value = Number($("scenario-" + name + "-" + field).value);
+    if (!Number.isFinite(value)) throw new Error("Enter finite scenario assumptions.");
+    return value;
+  }
+
+  function inputNumber(id) {
+    const field = $(id);
+    if (!field.value.trim() || !field.checkValidity()) {
+      throw new Error("Complete each input using the supported numeric range.");
+    }
+    const value = Number(field.value);
+    if (!Number.isFinite(value)) throw new Error("Use a finite numeric input.");
+    return value;
+  }
+
+  function manualScenarioInputs() {
+    return {
+      start_eps: inputNumber("scenario-eps"),
+      initial_price: inputNumber("scenario-price"),
+      years: inputNumber("scenario-years"),
+      scenarios: ["bear", "base", "bull"].map(name => ({
+        name,
+        annual_growth_percent: assumption(name, "growth"),
+        terminal_pe: assumption(name, "pe"),
+        weight_percent: assumption(name, "weight")
+      }))
+    };
+  }
+
+  function percentage(value) {
+    return Number(value).toLocaleString("en-US", { maximumFractionDigits: 2 }) + "%";
+  }
+
+  function amount(value) {
+    return Number(value).toLocaleString("en-US", {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    }) + " USD";
+  }
+
+  function renderHypothetical(data) {
+    if (data.mode !== "manual_hypothetical_no_provider_data" ||
+        !Array.isArray(data.outcomes) || data.outcomes.length !== 3) {
+      throw new Error("The scenario response did not match the supported contract.");
+    }
+    const summary = $("scenario-result-summary");
+    summary.replaceChildren(
+      row("Weighted terminal price (subjective)", amount(data.weighted_terminal_price)),
+      row("Price-only cumulative return", percentage(data.weighted_price_return_percent)),
+      row("Annualized return on weighted price", percentage(data.annualized_return_on_weighted_price_percent))
+    );
+    const results = $("scenario-result-cases");
+    results.replaceChildren();
+    for (const outcome of data.outcomes) {
+      const card = node("article", "scenario-case");
+      card.append(
+        node("strong", "scenario-case-title", outcome.name.toUpperCase()),
+        row("Subjective weight", percentage(outcome.weight_percent)),
+        row("Hypothetical terminal price", amount(outcome.terminal_price)),
+        row("Total price return", percentage(outcome.total_price_return_percent)),
+        row("Annualized price return", percentage(outcome.annualized_price_return_percent))
+      );
+      results.append(card);
+    }
+    $("scenario-input-hash").textContent =
+      "Deterministic input fingerprint: " + data.input_sha256 +
+      " · Not stored. An input fingerprint is not historical replay.";
+    const limitations = $("scenario-disclosures");
+    limitations.replaceChildren();
+    for (const warning of data.disclosures) {
+      limitations.append(node("li", "", warning));
+    }
+    $("scenario-results").hidden = false;
+  }
+
+  $("scenario-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!selected || !configured ||
+        !$("confirm-listing").checked || !$("confirm-currency").checked) {
+      status("scenario-message", "Select a company and confirm its listing and currency first.");
+      return;
+    }
+    const candidate = selected;
+    const selection = selectionVersion;
+    const generation = ++scenarioGeneration;
+    const button = $("scenario-run");
+    button.disabled = true;
+    $("scenario-results").hidden = true;
+    try {
+      const inputs = manualScenarioInputs();
+      const weightTotal = inputs.scenarios.reduce((sum, x) => sum + x.weight_percent, 0);
+      if (Math.abs(weightTotal - 100) > 1e-9) {
+        throw new Error("Subjective bear/base/bull weights must total 100%.");
+      }
+      status("scenario-message", "Calculating using the deterministic Python core…");
+      const result = await post("/api/v1/research/scenarios", {
+        symbol: candidate.symbol, venue: candidate.venue, cik: candidate.cik,
+        currency: candidate.currency_candidate,
+        confirm_current_listing: $("confirm-listing").checked,
+        confirm_currency: $("confirm-currency").checked,
+        hypothetical: inputs
+      });
+      if (generation !== scenarioGeneration || selection !== selectionVersion ||
+          selected !== candidate || !configured ||
+          !$("confirm-listing").checked || !$("confirm-currency").checked) {
+        status("scenario-message", "Inputs or company changed; outdated calculation discarded.");
+        return;
+      }
+      renderHypothetical(result);
+      status("scenario-message", "Hypothetical outcomes recalculated; no data was saved.");
+    } catch (error) {
+      if (generation === scenarioGeneration && selection === selectionVersion) {
+        status("scenario-message", error.message || "Invalid hypothetical scenario.");
+      }
+    } finally {
+      button.disabled = false;
     }
   });
 
