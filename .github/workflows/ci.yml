@@ -36,7 +36,9 @@ jobs:
       - name: Unit and workflow acceptance tests
         run: pytest -q
       - name: Local UI JavaScript syntax
-        run: node --check src/investiq_core/web/app.js
+        run: |
+          node --check src/investiq_core/web/app.js
+          node --check src/investiq_core/web/connect.js
       - name: Wheel and source distribution
         run: python -m build --sdist --wheel
       - name: Installed CLI smoke test
@@ -47,5 +49,5 @@ jobs:
           investiq research --help
           investiq replay --help
           investiq app --help
-          python -c 'from importlib.resources import files; root=files("investiq_core").joinpath("web"); assert all(root.joinpath(p).read_bytes() for p in ("index.html","styles.css","app.js"))'
+          python -c 'from importlib.resources import files; root=files("investiq_core").joinpath("web"); assert all(root.joinpath(p).read_bytes() for p in ("index.html","styles.css","app.js","connect.js"))'
           python -c 'from importlib.metadata import version; assert version("investiq-core") == "0.2.0"'
