@@ -137,7 +137,8 @@ class ResearchAppHandler(BaseHTTPRequestHandler):
             return
         sid, state = session
         self._json(
-            200, self.server.connected.session_status(state),
+            200, {**self.server.connected.session_status(state),
+                  "private_history_enabled": self.server.connected.history_available()},
             extra_headers={
                 "Set-Cookie": (
                     f"investiq_sid={sid}; HttpOnly; SameSite=Strict; "
