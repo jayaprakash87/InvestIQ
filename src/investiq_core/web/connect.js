@@ -247,6 +247,7 @@
   $("clear-session").addEventListener("click", async () => {
     try {
       await post("/api/v1/session/clear", {});
+      document.dispatchEvent(new Event("investiq:session-disconnected"));
       setConfigured(false, false);
       $("quote-key").value = "";
       $("sec-contact").value = "";
