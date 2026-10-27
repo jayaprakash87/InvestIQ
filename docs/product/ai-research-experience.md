@@ -35,7 +35,7 @@ Broadcom is an **illustrative supported-candidate** subject, not a pre-certified
 | Must ship v0.3 | Explicitly deferred |
 | --- | --- |
 | Local single-user UI with question/search, research view, source drawer and consent/error controls | Multiuser hosted SaaS, global live markets, broker auth |
-| Narrow verified company lookup and identity resolver for an approved small set | Every issuer, IFRS/20-F global coverage, exchange streaming |
+| Narrow verified company lookup and identity resolver for an approved small set; **lawfully retrievable issuer narrative evidence** (e.g., identifiable business/risk passages from annual filings) when making business/moat claims | Every issuer, IFRS/20-F global coverage, exchange streaming |
 | One bounded tool-using AI coordinator, versioned prompts/tool records | Agent swarm, autonomous trade decisions, complex persistent vector memory |
 | Sourced annual financial context plus eligible quote/valuation; clear missing metrics | Full quarterly/TTM FCF/ROIC history and comprehensive stock-scoring |
 | Testable sector/business explanation and specific bear-case challenge | Automatic research universe ranking and dynamic screening |
@@ -48,7 +48,7 @@ Broadcom is an **illustrative supported-candidate** subject, not a pre-certified
 Every answer must distinguish **reported fact; third-party estimate; deterministic calculation; AI interpretation; user assumption; unavailable evidence**. Material financial numbers need reference to exact provider/issuer, metric definition, fiscal time, unit/currency, original price/event timestamp and provider-declared real-time/delayed/EOD/unknown state. No silent fallback or today-labelled stale price. A hypothetical scenario is *not* a model's predicted return.
 
 Research analysis includes:
-- What products and economics drive the business; which AI layer it occupies; where its moat and competitors/partners lie, with attributed claims where possible.
+- What products and economics drive the business; which AI layer it occupies; where its moat and competitors/partners lie. **Claims about products, customers, concentration, competitive positioning and risk must be supported by retrieved filings/qualified evidence or explicitly labeled as unverified interpretation.** The existing v0.2 numeric Companyfacts API alone is insufficient; a bounded issuer-document text source or other permitted evidence source is a required v0.3 addition.
 - Latest supported financial observations and source limitations (no unsupported FCF/debt or growth data invented).
 - Suitable, currently supported valuation and changes implied by explicit user hypotheses.
 - Strongest bear case, **observable conditions that would weaken/strengthen the thesis**, and missing evidence that blocks conviction.
@@ -77,7 +77,7 @@ Research analysis includes:
 | Slice | User milestone | Engineering proof |
 | --- | --- | --- |
 | **A — local task shell + provider onboarding** | Launch simple research interface; select supported issuer; clearly synthetic offline demo or guided lawful BYOK | OS smoke, credential privacy, issuer mapping, entitlement/errors, startup |
-| **B — AI-integrated research** | One natural-language user question → complete referenced evidence/finance + bear-case research | Typed tools, finite orchestrator, deterministic arithmetic, semantic evidence tests, prompt injection, budget/cancel |
+| **B — AI-integrated research** | One natural-language user question → attributable filing/document *and* numeric evidence, business analysis and a specific bear case | Narrow cited issuer text retrieval, typed tools, finite orchestrator, deterministic arithmetic, semantic evidence tests, prompt injection, budget/cancel |
 | **C — interactive scenario + deliberate history** | Follow up, drill down, modify supported assumptions, explicitly save/export/replay | UX tests, financial method/units, immutable snapshots, lawful retention and deletion |
 | **D — personal acceptance** | Creator repeatedly completes the supported real research task and compares it with old workflow | Documented live-provider terms/coverage, performance/cost, usability gaps, unresolved risk register |
 
