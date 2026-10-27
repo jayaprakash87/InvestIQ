@@ -9,6 +9,8 @@
   let csrf = null;
   let selected = null;
   let configured = false;
+  let selectionVersion = 0;
+  let searchVersion = 0;
   const node = (tag, cls, value) => {
     const el = document.createElement(tag);
     if (cls) el.className = cls;
@@ -19,14 +21,17 @@
   function status(id, value) { $(id).textContent = value; }
   function setConfigured(value) {
     configured = Boolean(value);
+    // Rotate selection version when credentials/entitlements are changed.
+    selectionVersion += 1;
+    searchVersion += 1;
+    selected = null;
+    $("research-select").hidden = true;
+    $("connected-output").hidden = true;
+    $("company-results").replaceChildren();
     $("search-button").disabled = !configured;
     $("provider-status").textContent = configured ? "Session configured" : "Not configured";
     $("nav-connection-state").textContent = configured ? "Configured" : "Not configured";
     if (!configured) {
-      selected = null;
-      $("research-select").hidden = true;
-      $("connected-output").hidden = true;
-      $("company-results").replaceChildren();
     }
   }
 
@@ -78,6 +83,7 @@
         company.symbol + " · " + company.venue + " · SEC CIK " + company.cik);
       button.append(primary, secondary);
       button.addEventListener("click", () => {
+        selectionVersion += 1;
         selected = company;
         for (const choice of container.querySelectorAll("button")) {
           choice.classList.remove("candidate-selected");
@@ -140,7 +146,8 @@
   async function initialize() {
     try {
       const response = await fetch("/api/v1/session", {
-        credentials: "same-origin", cache: "no-store"
+        credentials: "same-origin", cache: "no-store",
+        headers: { "X-InvestIQ-Init": "1" }
       });
       if (!response.ok) throw new Error("Could not initialize local session.");
       const session = await response.json();
@@ -195,15 +202,23 @@
     event.preventDefault();
     if (!configured) return;
     const button = $("search-button");
+    const submittedSearch = ++searchVersion;
+    // A search initiated during a prior research call invalidates that result.
+    selectionVersion += 1;
+    selected = null;
+    $("research-select").hidden = true;
+    $("connected-output").hidden = true;
     button.disabled = true;
     status("search-message", "Retrieving issuer candidates from SEC (first search may take time)…");
     try {
       const result = await post("/api/v1/companies/search", {
         query: $("company-search").value.trim()
       });
-      displayCandidates(result);
+      if (submittedSearch === searchVersion && configured) displayCandidates(result);
     } catch (error) {
-      status("search-message", error.message || "Company search failed.");
+      if (submittedSearch === searchVersion) {
+        status("search-message", error.message || "Company search failed.");
+      }
     } finally {
       button.disabled = !configured;
     }
@@ -213,23 +228,31 @@
     event.preventDefault();
     if (!selected || !configured) return;
     const button = $("research-button");
+    const submittedCandidate = selected;
+    const submittedVersion = selectionVersion;
     button.disabled = true;
     $("connected-output").hidden = true;
     status("research-message", "Retrieving SEC annual facts and permitted quote…");
     try {
       const result = await post("/api/v1/research/connected", {
-        symbol: selected.symbol,
-        venue: selected.venue,
-        cik: selected.cik,
-        currency: selected.currency_candidate,
+        symbol: submittedCandidate.symbol,
+        venue: submittedCandidate.venue,
+        cik: submittedCandidate.cik,
+        currency: submittedCandidate.currency_candidate,
         confirm_current_listing: $("confirm-listing").checked,
         confirm_currency: $("confirm-currency").checked,
         max_quote_age_minutes: Number($("quote-age").value)
       });
+      if (submittedVersion !== selectionVersion || selected !== submittedCandidate || !configured) {
+        status("research-message", "Selection changed; the previous research result was discarded.");
+        return;
+      }
       displayResearch(result);
       status("research-message", "Current sourced results loaded. No data saved and no AI model executed.");
     } catch (error) {
-      status("research-message", error.message || "Connected research failed.");
+      if (submittedVersion === selectionVersion && selected === submittedCandidate) {
+        status("research-message", error.message || "Connected research failed.");
+      }
     } finally {
       button.disabled = false;
     }
