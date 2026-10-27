@@ -28,7 +28,7 @@ The first product release after the analytical core must let an individual inves
 5. **Research:** one bounded model-neutral tool coordinator calls existing dated/entitled data functions and deterministic valuation functions. Show progress, cancellation, errors and partial outputs.
 6. **Read:** concise conclusion **without buy/sell order**, source-backed business/financial summary, eligible valuation/sensitivity, strongest falsification condition and missing/unsupported evidence. Expand panels for original sources and units, fiscal/market periods.
 7. **Follow up:** ask why a number changed; adjust explicitly hypothetical assumptions; use deterministic calculations. If a requested metric lacks support, report gap rather than model-fabricated data.
-8. **Save deliberately:** present exact eligible research inputs and what source licenses prohibit storing; user can approve a versioned private thesis, inspect its version, export/open/replay eligible historical inputs and discard it. No automatic portfolio position or user profile recording.
+8. **Save deliberately:** present exact eligible research inputs and what source licenses prohibit storing; user can approve a versioned private thesis, inspect its version and export/open/replay eligible historical inputs. **In-app deletion is not yet implemented**; whole-chain deletion via the operating system is documented in the [v0.3 acceptance gaps](../engineering/release-acceptance-v0.3.md), and must not be claimed as completed. No automatic portfolio position or user profile recording.
 
 ## 4. Minimum feature boundaries
 
