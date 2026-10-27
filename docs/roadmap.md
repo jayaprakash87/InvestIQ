@@ -1,20 +1,19 @@
 # InvestIQ Roadmap
 
-**Canonical product roadmap:** [Product Strategy and Roadmap](product/product-roadmap.md) — current priorities, v0.2 PR sequence, release gates, risks, and conditional v0.3–v1.0 direction.
+**Canonical and finalized planning baseline:** [InvestIQ Product Strategy and Roadmap v2.0](product/product-roadmap.md) (2026-10-27).
 
-## Current
-**Released:** v0.1.1 — offline Python research toolkit, evidence provenance, valuation arithmetic, five portable skills, hash-linked thesis history, synthetic end-to-end CLI demonstration.
+**Architecture decision:** connected, provider-agnostic market/fundamental data; provider- and entitlement-aware freshness/cache; **optional** cloud deployment; **user-controlled immutable research snapshots**. Local storage is an allowed choice for *historical research*, never the sole source of current prices.
 
-## Next — v0.2 Real-Company Research
-**Product objective:** import correctly attributed real-company facts, create a reproducible local research dossier, and replay it offline. Local CSV/JSON ingestion and metric contracts first; opt-in SEC EDGAR adapter, local workspace, deterministic source-linked reports and acceptance evaluation next.
+| Release | Direction |
+| --- | --- |
+| **v0.1.1 (released)** | Offline research library, five skills, provenance, valuation and synthetic example |
+| **v0.2 (next)** | Connected company research: real permitted provider data, freshness, source-linked analysis, explicit save/replay |
+| **v0.3** | Comparisons, trends and industry-aware valuation |
+| **v0.4** | Data-change intelligence, human-approved thesis updates and opt-in monitoring |
+| **v0.5** | Optional local/hosted interface, gated by users, data licenses and cost |
+| **v0.6+** | Point-in-time quant research only after bias/cost/data-quality gates |
+| **v1.0** | Stable extensible open research platform |
 
-The [full roadmap](product/product-roadmap.md) contains outcome-based PRs and acceptance gates.
+v0.2 outcome PRs: (1) market-data contracts/ADR; (2) entitled provider adapters; (3) on-demand access/freshness/cache; (4) connected analysis; (5) durable snapshots and source-linked output; (6) integrated acceptance/release.
 
-## Later, subject to validated user value
-- **v0.3:** fundamental trends and peer comparison
-- **v0.4:** research updates, thesis change explanations
-- **v0.5:** optional local-first UX and evaluated AI integrations
-- **v0.6+:** point-in-time quant research, only once historical data constraints are satisfied
-- **v1.0:** mature, stable open research product
-
-Algorithmic trading, mutual funds and ETFs are **not** committed roadmap features. No return prediction or broker integration is implied.
+No web SaaS, live feed entitlement, trading or investment-fund capabilities are promised by this roadmap. **See the [full document](product/product-roadmap.md)** for requirements, non-goals, rollout gates, cost/security controls and provider evaluation.
