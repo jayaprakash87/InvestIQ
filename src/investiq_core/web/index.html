@@ -215,6 +215,55 @@
           <h4>Qualifications and warnings</h4><ul id="connected-warnings" class="connected-warnings"></ul>
         </div>
       </section>
+      <section class="connection-panel" id="private-decisions" aria-labelledby="decisions-title">
+        <div class="panel-heading">
+          <div><div class="section-overline">07 / PRIVATE RESEARCH HISTORY</div><h2 id="decisions-title">Research decisions & revisions</h2><p>Your own explicitly authored thesis, versioned and reopened offline. Never an automatic copy of market data or model output.</p></div>
+          <span class="panel-flag" id="history-status">History off</span>
+        </div>
+        <p class="trust-note">Private history is <strong>disabled by default</strong>. Restart with <code>investiq app --research-dir /your/private/parent/decisions</code> (parent folder must already exist) to opt in. Saved JSON stays on this computer. No quoted price, EPS amount, price-derived valuation, AI-generated text or entire SEC filing is saved from the browser. The SHA-256 chain detects accidental edits, not malicious rewriting or independently verified timestamps. Secure the folder with disk encryption and backups.</p>
+        <p class="connection-message" id="history-message" role="status" aria-live="polite">Initializing private history capability…</p>
+        <div class="history-grid">
+          <div class="connect-form-card" id="decision-save-panel" hidden>
+            <div class="form-step">AUTHOR AND EXPLICITLY SAVE</div>
+            <p class="field-help" id="decision-selected-issuer">Select and confirm an issuer to create or revise a decision.</p>
+            <form id="decision-form" autocomplete="off">
+              <label for="decision-id">Thesis identifier (stable across revisions)</label>
+              <input id="decision-id" type="text" maxlength="64" pattern="[A-Za-z0-9][A-Za-z0-9_-]*" placeholder="my_company_thesis" required>
+              <label for="decision-stage">Research stage</label>
+              <select id="decision-stage"><option value="researching">Researching</option><option value="watching">Watching</option><option value="challenged">Challenged</option><option value="archived">Archived</option></select>
+              <label for="decision-statement">My thesis (manually authored, not copied from AI)</label>
+              <textarea id="decision-statement" rows="4" maxlength="1400" required placeholder="What do I believe, and under what assumptions?"></textarea>
+              <label for="decision-reason">Why record or revise this decision?</label>
+              <textarea id="decision-reason" rows="2" maxlength="400" required placeholder="The change in my reasoning or evidence"></textarea>
+              <label for="decision-risks">Risks (one per line; maximum five)</label>
+              <textarea id="decision-risks" rows="3" maxlength="1000" placeholder="What could go wrong?"></textarea>
+              <label for="decision-triggers">Thesis invalidation conditions (one per line; maximum five)</label>
+              <textarea id="decision-triggers" rows="3" maxlength="1000" placeholder="What would disconfirm this thesis?"></textarea>
+              <label class="confirm-line"><input type="checkbox" id="decision-include-scenarios"> Also preserve the last validated <em>hypothetical</em> growth, multiple, weights and years only (never EPS, entry price or calculated outcomes)</label>
+              <label class="confirm-line"><input type="checkbox" id="decision-consent" required> Save this <strong>author-written decision</strong> to the private local folder now. Do not include restricted data or secrets in text fields.</label>
+              <button type="submit" id="decision-save" class="primary-button" disabled>Save new immutable revision</button>
+            </form>
+            <p class="connection-message" id="decision-message" aria-live="polite" role="status">No decision has been saved.</p>
+          </div>
+          <div class="connect-form-card" id="decision-list-panel" hidden>
+            <div class="form-step">OFFLINE HISTORY · NO API KEY REQUIRED</div>
+            <button type="button" class="secondary-button" id="history-refresh">Refresh saved decisions</button>
+            <p class="field-help">Open a historical revision after restarting the app. This will never refresh the original market quote.</p>
+            <div id="history-list" class="history-list"></div>
+            <div id="history-open" hidden>
+              <h3 id="history-open-title">Saved decision</h3>
+              <div id="history-open-details" class="history-open-details"></div>
+              <ul id="history-warnings" class="connected-warnings"></ul>
+              <div class="connect-actions">
+                <button class="secondary-button" type="button" id="history-export-json">Export private JSON</button>
+                <button class="secondary-button" type="button" id="history-export-md">Export private Markdown</button>
+                <button class="quiet-button" type="button" id="history-revise">Prepare revision</button>
+              </div>
+              <p class="field-help">Exports include your authored private research. Review before sharing. Replay intentionally cannot reproduce price-based calculations without lawfully retained price inputs.</p>
+            </div>
+          </div>
+        </div>
+      </section>
       <div class="section-grid">
         <section class="panel panel-wide" id="findings" aria-labelledby="findings-title">
           <div class="panel-heading"><div><div class="section-overline">01 / ANALYSIS</div><h2 id="findings-title">Research findings</h2><p>Every loaded finding retains its evidence or assumption reference.</p></div><span class="panel-flag">Structured</span></div>
