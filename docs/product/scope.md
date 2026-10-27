@@ -1,43 +1,36 @@
 # InvestIQ Product Scope
 
-> **Released:** v0.1.1 open-source, offline synthetic research toolkit.  
-> **Approved planned next release:** **v0.2 — Connected Company Research.** The v0.2 capabilities below are **not yet implemented**. See [canonical product roadmap v2.0](product-roadmap.md).
+> **Status:** Aligned to proposed [Product Strategy & Roadmap v3.0](product-roadmap.md) · **Date:** 2026-10-27
+> **Current code:** v0.2.0 source release candidate; independent real-provider smoke and public release authorization remain outstanding.
+> **Next product hypothesis:** v0.3 **AI Research Experience**, not another developer-first analytics release.
 
-## Mission
+## Mission and intended user
 
-Offer connected, source-aware equity research that **refreshes data with truthful timestamps** yet **preserves reproducible decisions**. Make it usable as an open-source library/CLI and optionally self-hosted or delivered through appropriately licensed managed services.
+Help a serious self-directed equity investor move from **question → sourced research → strongest challenge → deliberate thesis → subsequent reassessment** with substantially less manual prompting and clerical reconciliation. User-facing tools must be accessible without CLI, CIK/MIC, BYOK configuration or JSON knowledge for a supported consumer workflow. Developers retain the portable open-source Python library.
 
-## Intended users
+The competitive advantage is a hypothesis to **test** against a general LLM and existing investment research services, not a feature-based claim.
 
-Independent investment researchers, educators, analysts and developers. No private investment profile, brokerage account or managed investment service is necessary.
+## What currently exists (v0.2 source)
 
-## What v0.1.1 does today
+- Portable Python domain calculations, attributed financial observations, type/rights/time contracts, reproducible synthetic offline CLI, five portable **instruction-only** AI skills and hash-linked history.
+- Opt-in connected research: SEC annual US-GAAP facts and Twelve Data BYOK minute-candle CLOSE quote for explicitly verified issuer and listing; unknown plan timeliness remains unknown.
+- Rights-gated private snapshots; prices without confirmed retention permission and their derivatives are not stored/replayed. No user accounts, web UI, model-powered research agent, automatic search, monitoring, portfolio or returns predictor.
+- Live-provider rights/smoke are manual gates; synthetic CI is **not** provider/economic proof.
 
-Offline deterministic valuation calculations; precision-aware financial observations and source dates; structurally checked research outputs; five portable AI research skills; linked thesis history; installable CLI generating and validating a fictional research bundle; release build/tests and open-source governance.
+## Next intended outcome: v0.3
 
-**It does not ingest current real company financials or quotes.** The offline demo is explicitly fictional.
+A nontechnical user selects a **supported** equity or asks a natural-language question; InvestIQ's **planned** model-neutral, bounded orchestrator invokes sourced tools and deterministic calculations to generate an integrated evidence-supported research answer with a specific counter-thesis, explicit information gaps, traceable source drill-down and responsive interactive experience. Follow-ups and scenarios remain grounded; saved theses are explicitly approved and source-rights-aware.
 
-## v0.2 implemented user journey
+**Must prove:** low-friction task completion, source/financial reliability, usefulness versus general LLM/incumbent tools, AI privacy and cost/security guardrails. See [v0.3 PRD](ai-research-experience.md) and [validation](validation-plan.md).
 
-1. Choose a supported instrument/issuer with verified identity, venue, share class and currency.
-2. Request the latest permitted provider quotation and available financial statements; display actual timestamps, source and real-time/delayed/EOD/unknown classification, not invented freshness.
-3. Reconcile source metadata, units, fiscal periods, amendments and entitlement into normalized evidence with clear gaps/errors.
-4. Calculate a traceable research view from supported metrics; refresh price-dependent outputs when legitimate newer quotes arrive, without changing saved theses.
-5. Explicitly save a dated research snapshot with legally retainable inputs and a versioned research rationale.
-6. Replay the snapshot from its stored evidence/reference, offline when retention rights allow. Never substitute today's prices during historical replay.
+## Later (conditionally validated) capabilities
 
-## v0.2 minimum deliverables and caveats
+- **v0.4:** opt-in investor preferences, watchlists, durable research memory, material change explanation, safe opt-in monitoring.
+- **v0.5:** company discovery, trend/peer analytics, research rankings where inputs, evaluation and limitations support them.
+- **v0.6+:** voluntary portfolio-context scenarios and evidence-backed quantitative experimentation only after required permissions, security and methodology.
 
-Provider-agnostic data and entitlement contract; one permitted market-price provider adapter and one valid filing/fundamental adapter (e.g. SEC filings for US issuers), time-aware refresh and safe bounded cache, a source-linked connected research view, a user-triggered snapshot storage adapter and an end-to-end documented CLI demonstration with real supported source data.
+## Out of scope / principles
 
-**A cloud deployment is optional.** Start with direct API access and an in-process cache/BYOK. Shared cloud cache and managed durable research storage become optional deployment adapters only after terms, measured operational need and security are understood.
+No automatic trade execution, unsupported investment recommendations, guaranteed outperformance, unlicensed feed redistribution, default capture of private holdings, fabricated forecasts or silent changes to saved decisions. Current market facts come from legally permitted provider calls, not local stale copies. Historical thesis history is immutable, permissioned and separate. Actual hosting/distribution remains conditional and may be **assistant-native instead of standalone**.
 
-## v0.2 deliberately out of scope
-
-Global guaranteed real-time quotes, large historical market data store, streaming warehouse, stock trades, fund management, brokerage synchronization, automatic buy/sell advice, AI-fabricated fundamentals, multi-tenant hosted SaaS, subscriptions and predictive accuracy claims.
-
-## Acceptance
-
-A real-company example must report its original provider, permitted delay/session metadata and financial source; stale quotes must not appear live; a user must be able to refresh price-sensitive analysis without rewriting an old thesis and subsequently replay a lawfully saved decision. Provider failure, missing data, rate limits, symbol/FX mismatch, source-revision errors and entitlement-denied behavior must be covered by tests. The published package, CLI, docs, privacy and data-use rights must remain sound.
-
-For the order of six outcome PRs, constraints on usage rights, provider evaluation and later v0.3–v1.0 releases, refer to the [canonical roadmap](product-roadmap.md).
+Historical v0.1/v0.2 source behavior and release notes are unchanged by this scope document.
