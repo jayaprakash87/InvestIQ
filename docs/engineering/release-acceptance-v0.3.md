@@ -57,6 +57,15 @@ investiq app --help
 
 CI also checks `node --check`, wheel installation, help commands and packaged HTML/JS/CSS assets. Keep the normal draft-to-ready CI efficiency policy; do not create a new workflow per commit.
 
+## Recorded incomplete product controls
+
+- **No in-app delete/forget workflow yet.** Private snapshots are files under the explicitly selected `--research-dir`. To discard a thesis today, **stop the local app first**, securely identify that thesis ID, and remove **all** its versioned `<thesis-id>-NNNNNNNN.json` files using the operating system's file manager. Do not delete only a middle revision and leave a broken hash chain. Deleting files via the OS is not a guaranteed secure wipe from backups, SSDs or sync tools. A dedicated reviewed whole-chain delete/confirmation/recovery design is required before claiming complete in-app private-data lifecycle support.
+- **No independently scored AI claim-to-evidence entailment evaluation.** Allowlisted citation IDs establish that material was supplied, not that each claim is truly supported. Manual source challenge and a future grounding-evaluation suite remain open.
+- **No full numeric connected-decision replay when market-data retention is unapproved.** Browser snapshots explicitly omit quote and positive EPS/entry-price inputs. The saved thesis/history remains readable, but numeric scenario results cannot be reconstructed from omitted data.
+- **No completed external investor usability/accessibility trial or rights-authorized real-data benchmark.** The personal-alpha code is not a production-grade user-accepted service.
+
+These are **acceptance findings**, not defects concealed by green CI. Do not label the v0.3 product fully accepted until the relevant user and live-provider gates are actually completed.
+
 ## Opt-in manual live-provider and usability acceptance (NOT performed by CI)
 
 On a trusted local computer, with the actual holder's permission and credentials:
