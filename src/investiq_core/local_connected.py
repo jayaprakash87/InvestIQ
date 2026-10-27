@@ -257,6 +257,53 @@ class LocalConnectedResearch:
                 model_name=session.model_name, question=question.strip(),
             ))
 
+    def history_available(self) -> bool:
+        return self._decisions.enabled
+
+    def list_decisions(self) -> dict[str, Any]:
+        return self._decisions.list()
+
+    def open_decision(self, data: dict[str, Any]) -> dict[str, Any]:
+        return self._decisions.load(data.get("thesis_id"), data.get("revision"))
+
+    def export_decision(self, data: dict[str, Any]) -> dict[str, str]:
+        return self._decisions.export(
+            data.get("thesis_id"), data.get("revision"), data.get("format"),
+        )
+
+    def save_decision(
+        self, session: BrowserSession, data: dict[str, Any]
+    ) -> dict[str, Any]:
+        symbol, venue, cik = (data.get(name) for name in ("symbol", "venue", "cik"))
+        if (
+            not isinstance(symbol, str) or not isinstance(venue, str)
+            or not isinstance(cik, str) or data.get("currency") != "USD"
+            or data.get("confirm_current_listing") is not True
+            or data.get("confirm_currency") is not True
+            or data.get("approve_private_save") is not True
+            or set(data) != {
+                "symbol", "venue", "cik", "currency", "confirm_current_listing",
+                "confirm_currency", "approve_private_save", "decision",
+            }
+        ):
+            raise ValueError("Explicit save requires a confirmed issuer and decision")
+        with session.lock:
+            if not session.configured:
+                raise PermissionError("Configure SEC discovery first")
+            if (
+                session.directory_refreshed_at is None
+                or self._clock() - session.directory_refreshed_at > DIRECTORY_LIFETIME_SECONDS
+            ):
+                raise ValueError("Issuer directory expired; search again")
+            if sum(
+                (item.symbol, item.venue, item.cik) == (symbol, venue, cik)
+                for item in session.directory
+            ) != 1:
+                raise ValueError("Issuer is not the selected directory candidate")
+            return self._decisions.save(
+                symbol=symbol, venue=venue, cik=cik, data=data["decision"],
+            )
+
     def preview_scenarios(
         self, session: BrowserSession, data: dict[str, Any]
     ) -> dict[str, Any]:
