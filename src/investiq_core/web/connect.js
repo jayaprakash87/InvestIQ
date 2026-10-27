@@ -10,6 +10,7 @@
   let selected = null;
   let configured = false;
   let selectionVersion = 0;
+  let evidenceVersion = 0;
   let searchVersion = 0;
   const node = (tag, cls, value) => {
     const el = document.createElement(tag);
@@ -23,6 +24,7 @@
     configured = Boolean(value);
     // Rotate selection version when credentials/entitlements are changed.
     selectionVersion += 1;
+    evidenceVersion += 1;
     searchVersion += 1;
     selected = null;
     $("research-select").hidden = true;
@@ -88,6 +90,7 @@
       button.append(primary, secondary);
       button.addEventListener("click", () => {
         selectionVersion += 1;
+        evidenceVersion += 1;
         selected = company;
         for (const choice of container.querySelectorAll("button")) {
           choice.classList.remove("candidate-selected");
@@ -212,6 +215,7 @@
     const submittedSearch = ++searchVersion;
     // A search initiated during a prior research call invalidates that result.
     selectionVersion += 1;
+    evidenceVersion += 1;
     selected = null;
     $("research-select").hidden = true;
     $("connected-output").hidden = true;
@@ -311,6 +315,7 @@
       }
       const candidate = selected;
       const generation = selectionVersion;
+      const topicRequest = ++evidenceVersion;
       button.disabled = true;
       $("filing-result").hidden = true;
       status("filing-message", "Retrieving the selected SEC filing and excerpts…");
@@ -322,14 +327,17 @@
           confirm_currency: $("confirm-currency").checked,
           topic: button.dataset.topic
         });
-        if (generation !== selectionVersion || selected !== candidate || !configured) {
+        if (generation !== selectionVersion || topicRequest !== evidenceVersion ||
+            selected !== candidate || !configured ||
+            !$("confirm-listing").checked || !$("confirm-currency").checked) {
           status("filing-message", "Selection changed; previous excerpts discarded.");
           return;
         }
         showFiling(result);
         status("filing-message", "Retrieved source excerpts; no AI analysis was performed.");
       } catch (error) {
-        if (generation === selectionVersion && selected === candidate) {
+        if (generation === selectionVersion && topicRequest === evidenceVersion &&
+            selected === candidate && configured) {
           status("filing-message", error.message || "Filing evidence unavailable.");
         }
       } finally {
