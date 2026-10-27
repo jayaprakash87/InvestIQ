@@ -4,6 +4,8 @@ Five independent **model-agnostic** research skills. Each `SKILL.md` file provid
 
 These are **research procedures**, not credentialed investment advice, trading agents or verified predictors. The source-of-truth for financial calculations is the tested `investiq_core` library, not model-generated arithmetic.
 
+**Current status (v0.2):** These five SKILL.md files do **not** run a model, orchestrate tools or automatically research stocks. They require an external assistant/human to supply evidence and run the procedure. The [proposed v0.3 product](../docs/product/ai-research-experience.md) would add a **bounded, source-grounded model orchestrator** and nontechnical user interface, subject to [semantic/financial model evaluation](../docs/engineering/engineering-blueprint.md#8-ai-first-orchestration-and-release-evaluations). Until implemented and tested, do not market the skills as a deployed AI research agent.
+
 ## Available skills
 | Skill | Use |
 | --- | --- |
