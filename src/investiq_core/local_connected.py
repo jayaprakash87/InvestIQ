@@ -17,6 +17,10 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from .adapters._http import JsonTransport
+from .ai_research import (
+    ALLOWED_MODELS, AiResearchCoordinator, OpenAIResponseModel,
+    default_ai_coordinator,
+)
 from .adapters.sec_companyfacts import SecCompanyFactsProvider
 from .adapters.sec_edgar import SecEdgarFilingProvider
 from .adapters.twelve_data import TwelveDataQuoteProvider
@@ -39,13 +43,23 @@ class BrowserSession:
     created_at: float
     contact: str | None = None
     quote_key: str | None = None
+    model_key: str | None = None
+    model_name: str | None = None
     directory: tuple[IssuerCandidate, ...] = ()
     directory_refreshed_at: float | None = None
     lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
     @property
     def configured(self) -> bool:
+        return self.contact is not None
+
+    @property
+    def quote_configured(self) -> bool:
         return self.contact is not None and self.quote_key is not None
+
+    @property
+    def model_configured(self) -> bool:
+        return self.contact is not None and self.model_key is not None
 
 
 class LocalConnectedResearch:
@@ -57,12 +71,14 @@ class LocalConnectedResearch:
         directory_transport: JsonTransport | None = None,
         research_factory: Callable[[str, str], ConnectedResearchService] | None = None,
         evidence_factory: Callable[[str], SecFilingEvidenceProvider] | None = None,
+        ai_coordinator: AiResearchCoordinator | None = None,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self._sessions: dict[str, BrowserSession] = {}
         self._mutex = threading.Lock()
         self._clock = clock
         self._directory_transport = directory_transport
+        self._ai = ai_coordinator or default_ai_coordinator()
         self._research_factory = research_factory or _build_research_service
         self._evidence_factory = evidence_factory or (
             lambda contact: SecFilingEvidenceProvider(user_agent=contact)
@@ -91,6 +107,9 @@ class LocalConnectedResearch:
         return {
             "mode": "local_session",
             "configured": session.configured,
+            "quote_configured": session.quote_configured,
+            "model_configured": session.model_configured,
+            "model_name": session.model_name,
             "credentials_persisted": False,
             "csrf": session.csrf,
             "directory_loaded": session.directory_refreshed_at is not None,
@@ -100,28 +119,42 @@ class LocalConnectedResearch:
     def configure(session: BrowserSession, data: dict[str, Any]) -> dict[str, Any]:
         contact = data.get("sec_contact")
         key = data.get("twelve_data_api_key")
-        if not isinstance(contact, str) or not isinstance(key, str):
-            raise TypeError("SEC contact and Twelve Data API key are required")
-        if not 8 <= len(contact) <= 200 or not 1 <= len(key) <= 256:
+        if not isinstance(contact, str) or key is not None and not isinstance(key, str):
+            raise TypeError("SEC contact is required; quote key must be a string if supplied")
+        if not 8 <= len(contact) <= 200 or (
+            isinstance(key, str) and len(key) > 256
+        ):
             raise ValueError("Provider credentials do not meet supported length limits")
-        # Validate syntactic contracts with existing providers, WITHOUT network I/O.
+        # SEC directory and public-filing AI research do not require paid
+        # quote credentials. Quote analysis still fails closed without BYOK.
         SecEdgarFilingProvider(user_agent=contact)
-        TwelveDataQuoteProvider(api_key=key)
+        if key:
+            TwelveDataQuoteProvider(api_key=key)
         with session.lock:
             session.contact = contact
-            session.quote_key = key
+            session.quote_key = key or None
             session.directory = ()
             session.directory_refreshed_at = None
-        return {"configured": True, "credentials_persisted": False, "network_called": False}
+        return {
+            "configured": True,
+            "quote_configured": bool(key),
+            "credentials_persisted": False,
+            "network_called": False,
+        }
 
     @staticmethod
     def clear(session: BrowserSession) -> dict[str, Any]:
         with session.lock:
             session.contact = None
             session.quote_key = None
+            session.model_key = None
+            session.model_name = None
             session.directory = ()
             session.directory_refreshed_at = None
-        return {"configured": False, "credentials_persisted": False}
+        return {
+            "configured": False, "quote_configured": False,
+            "model_configured": False, "credentials_persisted": False,
+        }
 
     def search(self, session: BrowserSession, data: dict[str, Any]) -> dict[str, Any]:
         query = data.get("query")
@@ -155,6 +188,67 @@ class LocalConnectedResearch:
                     "You must confirm current listing and proposed USD currency.",
                 ],
             }
+
+    @staticmethod
+    def configure_model(session: BrowserSession, data: dict[str, Any]) -> dict[str, Any]:
+        """Store a BYOK credential for this one local-server session only."""
+        key = data.get("model_api_key")
+        model = data.get("model", "gpt-4.1-mini")
+        # Validate without requesting the external service.
+        OpenAIResponseModel(api_key=key, model=model)
+        with session.lock:
+            if not session.configured:
+                raise PermissionError("Configure SEC contact before model access")
+            session.model_key = key
+            session.model_name = model
+        return {
+            "model_configured": True, "model_name": model,
+            "credentials_persisted": False, "network_called": False,
+        }
+
+    @staticmethod
+    def clear_model(session: BrowserSession) -> dict[str, Any]:
+        with session.lock:
+            session.model_key = None
+            session.model_name = None
+        return {"model_configured": False, "credentials_persisted": False}
+
+    def ai_analyze(self, session: BrowserSession, data: dict[str, Any]) -> dict[str, Any]:
+        """One explicit authorized call, with SEC-only public evidence consent."""
+        symbol, venue, cik = (data.get(name) for name in ("symbol", "venue", "cik"))
+        question = data.get("question")
+        if (
+            not isinstance(symbol, str) or not isinstance(venue, str)
+            or not isinstance(cik, str)
+            or data.get("currency") != "USD"
+            or data.get("confirm_current_listing") is not True
+            or data.get("confirm_currency") is not True
+            or data.get("consent_external_sec_data") is not True
+            or not isinstance(question, str) or not 5 <= len(question.strip()) <= 360
+        ):
+            raise ValueError("Select and confirm an issuer; question and consent required")
+        with session.lock:
+            if (
+                not session.configured or session.contact is None
+                or session.model_key is None or session.model_name not in ALLOWED_MODELS
+            ):
+                raise PermissionError("Configure the SEC and model sessions first")
+            if (
+                session.directory_refreshed_at is None
+                or self._clock() - session.directory_refreshed_at > DIRECTORY_LIFETIME_SECONDS
+            ):
+                raise ValueError("Company directory expired; search and confirm again")
+            candidates = [
+                item for item in session.directory
+                if (item.symbol, item.venue, item.cik) == (symbol, venue, cik)
+            ]
+            if len(candidates) != 1:
+                raise ValueError("Selected listing is not an active directory candidate")
+            # Lock prevents clearance or credential rotation during processing.
+            return asyncio.run(self._ai.run(
+                cik=cik, contact=session.contact, model_key=session.model_key,
+                model_name=session.model_name, question=question.strip(),
+            ))
 
     def inspect_evidence(
         self, session: BrowserSession, data: dict[str, Any]
